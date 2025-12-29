@@ -28,7 +28,7 @@ export const Splash = () => {
     contentOpacity.value = withDelay(500, withTiming(1, { duration: 1000 }));
 
     const timer = setTimeout(() => {
-      navigation.replace('Register');
+      navigation.replace('BottomTabNavigation');
     }, 3000);
 
     return () => clearTimeout(timer);

@@ -66,9 +66,8 @@ const styles = ScaledSheet.create({
     borderRadius: '10@ms',
     paddingHorizontal: '12@ms',
     fontSize: '15@ms',
-    backgroundColor: '#eee',
+    backgroundColor: '#f7f4f4ff',
     color: '#000',
-    elevation:3
   },
   errorInput: {
     borderColor: 'red',

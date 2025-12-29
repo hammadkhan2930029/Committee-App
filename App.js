@@ -1,15 +1,12 @@
 import React from 'react';
 import { StatusBar, Text, View } from 'react-native';
 import { AppNavigator } from './src/navigations/AppNavigator';
-
-
+import { NavigationContainer } from '@react-navigation/native';
 const App = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <StatusBar/>
-    
-     <AppNavigator/>
-    </View>
+    <NavigationContainer>
+      <AppNavigator />
+    </NavigationContainer>
   );
 };
 export default App;

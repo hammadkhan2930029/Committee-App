@@ -1,6 +1,7 @@
 export const AppColors = {
   primary: '#E95B27',
   primary2: '#EE5A25',
+  cardLight:'#FFE4D7',
   title: '#FFFFFF',
   subtitle: '#D2D2D2',
   label: '#6B6B6B',
@@ -8,5 +9,6 @@ export const AppColors = {
   bodyText: '#6B6B6B',
   focusText: '#1E1E1E',
   link: '#E95B27',
-  background:"#fff"
+  background:"#fff",
+  blackText:'#000'
 };

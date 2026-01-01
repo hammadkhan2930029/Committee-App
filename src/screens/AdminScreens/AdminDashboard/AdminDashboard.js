@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
-import { AppColors } from '../../constant/appColors';
-import { AppImages } from '../../constant/appImages';
-import { AppIcons } from '../../constant/appIcons';
-import { CustomButton } from '../../components/customButton';
+import { AppColors } from '../../../constant/appColors';
+import { AppImages } from '../../../constant/appImages';
+import { AppIcons } from '../../../constant/appIcons';
+import { CustomButton } from '../../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
-
+import { navigate } from '../../../navigations/navigationService';
 
 export const AdminDashboard = () => {
     const navigation = useNavigation()
@@ -100,8 +100,9 @@ export const AdminDashboard = () => {
           <CustomButton
             title="Create Committee"
             style={styles.createCommittee}
+            onPress={()=> navigate('CreateCommittee')}
           />
-          <TouchableOpacity style={styles.CreateUser}>
+          <TouchableOpacity style={styles.CreateUser}  onPress={()=> navigation.navigate('CreateCommittee')}>
             <Text style={styles.CreateUser_text}>Create User</Text>
           </TouchableOpacity>
         </View>

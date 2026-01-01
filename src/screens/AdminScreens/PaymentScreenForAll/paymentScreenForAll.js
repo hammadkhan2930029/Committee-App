@@ -10,9 +10,9 @@ import {
   FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
-import { AppColors } from '../../constant/appColors';
-import { AppImages } from '../../constant/appImages';
-import { AppIcons } from '../../constant/appIcons';
+import { AppColors } from '../../../constant/appColors';
+import { AppImages } from '../../../constant/appImages';
+import { AppIcons } from '../../../constant/appIcons';
 import { date } from 'yup';
 
 const summaryData = [
@@ -138,9 +138,9 @@ export const Payments = () => {
       <ScrollView style={styles.scrollView}>
         <View>
           <ImageBackground
-            source={AppImages.Rectangle}
+            source={AppImages.Rectangle2}
             style={styles.RectangleImg}
-            resizeMode="cover"
+           
           >
             <View style={styles.main}>
               <View style={styles.TopView}>
@@ -292,7 +292,8 @@ const styles = ScaledSheet.create({
   },
   RectangleImg: {
     width: '100%',
-    height: '250@vs',
+    height: 200,
+    resizeMode:'contain'
   },
   TopView: {
     justifyContent: 'space-between',
@@ -322,19 +323,19 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 15,
+    padding: 10,
   },
 
   h4: {
     color: AppColors.title,
     fontSize: moderateScale(16),
     opacity: 0.9,
-    padding: 5,
+    padding: 3,
   },
   //---------------------------------
-  horizontalCards: {
-    marginTop: -40,
-  },
+  // horizontalCards: {
+  //   marginTop: -40,
+  // },
   summaryCard: {
     width: 200,
     height: 130,

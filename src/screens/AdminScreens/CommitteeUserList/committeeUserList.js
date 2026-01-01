@@ -9,10 +9,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
-import { AppColors } from '../../constant/appColors';
-import { AppImages } from '../../constant/appImages';
-import { AppIcons } from '../../constant/appIcons';
-import { CustomButton } from '../../components/customButton';
+import { AppColors } from '../../../constant/appColors';
+import { AppImages } from '../../../constant/appImages';
+import { AppIcons } from '../../../constant/appIcons';
+import { CustomButton } from '../../../components/customButton';
+import { navigate } from '../../../navigations/navigationService';
 
 export const CommitteeUserList = () => {
   return (
@@ -27,7 +28,7 @@ export const CommitteeUserList = () => {
       <ScrollView style={styles.scrollView}>
         <View>
           <ImageBackground
-            source={AppImages.Rectangle}
+            source={AppImages.Rectangle2}
             style={styles.RectangleImg}
             resizeMode="cover"
           >
@@ -56,28 +57,28 @@ export const CommitteeUserList = () => {
         <View style={styles.Committee_View}>
           {/* --------------------- */}
           {[...Array(5)].map((_, index) => (
-            <View style={styles.Dashboardcard}>
-              <View style={styles.first_view}>
-                <View style={styles.userMale_View}>
-                  <Image source={AppIcons.userMale} style={styles.userMale} />
+              <TouchableOpacity style={styles.Dashboardcard} onPress={() => navigate('MembersDetails')}>
+                <View style={styles.first_view}>
+                  <View style={styles.userMale_View}>
+                    <Image source={AppIcons.userMale} style={styles.userMale} />
+                  </View>
+                  <View>
+                    <Text style={styles.Name}>Bilal Ahmed</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={styles.Name}>Bilal Ahmed</Text>
+                <View style={styles.first_view}>
+                  <View style={styles.details}>
+                    <Text style={styles.one}>Phone:</Text>
+                    <Text style={styles.count}>+92 301 5566778</Text>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.first_view}>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Phone:</Text>
-                  <Text style={styles.count}>+92 301 5566778</Text>
+                <View style={styles.first_view}>
+                  <View style={styles.details}>
+                    <Text style={styles.one}>Joined BCs:</Text>
+                    <Text style={styles.count}> 10</Text>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.first_view}>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Joined BCs:</Text>
-                  <Text style={styles.count}> 10</Text>
-                </View>
-              </View>
-            </View>
+              </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -98,7 +99,8 @@ const styles = ScaledSheet.create({
   },
   RectangleImg: {
     width: '100%',
-    height: '250@vs',
+    height: 200,
+    resizeMode: 'contain',
   },
   TopView: {
     justifyContent: 'space-between',
@@ -111,16 +113,15 @@ const styles = ScaledSheet.create({
     marginTop: 20,
   },
   backAndText: {
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    width: '50%',
+    width: '30%',
   },
   h1: {
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    paddingLeft: 15,
   },
   avatar: {
     width: 60,
@@ -128,21 +129,20 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 15,
+    padding: 10,
   },
 
   h4: {
     color: AppColors.title,
     fontSize: moderateScale(16),
     opacity: 0.9,
-    padding: 5,
+    padding: 3,
   },
   //----------------------------
   Committee_View: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -50,
   },
   Dashboardcard: {
     width: '90%',

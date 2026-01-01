@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AdminDashboard } from '../screens/AdminScreens/AdminDashboard';
+import { AdminDashboard } from '../screens/AdminScreens/AdminDashboard/AdminDashboard';
 import { Image } from 'react-native';
 import { AppImages } from '../constant/appImages';
 import { AppIcons } from '../constant/appIcons';
-import { CommitteeList } from '../screens/AdminScreens/committeeList';
-import { CommitteeUserList } from '../screens/AdminScreens/committeeUserList';
-import { Payments } from '../screens/AdminScreens/paymentScreenForAll';
+import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
+import { CommitteeUserList } from '../screens/AdminScreens/CommitteeUserList/committeeUserList';
+import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 const Tab = createBottomTabNavigator();
 
 export const BottomTabNavigation = () => {

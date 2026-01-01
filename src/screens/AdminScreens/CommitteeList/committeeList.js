@@ -9,17 +9,21 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
-import { AppColors } from '../../constant/appColors';
-import { AppImages } from '../../constant/appImages';
-import { AppIcons } from '../../constant/appIcons';
-import { CustomButton } from '../../components/customButton';
+import { AppColors } from '../../../constant/appColors';
+import { AppImages } from '../../../constant/appImages';
+import { AppIcons } from '../../../constant/appIcons';
+import { CustomButton } from '../../../components/customButton';
+import { navigate } from '../../../navigations/navigationService';
 
 export const CommitteeList = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
       <View style={styles.addView}>
-        <TouchableOpacity activeOpacity={0.8}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigate('CreateMembers')}
+        >
           <Image source={AppIcons.Add} style={styles.add} />
         </TouchableOpacity>
       </View>
@@ -27,7 +31,7 @@ export const CommitteeList = () => {
       <ScrollView style={styles.scrollView}>
         <View>
           <ImageBackground
-            source={AppImages.Rectangle}
+            source={AppImages.Rectangle2}
             style={styles.RectangleImg}
             resizeMode="cover"
           >
@@ -55,36 +59,38 @@ export const CommitteeList = () => {
         {/* ---------------------------------------------- */}
         <View style={styles.Committee_View}>
           {/* --------------------- */}
-          <View style={styles.Dashboardcard}>
-            <View style={styles.first_view}>
-              <View>
-                <Text style={styles.family}>Family Fund BC</Text>
+          <TouchableOpacity onPress={() => navigate('CommitteeDetails')}>
+            <View style={styles.Dashboardcard}>
+              <View style={styles.first_view}>
+                <View>
+                  <Text style={styles.family}>Family Fund BC</Text>
+                </View>
+                <TouchableOpacity style={styles.Btncomplete}>
+                  <Text style={styles.complete}>Complete</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.Btncomplete}>
-                <Text style={styles.complete}>Complete</Text>
-              </TouchableOpacity>
+              <View style={styles.first_view}>
+                <View style={styles.details}>
+                  <Text style={styles.one}>Members : </Text>
+                  <Text style={styles.count}> 25</Text>
+                </View>
+                <View style={styles.details}>
+                  <Text style={styles.one}>Amount per Member :</Text>
+                  <Text style={styles.count}> 4,000</Text>
+                </View>
+              </View>
+              <View style={styles.first_view}>
+                <View style={styles.details}>
+                  <Text style={styles.one}>Round : </Text>
+                  <Text style={styles.count}> 10</Text>
+                </View>
+                <View style={styles.details}>
+                  <Text style={styles.one}>Start Date :</Text>
+                  <Text style={styles.count}> Dec 2025</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Members : </Text>
-                <Text style={styles.count}> 25</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Amount per Member :</Text>
-                <Text style={styles.count}> 4,000</Text>
-              </View>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Round : </Text>
-                <Text style={styles.count}> 10</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Start Date :</Text>
-                <Text style={styles.count}> Dec 2025</Text>
-              </View>
-            </View>
-          </View>
+          </TouchableOpacity>
           {/* --------------------- */}
           <View style={styles.Dashboardcard}>
             <View style={styles.first_view}>
@@ -199,7 +205,8 @@ const styles = ScaledSheet.create({
   },
   RectangleImg: {
     width: '100%',
-    height: '250@vs',
+    height: 200,
+    resizeMode:'contain'
   },
   TopView: {
     justifyContent: 'space-between',
@@ -228,21 +235,20 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 15,
+    padding: 10,
   },
 
   h4: {
     color: AppColors.title,
     fontSize: moderateScale(16),
     opacity: 0.9,
-    padding: 5,
+    padding: 3,
   },
   //----------------------------
   Committee_View: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -50,
   },
   Dashboardcard: {
     width: '90%',
@@ -311,7 +317,7 @@ const styles = ScaledSheet.create({
   //-----------------------------
   addView: {
     position: 'absolute',
-    top: 610, 
+    top: 610,
     right: 20,
     width: 60,
     height: 60,
@@ -319,14 +325,14 @@ const styles = ScaledSheet.create({
 
     justifyContent: 'center',
     alignItems: 'center',
-     
-    zIndex: 100, 
+
+    zIndex: 100,
   },
 
   add: {
     width: 80,
     height: 80,
-    
+
     resizeMode: 'contain',
     elevation: 10,
   },

@@ -6,6 +6,12 @@ import { AppIcons } from '../constant/appIcons';
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { CommitteeUserList } from '../screens/AdminScreens/CommitteeUserList/committeeUserList';
 import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
+//---------------------members-----------------------------------------
+// import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AppColors } from '../constant/appColors';
 const Tab = createBottomTabNavigator();
 
 export const BottomTabNavigation = () => {
@@ -15,27 +21,15 @@ export const BottomTabNavigation = () => {
         tabBarIcon: ({ focused, size, color }) => {
           let icon;
           if (route.name === 'AdminDashboard') {
-            icon = focused ? AppIcons.HomeActive : AppIcons.Home;
+            icon = focused ? 'home' : 'home-outline';
           } else if (route.name === 'CommitteeList') {
-            icon = focused
-              ? AppIcons.Magnetic_Card_Active
-              : AppIcons.Magnetic_Card;
+            icon = focused ? 'credit-card' : 'credit-card-outline';
           } else if (route.name === 'CommitteeUserList') {
-            icon = focused ? AppIcons.PeopleActive : AppIcons.PeopleTb;
+            icon = focused ? 'account-group' : 'account-group-outline';
+          } else if (route.name === 'Payments') {
+            icon = focused ? 'briefcase-variant' : 'briefcase-variant-outline';
           }
-          else if (route.name === 'Payments') {
-            icon = focused ? AppIcons.BriefcaseActive : AppIcons.Briefcase;
-          }
-          return (
-            <Image
-              source={icon}
-              style={{
-                width: 25,
-                height: 25,
-                resizeMode: 'contain',
-              }}
-            />
-          );
+          return <Icon name={icon} size={30} color={focused ? AppColors.primary : AppColors.bodyText} />;
         },
         tabBarInactiveTintColor: 'black',
         tabBarActiveTintColor: 'black',
@@ -75,11 +69,17 @@ export const BottomTabNavigation = () => {
         component={CommitteeUserList}
         options={{ headerShown: false }}
       />
-       <Tab.Screen
+      <Tab.Screen
         name="Payments"
         component={Payments}
         options={{ headerShown: false }}
       />
+      {/* -----------------Members-------------------- */}
+      {/* <Tab.Screen
+        name="MembersDashboard"
+        component={MembersDashboard}
+        options={{ headerShown: false }}
+      /> */}
     </Tab.Navigator>
   );
 };

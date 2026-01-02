@@ -12,6 +12,10 @@ import { CommitteeDetails } from '../screens/AdminScreens/CommitteeDetail/commit
 import { AddCommitteeMembers } from '../screens/AdminScreens/AddCommitteeMembers/AddCommitteeMembers';
 import { AssignRounds } from '../screens/AdminScreens/AssignRounds/assignRounds';
 import { MembersDetails } from '../screens/AdminScreens/MembersDetils/membersDetails';
+import { EditMember } from '../screens/AdminScreens/EditMember/editMember';
+import { PaymentDetails } from '../screens/AdminScreens/PaymentDetails/paymentDetails';
+//---------members--------------------------------------
+import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 const Stack = createNativeStackNavigator();
 
 export const AppNavigator = () => {
@@ -36,6 +40,10 @@ export const AppNavigator = () => {
       />
       <Stack.Screen name="AssignRounds" component={AssignRounds} />
       <Stack.Screen name="MembersDetails" component={MembersDetails} />
+      <Stack.Screen name="EditMember" component={EditMember} />
+      <Stack.Screen name="PaymentDetails" component={PaymentDetails} />
+      {/* -----------------members----------------------- */}
+      <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
 
     </Stack.Navigator>
   );

@@ -7,6 +7,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -14,8 +15,84 @@ import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { navigate } from '../../../navigations/navigationService';
+import { useNavigation } from '@react-navigation/native';
+
+const membersData = [
+  {
+    id: 1,
+    name: 'Bilal Ahmed',
+    phone: '+92 301 5566778',
+    status: 'Active',
+    joinedBCs: 5,
+  },
+  {
+    id: 2,
+    name: 'Ali Khan',
+    phone: '+92 312 9876543',
+    status: 'Inactive',
+    joinedBCs: 3,
+  },
+  {
+    id: 3,
+    name: 'Usman Raza',
+    phone: '+92 333 4455667',
+    status: 'Active',
+    joinedBCs: 7,
+  },
+  {
+    id: 4,
+    name: 'Ahmed Hassan',
+    phone: '+92 300 1122334',
+    status: 'Active',
+    joinedBCs: 2,
+  },
+  {
+    id: 5,
+    name: 'Hassan Ali',
+    phone: '+92 321 7788990',
+    status: 'Inactive',
+    joinedBCs: 1,
+  },
+  {
+    id: 6,
+    name: 'Fahad Iqbal',
+    phone: '+92 345 6677889',
+    status: 'Active',
+    joinedBCs: 6,
+  },
+  {
+    id: 7,
+    name: 'Saad Ahmed',
+    phone: '+92 334 5566778',
+    status: 'Active',
+    joinedBCs: 4,
+  },
+  {
+    id: 8,
+    name: 'Ahsan Javed',
+    phone: '+92 310 9988776',
+    status: 'Inactive',
+    joinedBCs: 2,
+  },
+  {
+    id: 9,
+    name: 'Hamza Noor',
+    phone: '+92 322 3344556',
+    status: 'Active',
+    joinedBCs: 8,
+  },
+  {
+    id: 10,
+    name: 'Zain Malik',
+    phone: '+92 311 2233445',
+    status: 'Active',
+    joinedBCs: 5,
+  },
+];
 
 export const CommitteeUserList = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -54,33 +131,42 @@ export const CommitteeUserList = () => {
         </View>
 
         {/* ---------------------------------------------- */}
-        <View style={styles.Committee_View}>
-          {/* --------------------- */}
-          {[...Array(5)].map((_, index) => (
-              <TouchableOpacity style={styles.Dashboardcard} onPress={() => navigate('MembersDetails')}>
+        {/* --------------------- */}
+        <FlatList
+          data={membersData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.Committee_View}>
+              <TouchableOpacity
+                style={styles.Dashboardcard}
+                onPress={() =>
+                  navigation.navigate('MembersDetails', { item: item })
+                }
+              >
                 <View style={styles.first_view}>
                   <View style={styles.userMale_View}>
                     <Image source={AppIcons.userMale} style={styles.userMale} />
                   </View>
                   <View>
-                    <Text style={styles.Name}>Bilal Ahmed</Text>
+                    <Text style={styles.Name}>{item.name}</Text>
                   </View>
                 </View>
                 <View style={styles.first_view}>
                   <View style={styles.details}>
                     <Text style={styles.one}>Phone:</Text>
-                    <Text style={styles.count}>+92 301 5566778</Text>
+                    <Text style={styles.count}>{item.phone}</Text>
                   </View>
                 </View>
                 <View style={styles.first_view}>
                   <View style={styles.details}>
                     <Text style={styles.one}>Joined BCs:</Text>
-                    <Text style={styles.count}> 10</Text>
+                    <Text style={styles.count}>{item.joinedBCs}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
-          ))}
-        </View>
+            </View>
+          )}
+        />
       </ScrollView>
     </View>
   );

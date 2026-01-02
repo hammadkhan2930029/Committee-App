@@ -16,7 +16,10 @@ import { CustomButton } from '../../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export const MembersDetails = () => {
+export const MembersDetails = ({ route }) => {
+  const { item } = route.params;
+  console.log('Items :', item);
+
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -56,20 +59,20 @@ export const MembersDetails = () => {
             <View style={styles.cardDetails}>
               <View style={styles.row}>
                 <Text style={styles.title}>Full Name</Text>
-                <Text style={styles.value}>Hammad khan</Text>
+                <Text style={styles.value}>{item.name}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.title}>Phone Number</Text>
-                <Text style={styles.value}>+92 301 5566778</Text>
+                <Text style={styles.value}>{item.phone}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.title}>Joined BCs</Text>
-                <Text style={styles.value}>5 Committees</Text>
+                <Text style={styles.value}>{item.joinedBCs} Committees</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.title}>Status </Text>
                 <View style={styles.activeBtn}>
-                  <Text style={styles.active}>Active</Text>
+                  <Text style={styles.active}>{item.status}</Text>
                 </View>
               </View>
             </View>
@@ -96,7 +99,10 @@ export const MembersDetails = () => {
           ))}
         </View>
         <View style={styles.btn}>
-          <CustomButton title="Edit User" />
+          <CustomButton
+            title="Edit User"
+            onPress={() => navigation.navigate('EditMember', { item: item })}
+          />
         </View>
       </ScrollView>
     </View>
@@ -252,9 +258,9 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(16),
     fontWeight: '600',
   },
-  btn:{
-    width:'90%',
-    padding:10,
-   alignSelf:'center'
-  }
+  btn: {
+    width: '90%',
+    padding: 10,
+    alignSelf: 'center',
+  },
 });

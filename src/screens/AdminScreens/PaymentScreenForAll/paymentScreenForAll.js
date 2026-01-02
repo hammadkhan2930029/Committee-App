@@ -14,6 +14,7 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { date } from 'yup';
+import { useNavigation } from '@react-navigation/native';
 
 const summaryData = [
   {
@@ -43,6 +44,7 @@ const demoData = [
   {
     id: 1,
     name: 'Bilal Ahmed',
+    phone: '+92 301 5566778',
     fund: 'Family Fund BC',
     amount: '5,000 PKR',
     date: 'Jan 2025',
@@ -51,6 +53,7 @@ const demoData = [
   {
     id: 2,
     name: 'Ali Khan',
+    phone: '+92 312 9876543',
     fund: 'ABC Group BC',
     amount: '4,000 PKR',
     date: 'Feb 2025',
@@ -59,6 +62,7 @@ const demoData = [
   {
     id: 3,
     name: 'Usman Raza',
+    phone: '+92 333 4455667',
     fund: 'Office BC',
     amount: '6,500 PKR',
     date: 'Mar 2025',
@@ -67,6 +71,7 @@ const demoData = [
   {
     id: 4,
     name: 'Ahmed Hassan',
+    phone: '+92 300 1122334',
     fund: 'Friends BC',
     amount: '3,000 PKR',
     date: 'Apr 2025',
@@ -75,6 +80,7 @@ const demoData = [
   {
     id: 5,
     name: 'Hamza Ali',
+    phone: '+92 321 7788990',
     fund: 'Monthly BC',
     amount: '7,000 PKR',
     date: 'May 2025',
@@ -83,6 +89,7 @@ const demoData = [
   {
     id: 6,
     name: 'Saad Khan',
+    phone: '+92 345 6677889',
     fund: 'Home BC',
     amount: '2,500 PKR',
     date: 'Jun 2025',
@@ -91,6 +98,7 @@ const demoData = [
   {
     id: 7,
     name: 'Fahad Malik',
+    phone: '+92 334 5566778',
     fund: 'Business BC',
     amount: '8,000 PKR',
     date: 'Jul 2025',
@@ -99,6 +107,7 @@ const demoData = [
   {
     id: 8,
     name: 'Zeeshan Ahmed',
+    phone: '+92 310 9988776',
     fund: 'Community BC',
     amount: '4,500 PKR',
     date: 'Aug 2025',
@@ -107,6 +116,7 @@ const demoData = [
   {
     id: 9,
     name: 'Awais Rafiq',
+    phone: '+92 322 3344556',
     fund: 'Event BC',
     amount: '6,000 PKR',
     date: 'Sep 2025',
@@ -115,6 +125,7 @@ const demoData = [
   {
     id: 10,
     name: 'Imran Shah',
+    phone: '+92 311 2233445',
     fund: 'Savings BC',
     amount: '5,500 PKR',
     date: 'Oct 2025',
@@ -122,7 +133,9 @@ const demoData = [
   },
 ];
 
+
 export const Payments = () => {
+  const navigation = useNavigation();
   const [selectedStatus, setSelectedStatus] = useState('All');
   console.log('status check :', selectedStatus);
 
@@ -140,7 +153,6 @@ export const Payments = () => {
           <ImageBackground
             source={AppImages.Rectangle2}
             style={styles.RectangleImg}
-           
           >
             <View style={styles.main}>
               <View style={styles.TopView}>
@@ -223,9 +235,16 @@ export const Payments = () => {
           />
         </View>
         <View>
-          {filterData.map((item, index) => {
-            return (
-              <View style={styles.cards} key={index}>
+          <FlatList
+            data={filterData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.cards}
+                onPress={() =>
+                  navigation.navigate('PaymentDetails', { item: item })
+                }
+              >
                 <View style={styles.left}>
                   <Text style={styles.name}>{item.name}</Text>
                   <Text style={styles.fund}>{item.fund}</Text>
@@ -270,9 +289,65 @@ export const Payments = () => {
                     <Text style={styles.date2}>{item.date}</Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
+            )}
+          />
+          {/* {filterData.map((item, index) => {
+            return (
+              <TouchableOpacity
+                style={styles.cards}
+                key={index}
+                onPress={() =>
+                  navigation.navigate('PaymentDetails', { item: item })
+                }
+              >
+                <View style={styles.left}>
+                  <Text style={styles.name}>{item.name}</Text>
+                  <Text style={styles.fund}>{item.fund}</Text>
+
+                  <View style={styles.amountView}>
+                    <Text style={styles.amount}>Amount :</Text>
+                    <Text style={styles.amount2}>{item.amount}</Text>
+                  </View>
+                </View>
+                <View style={styles.right}>
+                  <View
+                    style={[
+                      item.status === 'Paid'
+                        ? styles.paid
+                        : item.status === 'Pending'
+                        ? styles.pending
+                        : item.status === 'Overdue'
+                        ? styles.overDue
+                        : null,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.CardStatus,
+                        {
+                          color:
+                            item.status === 'Overdue'
+                              ? AppColors.bodyText
+                              : AppColors.title,
+                        },
+                      ]}
+                    >
+                      {item.status}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text style={styles.date}>{''}</Text>
+                  </View>
+                  <View style={styles.dateView}>
+                    <Text style={styles.date}>Date :</Text>
+
+                    <Text style={styles.date2}>{item.date}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
             );
-          })}
+          })} */}
         </View>
       </ScrollView>
     </View>
@@ -293,7 +368,7 @@ const styles = ScaledSheet.create({
   RectangleImg: {
     width: '100%',
     height: 200,
-    resizeMode:'contain'
+    resizeMode: 'contain',
   },
   TopView: {
     justifyContent: 'space-between',

@@ -29,6 +29,9 @@ export const Splash = () => {
 
     const timer = setTimeout(() => {
       navigation.replace('BottomTabNavigation');
+      // navigation.replace('MembersDashboard');
+
+      
     }, 3000);
 
     return () => clearTimeout(timer);

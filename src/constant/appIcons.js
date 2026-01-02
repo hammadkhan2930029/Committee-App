@@ -29,6 +29,8 @@ import sandWatchPrimary from '../assets/icons/sandWatchPrimary.png';
 import sandWatch from '../assets/icons/sandWatch.png';
 
 import Add from '../assets/icons/add.png';
+import CalendarActive from '../assets/icons/CalendarActive.png';
+import Cloud from '../assets/icons/Cloud.png';
 
 export const AppIcons = {
   wavingHand: wavingHand,
@@ -66,4 +68,7 @@ export const AppIcons = {
   dollarBag: dollarBag,
   sandWatchPrimary: sandWatchPrimary,
   sandWatch: sandWatch,
+  //--------------------------------
+  CalendarActive: CalendarActive,
+  Cloud: Cloud,
 };

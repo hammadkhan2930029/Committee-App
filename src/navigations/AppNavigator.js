@@ -14,8 +14,14 @@ import { AssignRounds } from '../screens/AdminScreens/AssignRounds/assignRounds'
 import { MembersDetails } from '../screens/AdminScreens/MembersDetils/membersDetails';
 import { EditMember } from '../screens/AdminScreens/EditMember/editMember';
 import { PaymentDetails } from '../screens/AdminScreens/PaymentDetails/paymentDetails';
+
 //---------members--------------------------------------
+import { BottomTabNavigationUser } from '../navigations/bottomTabsUser';
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
+import { UserEditProfile } from '../screens/MembersScreen/UserEditProfile/userEditProfile';
+import { UserProfile } from '../screens/MembersScreen/Profile/userProfile';
+import { UploadSlip } from '../screens/MembersScreen/UploadPaymentSlip/uploadSlip';
+
 const Stack = createNativeStackNavigator();
 
 export const AppNavigator = () => {
@@ -43,8 +49,14 @@ export const AppNavigator = () => {
       <Stack.Screen name="EditMember" component={EditMember} />
       <Stack.Screen name="PaymentDetails" component={PaymentDetails} />
       {/* -----------------members----------------------- */}
+      <Stack.Screen
+        name="BottomTabNavigationUser"
+        component={BottomTabNavigationUser}
+      />
       <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
-
+      <Stack.Screen name="UserEditProfile" component={UserEditProfile} />
+      <Stack.Screen name="UserProfile" component={UserProfile} />
+      <Stack.Screen name="UploadSlip" component={UploadSlip} />
     </Stack.Navigator>
   );
 };

@@ -28,8 +28,8 @@ export const Splash = () => {
     contentOpacity.value = withDelay(500, withTiming(1, { duration: 1000 }));
 
     const timer = setTimeout(() => {
-      navigation.replace('BottomTabNavigation');
-      // navigation.replace('MembersDashboard');
+      // navigation.replace('BottomTabNavigation');
+      navigation.replace('BottomTabNavigationUser');
 
       
     }, 3000);

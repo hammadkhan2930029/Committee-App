@@ -11,7 +11,16 @@ import { CustomButton } from '../../components/customButton';
 
 export const ChooseRole = () => {
   const navigation = useNavigation();
-  const [selected, setSelected] = useState(true);
+  const [selected, setSelected] = useState(1);
+
+  const handleContinue = () => {
+    if (selected === 1) {
+      navigation.navigate('BottomTabNavigation');
+    } else if (selected === 2) {
+      navigation.navigate('BottomTabNavigationUser');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -38,30 +47,86 @@ export const ChooseRole = () => {
       </View>
 
       <View style={styles.cardView}>
-        <TouchableOpacity style={styles.card}>
+        {/* ------------------admin---------------------- */}
+        <TouchableOpacity
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                selected === 1 ? AppColors.primary : AppColors.cardLight,
+            },
+          ]}
+          activeOpacity={0.8}
+          onPress={() => setSelected(1)}
+        >
           <View style={styles.view1}>
-            <Image source={AppIcons.AdminSetting} style={styles.cardIcon} />
-            <Text style={styles.card_h2}>Admin</Text>
-          </View>
-          <View>
-            <Text style={styles.card_h4}>Manage BCs and members</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card2}>
-          <View style={styles.view2}>
-            <Image source={AppIcons.AdminSetting2} style={styles.cardIcon2} />
-            <Text style={styles.card2_h2}>Member</Text>
-          </View>
-          <View>
-            <Text style={styles.card2_h4}>
-              Join BCs and pay monthly installments
+            <Image
+              source={
+                selected === 1 ? AppIcons.AdminSetting : AppIcons.AdminSetting2
+              }
+              style={styles.cardIcon}
+            />
+            <Text
+              style={[
+                styles.card_h2,
+                { color: selected === 1 ? AppColors.title : AppColors.primary },
+              ]}
+            >
+              Admin
             </Text>
           </View>
+
+          <Text
+            style={[
+              styles.card_h4,
+              { color: selected === 1 ? AppColors.subtitle : AppColors.link },
+            ]}
+          >
+            Manage BCs and members
+          </Text>
+        </TouchableOpacity>
+        {/* ------------------member------------------- */}
+
+        <TouchableOpacity
+          style={[
+            styles.card2,
+            {
+              backgroundColor:
+                selected === 2 ? AppColors.primary : AppColors.cardLight,
+            },
+          ]}
+          activeOpacity={0.8}
+          onPress={() => setSelected(2)}
+        >
+          <View style={styles.view2}>
+            <Image
+              source={
+                selected === 2 ? AppIcons.AdminSetting : AppIcons.AdminSetting2
+              }
+              style={styles.cardIcon2}
+            />
+            <Text
+              style={[
+                styles.card2_h2,
+                { color: selected === 2 ? AppColors.title : AppColors.primary },
+              ]}
+            >
+              Member
+            </Text>
+          </View>
+
+          <Text
+            style={[
+              styles.card2_h4,
+              { color: selected === 2 ? AppColors.title : AppColors.link },
+            ]}
+          >
+            Join BCs and pay monthly installments
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.btnView}>
-        <CustomButton title="Continue" />
+        <CustomButton title="Continue" onPress={handleContinue} />
       </View>
     </View>
   );
@@ -125,7 +190,7 @@ const styles = ScaledSheet.create({
   card: {
     backgroundColor: AppColors.primary,
     width: '80%',
-    height:120,
+    height: 120,
     borderRadius: 15,
     padding: 15,
     margin: 10,
@@ -162,7 +227,7 @@ const styles = ScaledSheet.create({
   card2: {
     backgroundColor: AppColors.cardLight,
     width: '80%',
-    height:120,
+    height: 120,
     borderRadius: 15,
     padding: 15,
     margin: 10,
@@ -188,7 +253,7 @@ const styles = ScaledSheet.create({
   card2_h4: {
     color: AppColors.link,
     fontSize: moderateScale(16),
-    textAlign:'center',
+    textAlign: 'center',
 
     padding: 5,
   },

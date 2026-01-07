@@ -34,7 +34,10 @@ export const AdminDashboard = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <Text style={styles.h1}>Admin Dashboard</Text>
+                <TouchableOpacity onPress={()=> navigation.navigate('AdminProfile')}>
+
                 <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h2}>

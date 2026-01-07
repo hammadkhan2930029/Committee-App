@@ -12,8 +12,10 @@ import { AppColors } from '../../constant/appColors';
 import { AppIcons } from '../../constant/appIcons';
 import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
+import { useNavigation } from '@react-navigation/native';
 
 export const AdminProfile = () => {
+  const navigation = useNavigation()
   return (
     <View style={styles.container}>
       <StatusBar
@@ -47,7 +49,7 @@ export const AdminProfile = () => {
         </View>
       </View>
       <View style={styles.BtnView}>
-        <CustomButton title="Edit Profile" />
+        <CustomButton title="Edit Profile" onPress={()=> navigation.navigate('AdminEditProfile')}/>
         <TouchableOpacity style={styles.button}>
             <Text style={styles.text}>Log Out</Text>
         </TouchableOpacity>

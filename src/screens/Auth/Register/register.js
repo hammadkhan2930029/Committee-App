@@ -21,9 +21,63 @@ import { CustomButton } from '../../../components/customButton';
 import { AppIcons } from '../../../constant/appIcons';
 import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
+//-----------------------------------------
+import * as Yup from 'yup';
+
+const registerSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(3, 'Name kam az kam 3 characters ka ho')
+    .required('Name required hai'),
+
+  phone: Yup.string()
+    .matches(/^03[0-9]{9}$/, 'Phone number must be a valid Pakistani number (11 digits, starting with 03)')
+  .required('Phone number is required'),
+
+  password: Yup.string()
+    .min(6, 'Password kam az kam 6 characters ka ho')
+    .required('Password required hai'),
+
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Password match nahi kar raha')
+    .required('Confirm password required hai'),
+});
+
+//-----------------------------------------
 
 export const Register = () => {
+
+
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+
+  ///-------------------------------------------
+  const register = async value => {
+    setLoading(true);
+    try {
+      var formData = new FormData();
+      formData.append('full_name', value.name);
+      formData.append('phone', value.phone);
+      formData.append('password', value.password);
+      formData.append('confirm_password', value.confirmPassword);
+
+      const res = await api.post('/user/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Account created successfully 👌',
+      });
+      console.log('response :', res);
+    } catch (error) {
+      console.log('Try Catch Error :', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  /// -----------------------------------------------
 
   return (
     <KeyboardAvoidingView
@@ -67,27 +121,14 @@ export const Register = () => {
             <Formik
               initialValues={{
                 name: '',
-                email: '',
                 phone: '',
                 password: '',
                 confirmPassword: '',
               }}
-              validate={values => {
-                const errors = {};
-                if (!values.email) {
-                  errors.email = 'Required';
-                } else if (
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-                ) {
-                  errors.email = 'Invalid email address';
-                }
-                return errors;
-              }}
-              onSubmit={(values, { setSubmitting }) => {
-                setTimeout(() => {
-                  alert(JSON.stringify(values, null, 2));
-                  setSubmitting(false);
-                }, 400);
+              validationSchema={registerSchema}
+              onSubmit={(values, { resetForm }) => {
+                register(values);
+                // resetForm();
               }}
             >
               {({
@@ -107,21 +148,19 @@ export const Register = () => {
                         type="text"
                         placeholder="Enter your name"
                         value={values.name}
-                        onChangeText={handleChange}
+                        onChangeText={handleChange('name')}
+                        onBlur={handleBlur('name')}
+                        error={touched.name && errors.name}
                       />
-                      <CustomInput
-                        label="Email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={values.email}
-                        onChangeText={handleChange}
-                      />
+
                       <CustomInput
                         label="Phone Number"
                         type="numeric"
                         placeholder="Enter your phone number"
                         value={values.phone}
-                        onChangeText={handleChange}
+                        onChangeText={handleChange('phone')}
+                        onBlur={handleBlur('phone')}
+                        error={touched.phone && errors.phone}
                       />
 
                       <CustomInput
@@ -129,14 +168,20 @@ export const Register = () => {
                         type="password"
                         placeholder="Enter your password"
                         value={values.password}
-                        onChangeText={handleChange}
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
+                        error={touched.password && errors.password}
                       />
                       <CustomInput
                         label="Confirm Password"
                         type="password"
                         placeholder="Re-enter your password"
                         value={values.confirmPassword}
-                        onChangeText={handleChange}
+                        onChangeText={handleChange('confirmPassword')}
+                        onBlur={handleBlur('confirmPassword')}
+                        error={
+                          touched.confirmPassword && errors.confirmPassword
+                        }
                       />
                     </View>
                   </View>

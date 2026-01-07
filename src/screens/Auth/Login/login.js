@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
+  Button,
 } from 'react-native';
 import { AppImages } from '../../../constant/appImages';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
@@ -21,19 +22,63 @@ import { CustomButton } from '../../../components/customButton';
 import { AppIcons } from '../../../constant/appIcons';
 import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
+import { Loader } from '../../Loader/loader';
+import * as Yup from 'yup';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
+//----------------------------------------------
+const loginSchema = Yup.object().shape({
+  phone: Yup.string()
+    .matches(
+      /^03[0-9]{9}$/,
+      'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
+    )
+    .required('Phone number is required'),
+
+  password: Yup.string()
+    .min(6, 'Password kam az kam 6 characters ka ho')
+    .required('Password required hai'),
+});
+//----------------------------------------------
 
 export const Login = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  };
+  //-----------------------------------
+  const loginUser = async value => {
+    setLoading(true);
+    try {
+      var formData = new FormData();
+      formData.append('phone',value.phone)
+      formData.append('password',value.password)
+
+    } catch (error) {
+      console.log('Login try catch error', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  //-----------------------------------
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      {/* {isLoding && <Loader />} */}
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-
+      {/* <TouchableOpacity>
+        <Text style={{}}>loader</Text>
+      </TouchableOpacity> */}
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         bounces={false}
@@ -54,23 +99,10 @@ export const Login = () => {
               </ImageBackground>
             </View>
             <Formik
-              initialValues={{ email: '', password: '' }}
-              validate={values => {
-                const errors = {};
-                if (!values.email) {
-                  errors.email = 'Required';
-                } else if (
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-                ) {
-                  errors.email = 'Invalid email address';
-                }
-                return errors;
-              }}
+              initialValues={{ phone: '', password: '' }}
+              validationSchema={loginSchema}
               onSubmit={(values, { setSubmitting }) => {
-                setTimeout(() => {
-                  alert(JSON.stringify(values, null, 2));
-                  setSubmitting(false);
-                }, 400);
+                loginUser(values);
               }}
             >
               {({
@@ -81,30 +113,27 @@ export const Login = () => {
                 handleBlur,
                 handleSubmit,
                 isSubmitting,
-                /* and other goodies */
               }) => (
-                // <form onSubmit={handleSubmit}>
                 <View>
                   <View style={styles.loginCard}>
                     <View>
                       <CustomInput
-                        label="Email"
-                        type="email"
+                        label="phone"
+                        type="numeric"
                         placeholder="Enter your phone number"
-                        value={values.email}
-                        onChangeText={handleChange}
-                        onBlur={handleBlur}
-                        
+                        value={values.phone}
+                        onChangeText={handleChange('phone')}
+                        onBlur={handleBlur('phone')}
+                        error={touched.phone && errors.phone}
                       />
                       <CustomInput
                         label="Password"
                         type="password"
                         placeholder="Enter your password"
                         value={values.password}
-                        onChangeText={handleChange}
-                        onBlur={handleBlur}
-
-                        
+                        onChangeText={handleChange('password')}
+                        onBlur={handleBlur('password')}
+                        error={touched.password && errors.password}
                       />
 
                       <View style={styles.forgetView}>
@@ -148,6 +177,12 @@ export const Login = () => {
             </View>
           </View>
         </TouchableWithoutFeedback>
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Button title="Login" onPress={handleLogin} />
+          <Loader visible={loading} />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -167,8 +202,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(24),
     color: AppColors.title,
     padding: 5,
-     fontWeight: '700',
-  
+    fontWeight: '700',
   },
   h4: {
     fontSize: moderateScale(18),

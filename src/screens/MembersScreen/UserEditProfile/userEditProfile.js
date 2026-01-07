@@ -15,10 +15,23 @@ import { AppIcons } from '../../../constant/appIcons';
 import { AppImages } from '../../../constant/appImages';
 import { CustomInput } from '../../../components/customTextInput';
 import { CustomButton } from '../../../components/customButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 export const UserEditProfile = () => {
   const navigation = useNavigation();
+   useFocusEffect(
+      React.useCallback(() => {
+        // Jab Profile screen open ho
+        StatusBar.setBackgroundColor('#fff');
+        StatusBar.setBarStyle('dark-content');
+  
+        // return () => {
+        //   // Jab Profile se bahar jao
+        //   StatusBar.setBackgroundColor(AppColors.primary);
+        //   StatusBar.setBarStyle('light-content');
+        // };
+      }, []),
+    );
   return (
     <View style={styles.container}>
       <StatusBar

@@ -14,10 +14,24 @@ import { AppImages } from '../../../constant/appImages';
 import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 export const UserProfile = () => {
-    const navigation = useNavigation()
+  const navigation = useNavigation();
+  useFocusEffect(
+    React.useCallback(() => {
+     
+      StatusBar.setBackgroundColor('#fff');
+      StatusBar.setBarStyle('dark-content');
+
+      return () => {
+        
+        StatusBar.setBackgroundColor(AppColors.primary);
+        StatusBar.setBarStyle('light-content');
+        
+      };
+    }, []),
+  );
   return (
     <View style={styles.container}>
       <StatusBar
@@ -25,7 +39,7 @@ export const UserProfile = () => {
         barStyle="dark-content"
       />
       <View style={styles.arrowBackView}>
-        <TouchableOpacity >
+        <TouchableOpacity>
           <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
         </TouchableOpacity>
       </View>
@@ -52,7 +66,10 @@ export const UserProfile = () => {
       </View>
       <View style={styles.BtnView}>
         <View style={styles.btn}>
-          <CustomButton title="Edit Profile" onPress={()=> navigate('UserEditProfile')}/>
+          <CustomButton
+            title="Edit Profile"
+            onPress={() => navigate('UserEditProfile')}
+          />
         </View>
         <View style={styles.btn}>
           <CustomButtonLight title="Log Out" />
@@ -86,10 +103,10 @@ const styles = ScaledSheet.create({
   },
   profileImage: {
     width: 150,
-    height:150,
-    borderRadius:75,
+    height: 150,
+    borderRadius: 75,
     resizeMode: 'contain',
-    elevation:5
+    elevation: 5,
   },
   nameView: {
     justifyContent: 'center',
@@ -138,9 +155,8 @@ const styles = ScaledSheet.create({
     borderColor: AppColors.primary,
     borderWidth: 1,
   },
-  btn:{
-    padding:5
-
+  btn: {
+    padding: 5,
   },
   text: {
     color: AppColors.link,

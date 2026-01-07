@@ -133,14 +133,16 @@ export const PaymentUser = () => {
             </View>
             <View style={styles.paymentCardRow}>
               <Text style={styles.label}>Slip</Text>
-              <View style={styles.slipView}>
-                <Text style={styles.value_slip}>View Slip</Text>
-                <Icon
-                  name="keyboard-arrow-right"
-                  size={20}
-                  color={AppColors.link}
-                />
-              </View>
+              <TouchableOpacity onPress={()=> navigation.navigate('UploadSlip')}>
+                <View style={styles.slipView}>
+                  <Text style={styles.value_slip}>View Slip</Text>
+                  <Icon
+                    name="keyboard-arrow-right"
+                    size={20}
+                    color={AppColors.link}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
           {/* ------------------OverDue--------------------- */}

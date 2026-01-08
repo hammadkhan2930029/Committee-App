@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,9 +18,87 @@ import { CustomButton } from '../../../components/customButton';
 import { CustomInput } from '../../../components/customTextInput';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
+import { Loader } from '../../Loader/loader';
+import * as Yup from 'yup';
+//-----------------------------------------------------
 
+const resetPasswordSchema = Yup.object().shape({
+  phone: Yup.string()
+    .matches(
+      /^03[0-9]{9}$/,
+      'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
+    )
+    .required('Phone number is required'),
+
+  newPassword: Yup.string()
+    .min(6, 'Password kam az kam 6 characters ka ho')
+    .required('Password required hai'),
+
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('newPassword')], 'Password match nahi kar raha')
+    .required('Confirm password required hai'),
+});
+
+//----------------------------------------------------
 export const ResetPassword = () => {
+  const [loader, setLoader] = useState(false);
   const navigation = useNavigation();
+
+  //----------------------------------------------------
+  const resetPassword = async value => {
+    console.log('reset:', value);
+    setLoader(true);
+    try {
+      var formData = new FormData();
+      formData.append('phone', value.phone);
+      formData.append('new_password', value.newPassword);
+      formData.append('confirm_password', value.confirmPassword);
+
+      const res = await api.post('/user/forgot-password', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res?.status === 200) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: res?.data?.message || 'Data successfully reset',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: res.data.message || 'Invalid credentials',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+
+      console.log('response reset api :', res);
+    } catch (error) {
+      console.log('Try Catch error reset password :', error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2:
+          error?.response?.data?.message || 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setLoader(false);
+    }
+  };
+  //----------------------------------------------------------
 
   return (
     <View style={styles.Container}>
@@ -52,12 +130,11 @@ export const ResetPassword = () => {
                 newPassword: '',
                 confirmPassword: '',
               }}
-              onSubmit={(values, { setSubmitting }) => {
-                setTimeout(() => {
-                  alert(JSON.stringify(values, null, 2));
-                  setSubmitting(false);
-                }, 400);
+              onSubmit={(values, { resetForm }) => {
+                resetPassword(values);
+                resetForm();
               }}
+              validationSchema={resetPasswordSchema}
             >
               {({
                 values,
@@ -65,6 +142,7 @@ export const ResetPassword = () => {
                 handleChange,
                 handleSubmit,
                 handleReset,
+                touched,
                 errors,
               }) => (
                 <View>
@@ -74,24 +152,27 @@ export const ResetPassword = () => {
                       type="numeric"
                       placeholder="Enter your phone number"
                       value={values.phone}
-                      onChangeText={handleChange}
-                      onBlur={handleBlur}
+                      onChangeText={handleChange('phone')}
+                      onBlur={handleBlur('phone')}
+                      error={touched.phone && errors.phone}
                     />
                     <CustomInput
                       label="New Password"
-                      type="pasword"
+                      type="password"
                       placeholder="Enter your new password"
                       value={values.newPassword}
-                      onChangeText={handleChange}
-                      onBlur={handleBlur}
+                      onChangeText={handleChange('newPassword')}
+                      onBlur={handleBlur('newPassword')}
+                      error={touched.newPassword && errors.newPassword}
                     />
                     <CustomInput
                       label="Confirm Password"
                       type="password"
                       placeholder="Re-enter your password"
                       value={values.confirmPassword}
-                      onChangeText={handleChange}
-                      onBlur={handleBlur}
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
+                      error={touched.confirmPassword && errors.confirmPassword}
                     />
                   </View>
 
@@ -107,10 +188,13 @@ export const ResetPassword = () => {
           </View>
 
           <View style={styles.reciveCode}>
-            <Text style={styles.h4}>Back to Login</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.h4}>Back to Login</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+      <Loader visible={loader} />
     </View>
   );
 };

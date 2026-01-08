@@ -26,6 +26,8 @@ import { Loader } from '../../Loader/loader';
 import * as Yup from 'yup';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 //----------------------------------------------
 const loginSchema = Yup.object().shape({
   phone: Yup.string()
@@ -45,24 +47,62 @@ export const Login = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-  };
   //-----------------------------------
   const loginUser = async value => {
+    console.log(value);
     setLoading(true);
     try {
       var formData = new FormData();
-      formData.append('phone',value.phone)
-      formData.append('password',value.password)
+      formData.append('phone', value.phone);
+      formData.append('password', value.password);
 
+      const res = await api.post('/user/login', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res?.status === 200 && res?.data?.code === '200') {
+        const userData = res.data.msg[0];
+        const token = res.data.token;
+
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        await AsyncStorage.setItem('token', token);
+
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: res.data.message || 'Login successful',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.replace('ChooseRole');
+        console.log('userData :', userData);
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: res.data.message || 'Invalid credentials',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+
+      console.log('login api response :', res.data.msg);
     } catch (error) {
-      console.log('Login try catch error', error);
+      console.log('Login error:', error);
+
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2:
+          error?.response?.data?.message || 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -74,11 +114,8 @@ export const Login = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      {/* {isLoding && <Loader />} */}
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      {/* <TouchableOpacity>
-        <Text style={{}}>loader</Text>
-      </TouchableOpacity> */}
+
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         bounces={false}
@@ -101,8 +138,9 @@ export const Login = () => {
             <Formik
               initialValues={{ phone: '', password: '' }}
               validationSchema={loginSchema}
-              onSubmit={(values, { setSubmitting }) => {
+              onSubmit={(values, { resetForm }) => {
                 loginUser(values);
+                // resetForm();
               }}
             >
               {({
@@ -138,7 +176,7 @@ export const Login = () => {
 
                       <View style={styles.forgetView}>
                         <TouchableOpacity
-                          onPress={() => navigation.navigate('Otp')}
+                          onPress={() => navigation.navigate('ResetPassword')}
                         >
                           <Text style={styles.forgetText}>
                             Forgot Password?
@@ -151,7 +189,6 @@ export const Login = () => {
                     <CustomButton title="Login" onPress={handleSubmit} />
                   </View>
                 </View>
-                // </form>
               )}
             </Formik>
             <View style={styles.continueLine}>
@@ -177,12 +214,8 @@ export const Login = () => {
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <Button title="Login" onPress={handleLogin} />
-          <Loader visible={loading} />
-        </View>
+
+        <Loader visible={loading} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

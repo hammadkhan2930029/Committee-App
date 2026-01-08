@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Image,
@@ -13,9 +13,23 @@ import { AppIcons } from '../../constant/appIcons';
 import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AdminProfile = () => {
-  const navigation = useNavigation()
+  const [userdata, setUserData] = useState('');
+  const navigation = useNavigation();
+  const getData = async () => {
+    const user = await AsyncStorage.getItem('user');
+    const parsedUser = JSON.parse(user);
+    setUserData(parsedUser)
+
+    console.log(parsedUser.full_name); // Hammad
+    console.log(parsedUser.user_id); // 11
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -49,9 +63,12 @@ export const AdminProfile = () => {
         </View>
       </View>
       <View style={styles.BtnView}>
-        <CustomButton title="Edit Profile" onPress={()=> navigation.navigate('AdminEditProfile')}/>
+        <CustomButton
+          title="Edit Profile"
+          onPress={() => navigation.navigate('AdminEditProfile')}
+        />
         <TouchableOpacity style={styles.button}>
-            <Text style={styles.text}>Log Out</Text>
+          <Text style={styles.text}>Log Out</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -111,26 +128,25 @@ const styles = ScaledSheet.create({
   text1: {
     fontSize: moderateScale(18),
     color: AppColors.focusText,
-    fontWeight:'600'
+    fontWeight: '600',
   },
   text2: {
     fontSize: moderateScale(18),
     color: AppColors.bodyText,
   },
-  BtnView:{
-    width:'70%',
-    alignSelf:'center'
+  BtnView: {
+    width: '70%',
+    alignSelf: 'center',
   },
-   button: {
+  button: {
     padding: 12,
     borderRadius: 15,
     alignItems: 'center',
-    elevation:5,
-    backgroundColor:AppColors.background,
-    marginTop:10,
-    borderColor:AppColors.primary,
-    borderWidth:1
-
+    elevation: 5,
+    backgroundColor: AppColors.background,
+    marginTop: 10,
+    borderColor: AppColors.primary,
+    borderWidth: 1,
   },
   text: {
     color: AppColors.link,

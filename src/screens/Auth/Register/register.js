@@ -25,6 +25,7 @@ import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 //-----------------------------------------
 import * as Yup from 'yup';
+import { Loader } from '../../Loader/loader';
 
 const registerSchema = Yup.object().shape({
   name: Yup.string()
@@ -32,8 +33,11 @@ const registerSchema = Yup.object().shape({
     .required('Name required hai'),
 
   phone: Yup.string()
-    .matches(/^03[0-9]{9}$/, 'Phone number must be a valid Pakistani number (11 digits, starting with 03)')
-  .required('Phone number is required'),
+    .matches(
+      /^03[0-9]{9}$/,
+      'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
+    )
+    .required('Phone number is required'),
 
   password: Yup.string()
     .min(6, 'Password kam az kam 6 characters ka ho')
@@ -47,8 +51,6 @@ const registerSchema = Yup.object().shape({
 //-----------------------------------------
 
 export const Register = () => {
-
-
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
@@ -65,14 +67,41 @@ export const Register = () => {
       const res = await api.post('/user/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Account created successfully 👌',
-      });
+      if (res?.status === 200 && res?.data?.success) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: res.data.message || 'Login successful',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: res.data.message || 'User already exist',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+
       console.log('response :', res);
     } catch (error) {
       console.log('Try Catch Error :', error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2:
+          error?.response?.data?.message || 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -128,7 +157,7 @@ export const Register = () => {
               validationSchema={registerSchema}
               onSubmit={(values, { resetForm }) => {
                 register(values);
-                // resetForm();
+                resetForm();
               }}
             >
               {({
@@ -214,6 +243,7 @@ export const Register = () => {
             </View>
           </View>
         </TouchableWithoutFeedback>
+        <Loader visible={loading} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

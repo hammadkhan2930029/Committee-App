@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   StatusBar,
@@ -17,30 +17,101 @@ import { CustomButton } from '../../../components/customButton';
 import { Formik } from 'formik';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import dayjs from 'dayjs';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { navigate } from '../../../navigations/navigationService';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
+import * as Yup from 'yup';
+import { Loader } from '../../Loader/loader';
+//-----------------------------------------------------------------
+const membersSchema = Yup.object().shape({
+  fullName: Yup.string()
+    .min(3, 'Name kam az kam 3 characters ka ho')
+    .required('Name required hai'),
+
+  phone: Yup.string()
+    .matches(
+      /^03[0-9]{9}$/,
+      'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
+    )
+    .required('Phone number is required'),
+
+  password: Yup.string()
+    .min(6, 'Password kam az kam 6 characters ka ho')
+    .required('Password required hai'),
+});
+//------------------------------------------------------------------
 
 export const CreateMembers = () => {
-    const navigation = useNavigation()
-  const [show, setShow] = useState(false);
-  const [date, setDate] = useState(null);
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-  const onChange = (event, selectedDate) => {
-    setShow(false);
-    if (selectedDate) {
-      setDate(selectedDate);
+  //-------------------get user data---------------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  //-----------------------------------------
+  const createMembers = async value => {
+    setLoading(true);
+    try {
+      var formData = new FormData();
+      formData.append('full_name', value.fullName);
+      formData.append('phone', value.phone);
+      formData.append('password', value.password);
+      formData.append('user_id', userData.user_id);
+
+      const response = await api.post('/user/create-user', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const msg = response?.data?.msg?.[0];
+      if (response.status === 200 && typeof msg === 'object' && msg.status) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: msg.status,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.goBack();
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: typeof msg === 'string' ? msg : 'User already exists',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+    } catch (error) {
+      console.log('try catch error', error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2: 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setLoading(false);
     }
   };
-  //---------------------------------
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState([
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' },
-    { label: 'Pending', value: 'pending' },
-  ]);
 
   return (
     <View style={styles.container}>
@@ -55,7 +126,7 @@ export const CreateMembers = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity onPress={()=> navigation.goBack()}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image
                       source={AppIcons.arrowBack}
                       style={styles.arrowBack}
@@ -65,9 +136,7 @@ export const CreateMembers = () => {
                 </View>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h4}>
-                  Fill in the details to 
-                </Text>
+                <Text style={styles.h4}>Fill in the details to</Text>
                 <Text style={styles.h4}>start a new committee</Text>
               </View>
             </View>
@@ -79,7 +148,11 @@ export const CreateMembers = () => {
               fullName: '',
               phone: '',
               password: '',
-          
+            }}
+            validationSchema={membersSchema}
+            onSubmit={(values, { resetForm }) => {
+              createMembers(values);
+              resetForm();
             }}
           >
             {({
@@ -89,14 +162,17 @@ export const CreateMembers = () => {
               handleSubmit,
               handleChange,
               setFieldValue,
+              touched,
             }) => (
               <View style={styles.createCommitteForm}>
                 <CustomInputWithIcon
-                  label="Total Members"
+                  label="Enter full name"
                   placeholder="Enter full name"
                   type="text"
                   value={values.fullName}
-                  onChangeText={handleChange}
+                  onChangeText={handleChange('fullName')}
+                  onblur={handleBlur('fullName')}
+                  error={touched.fullName && errors.fullName}
                 />
 
                 <CustomInputWithIcon
@@ -104,7 +180,9 @@ export const CreateMembers = () => {
                   placeholder="+92 300 1234567"
                   type="numeric"
                   value={values.phone}
-                  onChangeText={handleChange}
+                  onChangeText={handleChange('phone')}
+                  onblur={handleBlur('phone')}
+                  error={touched.phone && errors.phone}
                 />
 
                 <CustomInputWithIcon
@@ -112,20 +190,23 @@ export const CreateMembers = () => {
                   placeholder="Set user password"
                   type="password"
                   value={values.password}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="remove-red-eye" size={20} color="#666" />}
+                  onChangeText={handleChange('password')}
+                  onblur={handleBlur('password')}
+                  error={touched.password && errors.password}
+                  rightIcon={
+                    <Icon name="remove-red-eye" size={20} color="#666" />
+                  }
                 />
 
-                
                 <View style={styles.btnView}>
                   <CustomButton title="Create User" onPress={handleSubmit} />
                 </View>
-                
               </View>
             )}
           </Formik>
         </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -138,7 +219,6 @@ const styles = ScaledSheet.create({
   arrowBack: {
     width: 28,
     height: 28,
-   
   },
   RectangleImg: {
     width: '100%',
@@ -209,9 +289,9 @@ const styles = ScaledSheet.create({
     color: AppColors.primary,
     fontWeight: 'bold',
   },
-  btnView:{
-    width:'80%',
-    alignSelf:'center',
-    padding:10
-  }
+  btnView: {
+    width: '80%',
+    alignSelf: 'center',
+    padding: 10,
+  },
 });

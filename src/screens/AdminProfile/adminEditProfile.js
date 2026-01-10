@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Image,
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -14,81 +15,161 @@ import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
 import { CustomInput } from '../../components/customTextInput';
 import { Formik } from 'formik';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../../services/api';
+import Toast from 'react-native-toast-message';
+import * as Yup from 'yup';
+import { Loader } from '../Loader/loader';
 
-export const AdminEditProfile = () => {
+export const AdminEditProfile = ({ route }) => {
+  const { user } = route.params;
+  console.log('user :', user);
+  const [userdata, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation();
+  //------------------local storage update data-----------------
+  const updateUserInStorage = async updatedUser => {
+    try {
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      console.log('User updated in AsyncStorage');
+    } catch (e) {
+      console.log('Storage update error:', e);
+    }
+  };
+
+  //----------------------------------------------------------
+  const editProfile = async value => {
+    setIsLoading(true);
+    try {
+      var formData = new FormData();
+      formData.append('full_name', value.fullName);
+      formData.append('phone', value.phoneNumber);
+      formData.append('user_id', user.user_id);
+      const res = await api.post('/user/edit-profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res?.data?.code === '200') {
+        const updatedUser = {
+          ...user,
+          full_name: value.fullName || user.full_name,
+          phone: value.phoneNumber || user.phone,
+        };
+
+        await updateUserInStorage(updatedUser);
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: res?.data?.msg?.[0].response || 'Profile updated',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: res?.data?.msg?.[0].response || 'Something went wrong',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+      navigation.goBack();
+      console.log('edit profile response', res.data.code);
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2:
+          error?.response?.data?.msg?.[0]?.response ||
+          'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  //----------------------------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar
         backgroundColor={AppColors.background}
         barStyle="dark-content"
       />
-      <View style={styles.arrowBackView}>
-        <TouchableOpacity>
-          <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
-        </TouchableOpacity>
-      </View>
+      <ScrollView>
+        <View style={styles.arrowBackView}>
+          <TouchableOpacity>
+            <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.profileView}>
-        <Text style={styles.profile}>Edit Profile</Text>
-      </View>
-      <View style={styles.profileView}>
-        <Image source={AppImages.profileAvatar} style={styles.profileImage} />
-      </View>
-      <View style={styles.nameView}>
-        <Text style={styles.name}>Ahmed khan</Text>
-        <Text style={styles.admin}>Admin</Text>
-      </View>
-      <View style={styles.detailView}>
-        <Formik
-          initialValues={{
-            FullName: '',
-            PhoneNumber: '',
-           
-          }}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 400);
-          }}
-        >
-          {({
-            values,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            handleReset,
-            errors,
-          }) => (
-            <View>
+        <View style={styles.profileView}>
+          <Text style={styles.profile}>Edit Profile</Text>
+        </View>
+        <View style={styles.profileView}>
+          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
+        </View>
+        <View style={styles.nameView}>
+          <Text style={styles.name}>{userdata?.full_name}</Text>
+          <Text style={styles.admin}>Admin</Text>
+        </View>
+        <View style={styles.detailView}>
+          <Formik
+            initialValues={{
+              fullName: '',
+              phoneNumber: '',
+            }}
+            onSubmit={(values, { resetForm }) => {
+              editProfile(values);
+              // resetForm();
+            }}
+          >
+            {({
+              values,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              handleReset,
+              errors,
+            }) => (
               <View>
-                <CustomInput
-                  label="Full Name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={values.FullName}
-                  onChangeText={handleChange}
-                  onBlur={handleBlur}
-                />
-                <CustomInput
-                  label="Phone Number"
-                  type="numeric"
-                  placeholder="Enter your phone Number"
-                  value={values.PhoneNumber}
-                  onChangeText={handleChange}
-                  onBlur={handleBlur}
-                />
-                
-              </View>
+                <View>
+                  <CustomInput
+                    label="Full Name"
+                    type="text"
+                    placeholder={user.full_name}
+                    value={values.fullName}
+                    onChangeText={handleChange('fullName')}
+                    onBlur={handleBlur('fullName')}
+                  />
+                  <CustomInput
+                    label="Phone Number"
+                    type="numeric"
+                    placeholder={user.phone}
+                    value={values.phoneNumber}
+                    onChangeText={handleChange('phoneNumber')}
+                    onBlur={handleBlur('phoneNumber')}
+                  />
+                </View>
 
-              <View style={styles.btn}>
-                <CustomButton title="Submit" onPress={handleSubmit} />
+                <View style={styles.btn}>
+                  <CustomButton title="Submit" onPress={handleSubmit} />
+                </View>
               </View>
-            </View>
-          )}
-        </Formik>
-      </View>
-     
+            )}
+          </Formik>
+        </View>
+      </ScrollView>
+      <Loader visible={isLoading} />
     </View>
   );
 };
@@ -101,7 +182,7 @@ const styles = ScaledSheet.create({
     marginTop: 20,
     padding: 20,
   },
- 
+
   profileView: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -172,7 +253,7 @@ const styles = ScaledSheet.create({
     fontWeight: 'bold',
     fontSize: moderateScale(14),
   },
-  btn:{
-    marginTop:15
-  }
+  btn: {
+    marginTop: 15,
+  },
 });

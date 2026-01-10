@@ -12,23 +12,41 @@ import { AppColors } from '../../constant/appColors';
 import { AppIcons } from '../../constant/appIcons';
 import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Loader } from '../Loader/loader';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const AdminProfile = () => {
   const [userdata, setUserData] = useState('');
+  const [isLodaing, setIsLoading] = useState(false);
   const navigation = useNavigation();
+  //-----------------get data--------------------
   const getData = async () => {
     const user = await AsyncStorage.getItem('user');
     const parsedUser = JSON.parse(user);
-    setUserData(parsedUser)
+    setUserData(parsedUser);
 
     console.log(parsedUser.full_name); // Hammad
     console.log(parsedUser.user_id); // 11
   };
-  useEffect(() => {
+  useFocusEffect(() => {
     getData();
   }, []);
+  console.log('user data :', userdata);
+  //-----------------logout--------------------------
+  const logout = async () => {
+    setIsLoading(true);
+    await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('token');
+    navigation.replace('Login');
+  };
+  // useEffect(() => {
+  //   logout();
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
+  // }, []);
 
   return (
     <View style={styles.container}>
@@ -37,8 +55,14 @@ export const AdminProfile = () => {
         barStyle="dark-content"
       />
       <View style={styles.arrowBackView}>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
+        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.arrowIcon}>
+          <Icon name="keyboard-arrow-left" size={26} color={AppColors.title} />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Icon name="settings" size={26} color={AppColors.link} />
         </TouchableOpacity>
       </View>
 
@@ -49,28 +73,31 @@ export const AdminProfile = () => {
         <Image source={AppImages.profileAvatar} style={styles.profileImage} />
       </View>
       <View style={styles.nameView}>
-        <Text style={styles.name}>Ahmed khan</Text>
+        <Text style={styles.name}>{userdata.full_name}</Text>
         <Text style={styles.admin}>Admin</Text>
       </View>
       <View style={styles.detailView}>
         <View style={styles.detail}>
           <Text style={styles.text1}>Full Name : </Text>
-          <Text style={styles.text2}> Ahmed khan</Text>
+          <Text style={styles.text2}> {userdata.full_name}</Text>
         </View>
         <View style={styles.detail}>
           <Text style={styles.text1}>Phone Number : </Text>
-          <Text style={styles.text2}> +92 301 5566778</Text>
+          <Text style={styles.text2}> {userdata.phone}</Text>
         </View>
       </View>
       <View style={styles.BtnView}>
         <CustomButton
           title="Edit Profile"
-          onPress={() => navigation.navigate('AdminEditProfile')}
+          onPress={() =>
+            navigation.navigate('AdminEditProfile', { user: userdata })
+          }
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => logout()}>
           <Text style={styles.text}>Log Out</Text>
         </TouchableOpacity>
       </View>
+      <Loader visible={isLodaing} />
     </View>
   );
 };
@@ -82,6 +109,17 @@ const styles = ScaledSheet.create({
   arrowBackView: {
     marginTop: 20,
     padding: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  arrowIcon: {
+    backgroundColor: AppColors.primary,
+    borderRadius: 20,
+    width: 25,
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileView: {
     justifyContent: 'center',

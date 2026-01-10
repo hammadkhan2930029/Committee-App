@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -15,7 +15,10 @@ import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { navigate } from '../../../navigations/navigationService';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { api } from '../../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getStoredUser } from '../../../Utils/getUser';
 
 const membersData = [
   {
@@ -91,7 +94,52 @@ const membersData = [
 ];
 
 export const CommitteeUserList = () => {
+  const [userdata, setUserData] = useState();
+  const [userList, setUserList] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigation = useNavigation();
+
+  //-----------------get data--------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+
+  //-----------------user list------------------------
+  const userViewUsers = async () => {
+    if (!userdata?.user_id) return; // safeguard
+    console.log(userdata.user_id);
+    try {
+      const response = await api.get(`/user/view-users/${userdata.user_id}`);
+      console.log('response:', response.data.msg);
+      if (Array.isArray(response.data.msg)) {
+        setUserList(response.data.msg);
+      } else {
+        setUserList([]);
+      }
+    } catch (error) {
+      console.log('error :', error);
+    }
+  };
+
+  useEffect(() => {
+    if (userdata?.user_id) {
+      userViewUsers();
+    }
+  }, [userdata]);
+  console.log(userList);
+  //---------------------------------------------
 
   return (
     <View style={styles.container}>
@@ -131,10 +179,11 @@ export const CommitteeUserList = () => {
         </View>
 
         {/* ---------------------------------------------- */}
-        {/* --------------------- */}
         <FlatList
-          data={membersData}
-          keyExtractor={item => item.id.toString()}
+          data={userList}
+          keyExtractor={(item, index) =>
+            item.id?.toString() || index.toString()
+          }
           renderItem={({ item }) => (
             <View style={styles.Committee_View}>
               <TouchableOpacity
@@ -157,12 +206,12 @@ export const CommitteeUserList = () => {
                     <Text style={styles.count}>{item.phone}</Text>
                   </View>
                 </View>
-                <View style={styles.first_view}>
+                {/* <View style={styles.first_view}>
                   <View style={styles.details}>
                     <Text style={styles.one}>Joined BCs:</Text>
                     <Text style={styles.count}>{item.joinedBCs}</Text>
                   </View>
-                </View>
+                </View> */}
               </TouchableOpacity>
             </View>
           )}

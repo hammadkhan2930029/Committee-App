@@ -1,42 +1,91 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Text,StatusBar } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, StatusBar } from 'react-native';
 import { AppColors } from '../../constant/appColors'; // Aapki original theme
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { useNavigation } from '@react-navigation/native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
   withTiming,
-  withDelay 
+  withDelay,
 } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const Splash = () => {
   const navigation = useNavigation();
+  //-----------------------------------------
+  // const [userData, setUserData] = useState();
+  // const getData = async () => {
+  //   const user = await AsyncStorage.getItem('user');
+  //   const parsedUser = JSON.parse(user);
+  //   setUserData(parsedUser);
+  // };
+  // useEffect(() => {
+  //   getData();
+  // }, []);
+  // console.log('splash check data:', userData);
+  //-------------------------------------------
 
+  const logoPosition = useSharedValue(-500);
+  const contentOpacity = useSharedValue(0);
 
-  const logoPosition = useSharedValue(-500); 
-  const contentOpacity = useSharedValue(0);  
+  // useEffect(() => {
+  //   logoPosition.value = withSpring(0, {
+  //     damping: 12,
+  //     stiffness: 90,
+  //   });
 
+  //   contentOpacity.value = withDelay(500, withTiming(1, { duration: 1000 }));
+
+  //   const checkLogin = async () => {
+  //     const user = await AsyncStorage.getItem('user');
+  //     console.log('user splash:',user)
+
+  //     setTimeout(() => {
+  //       if (user) {
+  //         navigation.replace('ChooseRole');
+  //       } else {
+  //         navigation.replace('Login');
+  //       }
+  //     }, 3000);
+  //   };
+
+  //   checkLogin();
+  // }, []);
   useEffect(() => {
-  
     logoPosition.value = withSpring(0, {
       damping: 12,
-      stiffness: 90
+      stiffness: 90,
     });
 
     contentOpacity.value = withDelay(500, withTiming(1, { duration: 1000 }));
 
-    const timer = setTimeout(() => {
-   
-      navigation.replace('Login');
+    const checkLogin = async () => {
+      try {
+        const userString = await AsyncStorage.getItem('user');
+        console.log('RAW user from storage:', userString);
 
-      
+        let user = null;
 
-      
-    }, 3000);
+        if (userString) {
+          user = JSON.parse(userString);
+        }
 
-    return () => clearTimeout(timer);
+        setTimeout(() => {
+          if (user && user.user_id) {
+            navigation.replace('ChooseRole');
+          } else {
+            navigation.replace('Login');
+          }
+        }, 3000);
+      } catch (e) {
+        console.log('Storage error:', e);
+        navigation.replace('Login');
+      }
+    };
+
+    checkLogin();
   }, []);
 
   const logoStyle = useAnimatedStyle(() => ({
@@ -49,9 +98,8 @@ export const Splash = () => {
 
   return (
     <View style={styles.splashMain}>
-            <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      
-      
+      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
+
       <Animated.View style={[styles.splash_logo_view, logoStyle]}>
         <Text>Logo</Text>
       </Animated.View>
@@ -60,7 +108,6 @@ export const Splash = () => {
         <Text style={styles.h1}>Committee App</Text>
         <Text style={styles.h4}>Manage your BC easily and securely</Text>
       </Animated.View>
-
     </View>
   );
 };
@@ -68,7 +115,7 @@ export const Splash = () => {
 const styles = StyleSheet.create({
   splashMain: {
     flex: 1,
-    backgroundColor: AppColors.primary2, 
+    backgroundColor: AppColors.primary2,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
@@ -89,7 +136,7 @@ const styles = StyleSheet.create({
   },
   h1: {
     fontSize: moderateScale(24),
-    color: AppColors.title, 
+    color: AppColors.title,
     padding: 5,
     fontWeight: 'bold',
   },
@@ -97,6 +144,5 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(18),
     color: AppColors.title,
     textAlign: 'center',
-    
   },
 });

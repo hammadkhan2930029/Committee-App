@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -14,8 +14,47 @@ import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { navigate } from '../../../navigations/navigationService';
+import { useFocusEffect } from '@react-navigation/native';
+import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
 
 export const CommitteeList = () => {
+  const { loading, setLoading } = useState(false);
+  //----------------------------------------------
+  const [userData, setUserData] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  //----------get committee list----------------------
+
+  const committeeList = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committees/${userData.user_id}`,
+      );
+      
+      console.log('committee list :', response.data.msg);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+  useEffect(() => {
+    committeeList();
+  }, [userData]);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -206,7 +245,7 @@ const styles = ScaledSheet.create({
   RectangleImg: {
     width: '100%',
     height: 200,
-    resizeMode:'contain'
+    resizeMode: 'contain',
   },
   TopView: {
     justifyContent: 'space-between',

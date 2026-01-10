@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StatusBar,
@@ -16,30 +16,129 @@ import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { Formik } from 'formik';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
+import { CustomInput } from '../../../components/customTextInput';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Loader } from '../../Loader/loader';
+import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
 
 export const CreateCommittee = () => {
-    const navigation = useNavigation()
+  const navigation = useNavigation();
+  //------------------------------------
+  const [showDue, setShowDue] = useState(false);
+  const [dateDue, setDateDue] = useState(null);
+  //------------------------------------
   const [show, setShow] = useState(false);
   const [date, setDate] = useState(null);
+  //------------------------------------
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState();
+  //-----------------get data--------------------
 
-  const onChange = (event, selectedDate) => {
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  //-----------start date-------------
+
+  const onChange = (event, selectedDate, setFieldValue) => {
     setShow(false);
     if (selectedDate) {
       setDate(selectedDate);
+      setFieldValue('startDate', dayjs(selectedDate).format('YYYY-MM-DD'));
     }
   };
-  //---------------------------------
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState([
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' },
-    { label: 'Pending', value: 'pending' },
-  ]);
+
+  //--------------due date---------------------
+
+  const onChangeDue = (event, selectedDate, setFieldValue) => {
+    setShowDue(false);
+    if (selectedDate) {
+      setDateDue(selectedDate);
+      setFieldValue('due_on', dayjs(selectedDate).format('YYYY-MM-DD'));
+    }
+  };
+  //---thousand separator---only display ke liye-------
+  const formatNumber = value => {
+    if (!value) return '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  //---- User input se commas remove karne ke liye-------
+  const removeCommas = value => value.replace(/,/g, '');
+
+  //--------------------api--------------------------
+  const createCommittee = async value => {
+    setLoading(true);
+    try {
+      var formData = new FormData();
+      formData.append('user_id', userData.user_id);
+      formData.append('name', value.committeeName);
+      formData.append('total_member', value.totalMembers);
+      formData.append('total_rounds', value.totalRounds);
+      formData.append('rounds_per_month', value.roundsPerMonth);
+      formData.append('no_of_month', value.noOfMonths);
+      formData.append('amount_per_member', value.amountPerMember);
+      formData.append('total', value.totalAmount);
+      formData.append('start_date', value.startDate);
+      formData.append('due_on', value.due_on);
+
+      const response = await api.post('/user/create-committee', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const msg = response?.data?.msg?.[0];
+      if (response.status === 200) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: msg.response,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.goBack();
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: 'User already exists',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+      console.log('create committee :', msg.response);
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2: 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -54,7 +153,7 @@ export const CreateCommittee = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity onPress={()=> navigation.goBack()}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image
                       source={AppIcons.arrowBack}
                       style={styles.arrowBack}
@@ -71,9 +170,11 @@ export const CreateCommittee = () => {
             </View>
           </ImageBackground>
         </View>
+        {/* ------------------------------------------------------------ */}
         <View>
           <Formik
             initialValues={{
+              committeeName: '',
               totalMembers: '',
               totalRounds: '',
               roundsPerMonth: '',
@@ -81,7 +182,11 @@ export const CreateCommittee = () => {
               amountPerMember: '',
               totalAmount: '',
               startDate: '',
-              status: '',
+              due_on: '',
+            }}
+            onSubmit={(values, { resetForm }) => {
+              createCommittee(values);
+              // resetForm();
             }}
           >
             {({
@@ -91,124 +196,154 @@ export const CreateCommittee = () => {
               handleSubmit,
               handleChange,
               setFieldValue,
-            }) => (
-              <View style={styles.createCommitteForm}>
-                <CustomInputWithIcon
-                  label="Total Members"
-                  placeholder="Enter total members"
-                  type="numeric"
-                  value={values.totalMembers}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
+              touched,
+            }) => {
+              useEffect(() => {
+                if (values.totalMembers && values.amountPerMember) {
+                  const total =
+                    Number(values.totalMembers) *
+                    Number(values.amountPerMember);
 
-                <CustomInputWithIcon
-                  label="Total Rounds"
-                  placeholder="Enter total rounds"
-                  type="numeric"
-                  value={values.totalRounds}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
+                  setFieldValue('totalAmount', total.toString());
+                }
+              }, [values.totalMembers, values.amountPerMember]);
 
-                <CustomInputWithIcon
-                  label="Rounds Per Month"
-                  placeholder="Enter rounds per month"
-                  type="numeric"
-                  value={values.roundsPerMonth}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
-
-                <CustomInputWithIcon
-                  label="No. Of Months"
-                  placeholder="Enter number of months"
-                  type="numeric"
-                  value={values.noOfMonths}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
-
-                <CustomInputWithIcon
-                  label="Amount Per Member"
-                  placeholder="Enter amount per member"
-                  type="numeric"
-                  value={values.amountPerMember}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
-
-                <CustomInputWithIcon
-                  label="Total Amount"
-                  placeholder="Calculated automatically"
-                  type="numeric"
-                  value={values.totalAmount}
-                  onChangeText={handleChange}
-                  rightIcon={<Icon name="edit" size={20} color="#666" />}
-                />
-                <View>
-                  <CustomInputWithIcon
-                    label="Select Date"
-                    type="date"
-                    placeholder="Pick start date"
-                    value={date ? dayjs(date).format('DD-MM-YYYY') : ''}
-                    rightIcon={
-                      <Icon name="calendar-today" size={22} color="#666" />
-                    }
-                    onRightIconPress={() => setShow(true)}
+              return (
+                <View style={styles.createCommitteForm}>
+                  <CustomInput
+                    label="Committee Name"
+                    placeholder="Enter committee name"
+                    type="text"
+                    value={values.committeeName}
+                    onChangeText={handleChange('committeeName')}
+                    onblur={handleBlur('committeeName')}
+                    error={touched.committeeName && errors.committeeName}
+                  />
+                  <CustomInput
+                    label="Total Members"
+                    placeholder="Enter total members"
+                    type="numeric"
+                    value={values.totalMembers}
+                    onChangeText={handleChange('totalMembers')}
+                    onblur={handleBlur('totalMembers')}
+                    error={touched.totalMembers && errors.totalMembers}
                   />
 
-                  {show && (
-                    <DateTimePicker
-                      value={date || new Date()}
-                      mode="date"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={onChange}
-                    />
-                  )}
-                </View>
-                <View>
-                  <Text style={styles.label}>Status</Text>
-                  <DropDownPicker
-                    open={open}
-                    items={items}
-                    setOpen={setOpen}
-                    value={values.status}
-                    setValue={val => setFieldValue('status', val)}
-                    setItems={setItems}
-                    placeholder="Select Status"
-                    style={styles.dropDown}
-                    dropDownContainerStyle={{
-                      borderColor: '#ccc',
-                      borderRadius: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      borderWidth: 1,
-                      borderColor: '#ccc',
-                      borderRadius: '10@ms',
-                      backgroundColor: '#f7f4f4ff',
-                      paddingHorizontal: '10@ms',
+                  <CustomInput
+                    label="Total Rounds"
+                    placeholder="Enter total rounds"
+                    type="numeric"
+                    value={values.totalRounds}
+                    onChangeText={handleChange('totalRounds')}
+                    onblur={handleBlur('totalRounds')}
+                    error={touched.totalRounds && errors.totalRounds}
+                  />
+
+                  <CustomInput
+                    label="Rounds Per Month"
+                    placeholder="Enter rounds per month"
+                    type="numeric"
+                    value={values.roundsPerMonth}
+                    onChangeText={handleChange('roundsPerMonth')}
+                    onblur={handleBlur('roundsPerMonth')}
+                    error={touched.roundsPerMonth && errors.roundsPerMonth}
+                  />
+
+                  <CustomInput
+                    label="No. Of Months"
+                    placeholder="Enter number of months"
+                    type="numeric"
+                    value={values.noOfMonths}
+                    onChangeText={handleChange('noOfMonths')}
+                    onblur={handleBlur('noOfMonths')}
+                    error={touched.noOfMonths && errors.noOfMonths}
+                  />
+
+                  <CustomInput
+                    label="Amount Per Member"
+                    placeholder="Enter amount per member"
+                    type="numeric"
+                    value={formatNumber(values.amountPerMember)}
+                    onChangeText={text => {
+                      const rawValue = removeCommas(text);
+                      if (!isNaN(rawValue)) {
+                        setFieldValue('amountPerMember', rawValue);
+                      }
                     }}
-                    listMode="SCROLLVIEW"
-                    ArrowDownIconComponent={({ style }) => (
-                      <Icon name="arrow-drop-down" size={24} color="#666" />
-                    )}
-                    ArrowUpIconComponent={({ style }) => (
-                      <Icon name="arrow-drop-up" size={24} color="#666" />
-                    )}
+                    onblur={handleBlur('amountPerMember')}
+                    error={touched.amountPerMember && errors.amountPerMember}
                   />
-                </View>
-                <View style={{ padding: 20 }}>
-                  <CustomButton
-                    title="Create Committee"
-                    onPress={handleSubmit}
+
+                  <CustomInput
+                    label="Total Amount"
+                    placeholder="Calculated automatically"
+                    type="numeric"
+                    value={formatNumber(values.totalAmount)}
+                    editable={false}
+                    onChangeText={handleChange('totalAmount')}
+                    onblur={handleBlur('totalAmount')}
+                    error={touched.totalAmount && errors.totalAmount}
                   />
+                  <View>
+                    <CustomInputWithIcon
+                      label="Select Date"
+                      type="date"
+                      placeholder="Pick start date"
+                      value={date ? dayjs(date).format('DD-MM-YYYY') : ''}
+                      rightIcon={
+                        <Icon name="calendar-today" size={22} color="#666" />
+                      }
+                      onRightIconPress={() => setShow(true)}
+                    />
+
+                    {show && (
+                      <DateTimePicker
+                        value={date || new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(event, selectedDate) =>
+                          onChange(event, selectedDate, setFieldValue)
+                        }
+                      />
+                    )}
+                  </View>
+                  <View>
+                    <CustomInputWithIcon
+                      label="Due on"
+                      type="date"
+                      placeholder="Pick due date"
+                      value={dateDue ? dayjs(dateDue).format('DD-MM-YYYY') : ''}
+                      rightIcon={
+                        <Icon name="calendar-today" size={22} color="#666" />
+                      }
+                      onRightIconPress={() => setShowDue(true)}
+                    />
+
+                    {showDue && (
+                      <DateTimePicker
+                        value={dateDue || new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(event, selectedDate) =>
+                          onChangeDue(event, selectedDate, setFieldValue)
+                        }
+                      />
+                    )}
+                  </View>
+
+                  <View style={{ padding: 20 }}>
+                    <CustomButton
+                      title="Create Committee"
+                      onPress={handleSubmit}
+                    />
+                  </View>
                 </View>
-              </View>
-            )}
+              );
+            }}
           </Formik>
         </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -270,7 +405,6 @@ const styles = ScaledSheet.create({
     color: '#333',
   },
   dropDown: {
-   
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,

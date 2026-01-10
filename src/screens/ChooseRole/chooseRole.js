@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImageBackground } from 'react-native';
 import { View, TouchableOpacity, Text, Image, StatusBar } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
@@ -8,6 +8,7 @@ import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
 import { AppIcons } from '../../constant/appIcons';
 import { CustomButton } from '../../components/customButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ChooseRole = () => {
   const navigation = useNavigation();
@@ -20,6 +21,13 @@ export const ChooseRole = () => {
       navigation.navigate('BottomTabNavigationUser');
     }
   };
+  useEffect(() => {
+    const data = async () => {
+      const savedUser = await AsyncStorage.getItem('user');
+      console.log('Saved user:', savedUser);
+    };
+    data();
+  }, []);
 
   return (
     <View style={styles.container}>

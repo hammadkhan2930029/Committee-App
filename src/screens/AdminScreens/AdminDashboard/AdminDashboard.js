@@ -106,7 +106,7 @@ export const AdminDashboard = () => {
             style={styles.createCommittee}
             onPress={()=> navigate('CreateCommittee')}
           />
-          <TouchableOpacity style={styles.CreateUser}  onPress={()=> navigation.navigate('CreateCommittee')}>
+          <TouchableOpacity style={styles.CreateUser}  onPress={()=> navigation.navigate('CreateMembers')}>
             <Text style={styles.CreateUser_text}>Create User</Text>
           </TouchableOpacity>
         </View>

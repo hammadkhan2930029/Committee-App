@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
   View,
@@ -15,9 +16,29 @@ import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
+import { api } from '../../../services/api';
 
-export const CommitteeDetails = () => {
+export const CommitteeDetails = ({ route }) => {
+  const { id } = route.params;
+  console.log('ID :', id);
   const navigation = useNavigation();
+  const [details, setDetails] = useState([]);
+
+  //------------------------------------------------
+  const committeeDetails = async () => {
+    try {
+      const response = await api.get(`/user/view-committee-detail/${id}`);
+      console.log('committee details :', response.data.msg[0]);
+      setDetails(response.data.msg[0]);
+    } catch (error) {
+      console.log('Try catch error :', error);
+    }
+  };
+  useEffect(() => {
+    committeeDetails();
+  }, [id]);
+  console.log('committee details 2:', details.name);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -40,56 +61,73 @@ export const CommitteeDetails = () => {
                 </View>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h4}>ABC Group BC</Text>
+                <Text style={styles.h4}>{details.name}</Text>
                 <View style={styles.activeBtn}>
-                  <Text style={styles.active}>Active</Text>
+                  <Text style={styles.active}>{details.status}</Text>
                 </View>
               </View>
             </View>
           </ImageBackground>
         </View>
         <View style={styles.BCDetails}>
+          
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{details.total_member}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Rounds</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{details.total_rounds}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Rounds Per Month</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{details.rounds_per_month}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.text1}>No. of Month</Text>
+            <Text style={styles.text2}>{details.no_of_month}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Amount Per Member</Text>
-            <Text style={styles.text2}>PKR 2,000</Text>
+            <Text style={styles.text2}>PKR {details.amount_per_member}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Amount</Text>
-            <Text style={styles.text2}>PKR 60,000</Text>
+            <Text style={styles.text2}>PKR {details.total}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Date</Text>
-            <Text style={styles.text2}>Dec 2025</Text>
+            <Text style={styles.text2}>{details.start_date}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.text1}>Start Month</Text>
+            <Text style={styles.text2}>{details.start_month}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Due On</Text>
-            <Text style={styles.text2}>15th every month</Text>
+            <Text style={styles.text2}>{details.due_on}</Text>
           </View>
         </View>
-        <View>
 
-        </View>
+        <View></View>
         <View style={styles.buttons}>
           <View style={styles.btnView}>
-            <CustomButton title="Edit Committee" onPress={()=>navigate('EditCommittee')}/>
+            <CustomButton
+              title="Edit Committee"
+              onPress={() => navigate('EditCommittee',{details:details})}
+            />
           </View>
           <View style={styles.btnView}>
-            <CustomButtonLight title="Add Members" onPress={()=>navigate('AddCommitteeMembers')}/>
+            <CustomButtonLight
+              title="Add Members"
+              onPress={() => navigate('AddCommitteeMembers')}
+            />
           </View>
           <View style={styles.btnView}>
-            <CustomButtonLight title="Assign Rounds" onPress={()=>navigate('AssignRounds')}/>
+            <CustomButtonLight
+              title="Assign Rounds"
+              onPress={() => navigate('AssignRounds')}
+            />
           </View>
         </View>
       </ScrollView>
@@ -189,6 +227,6 @@ const styles = ScaledSheet.create({
   },
   btnView: {
     width: '50%',
-    margin:5
+    margin: 5,
   },
 });

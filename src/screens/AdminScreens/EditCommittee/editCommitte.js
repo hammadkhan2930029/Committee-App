@@ -21,11 +21,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation } from '@react-navigation/native';
-import {CustomButtonLight}from '../../../components/customeButtonLight'
+import { CustomButtonLight } from '../../../components/customeButtonLight';
 
-
-export const EditCommittee = () => {
-  const navigation = useNavigation()
+export const EditCommittee = ({ route }) => {
+  const { details } = route.params;
+  console.log('edit :',details)
+  const navigation = useNavigation();
   const [show, setShow] = useState(false);
   const [date, setDate] = useState(null);
 
@@ -56,7 +57,7 @@ export const EditCommittee = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity onPress={()=> navigation.goBack()}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image
                       source={AppIcons.arrowBack}
                       style={styles.arrowBack}
@@ -74,7 +75,7 @@ export const EditCommittee = () => {
             </View>
           </ImageBackground>
         </View>
-        <View >
+        <View>
           <Formik
             initialValues={{
               totalMembers: '',
@@ -226,7 +227,7 @@ export const EditCommittee = () => {
                   <CustomButton title="Save Changes" onPress={handleSubmit} />
                 </View>
                 <View style={styles.btnView}>
-                 <CustomButtonLight title='Cancel'/>
+                  <CustomButtonLight title="Cancel" />
                 </View>
               </View>
             )}
@@ -265,7 +266,7 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    padding:10
+    padding: 10,
   },
   h1: {
     fontSize: moderateScale(24),
@@ -315,9 +316,9 @@ const styles = ScaledSheet.create({
     color: AppColors.primary,
     fontWeight: 'bold',
   },
-  btnView:{
-    width:'80%',
-    alignSelf:'center',
-    padding:10
-  }
+  btnView: {
+    width: '80%',
+    alignSelf: 'center',
+    padding: 10,
+  },
 });

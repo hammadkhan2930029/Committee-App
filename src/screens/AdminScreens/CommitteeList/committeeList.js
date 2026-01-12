@@ -7,6 +7,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -18,9 +19,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const CommitteeList = () => {
-  const { loading, setLoading } = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [listView, setListView] = useState([]);
   //----------------------------------------------
   const [userData, setUserData] = useState(null);
 
@@ -39,21 +42,106 @@ export const CommitteeList = () => {
   //----------get committee list----------------------
 
   const committeeList = async () => {
+    setLoading(true);
     try {
       const response = await api.get(
         `/user/view-committees/${userData.user_id}`,
       );
-      
-      console.log('committee list :', response.data.msg);
+
+      setListView(response.data.msg);
+      if (response.data.msg) {
+        setLoading(false);
+      }
     } catch (error) {
       console.log(error);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
   useEffect(() => {
     committeeList();
   }, [userData]);
+
+  //----------------------Skeleton-----------------------------
+  const MySkeleton = () => {
+    return (
+      <View>
+        {[...Array(6)].map((_, index) => (
+          <SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item
+              justifyContent="center"
+              alignItems="center"
+            >
+              <View
+                style={{
+                  backgroundColor: AppColors.background,
+                  padding: 10,
+                  elevation: 5,
+                  borderRadius: 20,
+                  margin: 10,
+                  borderColor: AppColors.primary,
+                  borderWidth: 1,
+                  height: 420,
+                  width: '95%',
+                  height: 120,
+                }}
+              >
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  padding={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  {/* Text */}
+                  <SkeletonPlaceholder.Item>
+                    <SkeletonPlaceholder.Item
+                      width={120}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                  <SkeletonPlaceholder.Item
+                    justifyContent="flex-end"
+                    alignItems="flex-end"
+                  >
+                    <SkeletonPlaceholder.Item
+                      width={80}
+                      height={25}
+                      borderRadius={30}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={120}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                </SkeletonPlaceholder.Item>
+              </View>
+            </SkeletonPlaceholder.Item>
+          </SkeletonPlaceholder>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +149,7 @@ export const CommitteeList = () => {
       <View style={styles.addView}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => navigate('CreateMembers')}
+          onPress={() => navigate('CreateCommittee')}
         >
           <Image source={AppIcons.Add} style={styles.add} />
         </TouchableOpacity>
@@ -96,136 +184,83 @@ export const CommitteeList = () => {
         </View>
 
         {/* ---------------------------------------------- */}
-        <View style={styles.Committee_View}>
-          {/* --------------------- */}
-          <TouchableOpacity onPress={() => navigate('CommitteeDetails')}>
-            <View style={styles.Dashboardcard}>
-              <View style={styles.first_view}>
-                <View>
-                  <Text style={styles.family}>Family Fund BC</Text>
-                </View>
-                <TouchableOpacity style={styles.Btncomplete}>
-                  <Text style={styles.complete}>Complete</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.first_view}>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Members : </Text>
-                  <Text style={styles.count}> 25</Text>
-                </View>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Amount per Member :</Text>
-                  <Text style={styles.count}> 4,000</Text>
-                </View>
-              </View>
-              <View style={styles.first_view}>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Round : </Text>
-                  <Text style={styles.count}> 10</Text>
-                </View>
-                <View style={styles.details}>
-                  <Text style={styles.one}>Start Date :</Text>
-                  <Text style={styles.count}> Dec 2025</Text>
-                </View>
-              </View>
-            </View>
-          </TouchableOpacity>
-          {/* --------------------- */}
-          <View style={styles.Dashboardcard}>
-            <View style={styles.first_view}>
-              <View>
-                <Text style={styles.family}>ABC Group BC</Text>
-              </View>
-              <TouchableOpacity style={styles.BtnActive}>
-                <Text style={styles.active}>Active</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Members : </Text>
-                <Text style={styles.count}> 25</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Amount per Member :</Text>
-                <Text style={styles.count}> 4,000</Text>
-              </View>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Round : </Text>
-                <Text style={styles.count}> 10</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Start Date :</Text>
-                <Text style={styles.count}> Dec 2025</Text>
-              </View>
-            </View>
+        {loading ? (
+          <MySkeleton />
+        ) : (
+          <View style={styles.Committee_View}>
+            <FlatList
+              data={listView}
+              keyExtractor={(item, index) =>
+                item?.id.toString() || index.toString()
+              }
+              renderItem={item => {
+                const datalist = item.item;
+                return (
+                  <View style={styles.Committee_View}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigate('CommitteeDetails', { id: datalist.id })
+                      }
+                    >
+                      <View style={styles.Dashboardcard}>
+                        <View style={styles.first_view}>
+                          <View>
+                            <Text style={styles.family}>{datalist.name}</Text>
+                          </View>
+                          <TouchableOpacity
+                            style={
+                              datalist.status === 'Active'
+                                ? styles.BtnActive
+                                : styles.Btncomplete
+                            }
+                          >
+                            <Text style={styles.complete}>
+                              {datalist.status}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.first_view}>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Members :</Text>
+                            <Text style={styles.count}>
+                              {' '}
+                              {datalist.total_member}
+                            </Text>
+                          </View>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Amount per Member :</Text>
+                            <Text style={styles.count}>
+                              {' '}
+                              {datalist.amount_per_member}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.first_view}>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Round :</Text>
+                            <Text style={styles.count}>
+                              {' '}
+                              {datalist.total_rounds}
+                            </Text>
+                          </View>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Start Date :</Text>
+                            <Text style={styles.count}>
+                              {' '}
+                              {datalist.start_date}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
+            />
           </View>
+        )}
 
-          {/* --------------------- */}
-          <View style={styles.Dashboardcard}>
-            <View style={styles.first_view}>
-              <View>
-                <Text style={styles.family}>ABC Group BC</Text>
-              </View>
-              <TouchableOpacity style={styles.BtnActive}>
-                <Text style={styles.active}>Active</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Members : </Text>
-                <Text style={styles.count}> 25</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Amount per Member :</Text>
-                <Text style={styles.count}> 4,000</Text>
-              </View>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Round : </Text>
-                <Text style={styles.count}> 10</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Start Date :</Text>
-                <Text style={styles.count}> Dec 2025</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* --------------------- */}
-          <View style={styles.Dashboardcard}>
-            <View style={styles.first_view}>
-              <View>
-                <Text style={styles.family}>Family Fund BC</Text>
-              </View>
-              <TouchableOpacity style={styles.Btncomplete}>
-                <Text style={styles.complete}>Complete</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Members : </Text>
-                <Text style={styles.count}> 25</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Amount per Member :</Text>
-                <Text style={styles.count}> 4,000</Text>
-              </View>
-            </View>
-            <View style={styles.first_view}>
-              <View style={styles.details}>
-                <Text style={styles.one}>Round : </Text>
-                <Text style={styles.count}> 10</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.one}>Start Date :</Text>
-                <Text style={styles.count}> Dec 2025</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        {/* ------------------------------------------------------------------------- */}
       </ScrollView>
     </View>
   );
@@ -290,7 +325,7 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
   },
   Dashboardcard: {
-    width: '90%',
+    width: '95%',
     backgroundColor: AppColors.background,
     justifyContent: 'center',
 
@@ -315,7 +350,7 @@ const styles = ScaledSheet.create({
     fontWeight: '600',
   },
   Btncomplete: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: 'green',
     borderRadius: 20,
     padding: 5,
   },
@@ -326,7 +361,8 @@ const styles = ScaledSheet.create({
     paddingRight: 7,
   },
   BtnActive: {
-    backgroundColor: AppColors.cardLight,
+    backgroundColor: AppColors.primary,
+
     borderRadius: 20,
     padding: 5,
     borderColor: AppColors.primary,

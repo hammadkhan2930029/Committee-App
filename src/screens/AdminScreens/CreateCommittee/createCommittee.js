@@ -116,7 +116,7 @@ export const CreateCommittee = () => {
         Toast.show({
           type: 'customToast',
           text1: 'Warning',
-          text2: 'User already exists',
+          text2: 'something error',
           props: {
             bgColor: AppColors.background,
             borderColor: 'orange',

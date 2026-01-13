@@ -145,7 +145,7 @@ export const CommitteeUserList = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
       <View style={styles.addView}>
-        <TouchableOpacity activeOpacity={0.8}>
+        <TouchableOpacity activeOpacity={0.8} onPress={()=> navigation.navigate('CreateMembers')}>
           <Image source={AppIcons.Add} style={styles.add} />
         </TouchableOpacity>
       </View>
@@ -206,12 +206,7 @@ export const CommitteeUserList = () => {
                     <Text style={styles.count}>{item.phone}</Text>
                   </View>
                 </View>
-                {/* <View style={styles.first_view}>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Joined BCs:</Text>
-                    <Text style={styles.count}>{item.joinedBCs}</Text>
-                  </View>
-                </View> */}
+                
               </TouchableOpacity>
             </View>
           )}

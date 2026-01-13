@@ -22,6 +22,7 @@ import { Loader } from '../../Loader/loader';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const CommitteeList = () => {
+
   const [loading, setLoading] = useState(false);
   const [listView, setListView] = useState([]);
   //----------------------------------------------
@@ -39,6 +40,14 @@ export const CommitteeList = () => {
       loadUser();
     }, []),
   );
+    //---thousand separator---only display ke liye-------
+  const formatNumber = value => {
+    if (!value) return '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  //---- User input se commas remove karne ke liye-------
+  const removeCommas = value => value.replace(/,/g, '');
   //----------get committee list----------------------
 
   const committeeList = async () => {
@@ -76,7 +85,6 @@ export const CommitteeList = () => {
                 style={{
                   backgroundColor: AppColors.background,
                   padding: 10,
-                  elevation: 5,
                   borderRadius: 20,
                   margin: 10,
                   borderColor: AppColors.primary,
@@ -231,7 +239,7 @@ export const CommitteeList = () => {
                             <Text style={styles.one}>Amount per Member :</Text>
                             <Text style={styles.count}>
                               {' '}
-                              {datalist.amount_per_member}
+                              {formatNumber(datalist.amount_per_member)}
                             </Text>
                           </View>
                         </View>

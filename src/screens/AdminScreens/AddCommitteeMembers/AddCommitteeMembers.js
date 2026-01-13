@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -16,19 +16,91 @@ import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { api } from '../../../services/api';
+import { getStoredUser } from '../../../Utils/getUser';
 
 export const AddCommitteeMembers = () => {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [userdata, setUserData] = useState([]);
+  const [userList, setUserList] = useState([]);
 
-  const [items, setItems] = useState([
-    { label: 'Member1', value: 'Member1' },
-    { label: 'Member2', value: 'Member2' },
-    { label: 'Member3', value: 'Member3' },
-  ]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigation = useNavigation();
+  //----------------------------------------
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState([]);
+
+  const [items, setItems] = useState([]);
+
+  //-----------------get data--------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+
+  //-----------------user list------------------------
+  const userViewUsers = async () => {
+    if (!userdata?.user_id) return; // safeguard
+
+    console.log(userdata.user_id);
+
+    try {
+      const response = await api.get(`/user/view-users/${userdata.user_id}`);
+      console.log('response:', response.data.msg);
+      if (Array.isArray(response.data.msg)) {
+        const dropdownItems = response.data.msg.map(user => ({
+          label: user.name, // jo screen par dikhana hai
+          value: user.user_id, // jo backend me bhejna hai
+        }));
+        setUserList(response.data.msg); // original list optional
+        setItems(dropdownItems);
+      } else {
+        setUserList([]);
+        setItems([]);
+      }
+    } catch (error) {
+      console.log('error :', error);
+    }
+  };
+
+  useEffect(() => {
+    if (userdata?.user_id) {
+      userViewUsers();
+    }
+  }, [userdata]);
+  console.log('add members committee :', items);
+
+  //----------------------------------------------
+  const addCommitteeMember = async () => {
+    try {
+      var formData = new FormData();
+      formData.append('committee_member_id[]', value);
+      formData.append('user_id[]', userdata.user_id);
+
+      const response = await api.post(
+        '/user/update/committee-members',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
+      console.log('Add committee member response:', response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log('set value :', value);
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -72,19 +144,15 @@ export const AddCommitteeMembers = () => {
             dropDownContainerStyle={{
               borderColor: '#ccc',
               borderRadius: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderWidth: 1,
-              borderColor: '#ccc',
-              borderRadius: '10@ms',
               backgroundColor: '#f7f4f4ff',
               paddingHorizontal: '10@ms',
+              color: '#000',
             }}
             listMode="SCROLLVIEW"
-            ArrowDownIconComponent={({ style }) => (
+            ArrowDownIconComponent={() => (
               <Icon name="arrow-drop-down" size={24} color="#666" />
             )}
-            ArrowUpIconComponent={({ style }) => (
+            ArrowUpIconComponent={() => (
               <Icon name="arrow-drop-up" size={24} color="#666" />
             )}
           />
@@ -92,7 +160,10 @@ export const AddCommitteeMembers = () => {
 
         <View style={styles.buttons}>
           <View style={styles.btnView}>
-            <CustomButton title="Add Member" />
+            <CustomButton
+              title="Add Member"
+              onPress={() => addCommitteeMember()}
+            />
           </View>
         </View>
       </ScrollView>

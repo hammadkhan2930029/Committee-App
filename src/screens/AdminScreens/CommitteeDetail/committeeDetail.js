@@ -23,6 +23,11 @@ export const CommitteeDetails = ({ route }) => {
   console.log('ID :', id);
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
+    //---thousand separator---only display ke liye-------
+  const formatNumber = value => {
+    if (!value) return '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
 
   //------------------------------------------------
   const committeeDetails = async () => {
@@ -89,11 +94,11 @@ export const CommitteeDetails = ({ route }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Amount Per Member</Text>
-            <Text style={styles.text2}>PKR {details.amount_per_member}</Text>
+            <Text style={styles.text2}>PKR {formatNumber(details.amount_per_member)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Amount</Text>
-            <Text style={styles.text2}>PKR {details.total}</Text>
+            <Text style={styles.text2}>PKR {formatNumber(details.total)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Date</Text>
@@ -137,6 +142,7 @@ export const CommitteeDetails = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor:AppColors.background
   },
   arrowBack: {
     width: 28,

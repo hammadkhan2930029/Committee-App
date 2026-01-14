@@ -23,7 +23,9 @@ export const CommitteeDetails = ({ route }) => {
   console.log('ID :', id);
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
-    //---thousand separator---only display ke liye-------
+  const [multipleData, setMultipleData] = useState([]);
+
+  //---thousand separator---only display ke liye-------
   const formatNumber = value => {
     if (!value) return '';
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -33,8 +35,11 @@ export const CommitteeDetails = ({ route }) => {
   const committeeDetails = async () => {
     try {
       const response = await api.get(`/user/view-committee-detail/${id}`);
-      console.log('committee details :', response.data.msg[0]);
-      setDetails(response.data.msg[0]);
+      console.log('committee details :', response.data);
+      if (response?.data?.code === '200') {
+        setDetails(response.data.msg[0]);
+        setMultipleData(response.data);
+      }
     } catch (error) {
       console.log('Try catch error :', error);
     }
@@ -42,7 +47,7 @@ export const CommitteeDetails = ({ route }) => {
   useEffect(() => {
     committeeDetails();
   }, [id]);
-  console.log('committee details 2:', details.name);
+  console.log('committee details 2:', details);
 
   return (
     <View style={styles.container}>
@@ -75,7 +80,6 @@ export const CommitteeDetails = ({ route }) => {
           </ImageBackground>
         </View>
         <View style={styles.BCDetails}>
-          
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -94,7 +98,9 @@ export const CommitteeDetails = ({ route }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Amount Per Member</Text>
-            <Text style={styles.text2}>PKR {formatNumber(details.amount_per_member)}</Text>
+            <Text style={styles.text2}>
+              PKR {formatNumber(details.amount_per_member)}
+            </Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Amount</Text>
@@ -119,19 +125,21 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.btnView}>
             <CustomButton
               title="Edit Committee"
-              onPress={() => navigate('EditCommittee',{details:details})}
+              onPress={() => navigate('EditCommittee', { details: details })}
             />
           </View>
           <View style={styles.btnView}>
             <CustomButtonLight
               title="Add Members"
-              onPress={() => navigate('AddCommitteeMembers')}
+              onPress={() =>
+                navigate('AddCommitteeMembers', { multipleData: multipleData })
+              }
             />
           </View>
           <View style={styles.btnView}>
             <CustomButtonLight
               title="Assign Rounds"
-              onPress={() => navigate('AssignRounds')}
+              onPress={() => navigate('AssignRounds', { details: details })}
             />
           </View>
         </View>
@@ -142,7 +150,7 @@ export const CommitteeDetails = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
-    backgroundColor:AppColors.background
+    backgroundColor: AppColors.background,
   },
   arrowBack: {
     width: 28,

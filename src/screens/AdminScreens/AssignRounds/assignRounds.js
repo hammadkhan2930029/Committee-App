@@ -20,7 +20,14 @@ import { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
 
-export const AssignRounds = () => {
+export const AssignRounds = ({ route }) => {
+  //---------------------------------------------
+  const navigation = useNavigation();
+  const { details } = route.params;
+  const committeeID = details.committee_id;
+
+  console.log('committee id :', committeeID);
+  //----------------------------------------------
   const [rounds, setRounds] = useState(null);
 
   const [open, setOpen] = useState(false);
@@ -31,7 +38,9 @@ export const AssignRounds = () => {
     { label: 'Member2', value: 'Member2' },
     { label: 'Member3', value: 'Member3' },
   ]);
-  const navigation = useNavigation();
+  //--------------------view committe members--------------------------
+
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />

@@ -7,14 +7,13 @@ import {
   ImageBackground,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { CustomButtonLight } from '../../../components/customeButtonLight';
-import { navigate } from '../../../navigations/navigationService';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useCallback, useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -28,6 +27,7 @@ export const AddCommitteeMembers = ({ route }) => {
   const [userdata, setUserData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
+  const [membersList, setMembersList] = useState([]);
 
   //------------------dropdown 1----------------------
 
@@ -41,9 +41,12 @@ export const AddCommitteeMembers = ({ route }) => {
   const [value2, setValue2] = useState(null);
   const [items2, setItems2] = useState([]);
 
-  //-------------------select members ID dropdown 2------------------------
+  //---------select members ID dropdown 2------------------------
 
   const { multipleData } = route.params;
+
+  const committeeID = multipleData?.msg[0]?.committee_id;
+
   const membersID = multipleData.members.map(item => item);
 
   console.log('committee multipleData :', membersID);
@@ -56,8 +59,21 @@ export const AddCommitteeMembers = ({ route }) => {
       setItems2(dropdownItems);
     }
   }, []);
-  console.log('committe member id already created :', value2);
-
+  //--------------------members api---------------------------------------
+  const membersApi = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-members/${committeeID}`,
+      );
+      const data = response?.data?.msg;
+      setMembersList(data);
+    } catch (error) {
+      console.log('members api error:', error);
+    }
+  };
+  useEffect(() => {
+    membersApi();
+  }, [committeeID]);
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -72,7 +88,6 @@ export const AddCommitteeMembers = ({ route }) => {
       loadUser();
     }, []),
   );
-  console.log('user id', userdata.user_id);
 
   //-----------------user list------------------------
 
@@ -83,13 +98,11 @@ export const AddCommitteeMembers = ({ route }) => {
 
     try {
       const response = await api.get(`/user/view-users/${userdata.user_id}`);
-      console.log('response:', response.data.msg);
       if (Array.isArray(response.data.msg)) {
         const dropdownItems = response.data.msg.map(user => ({
           label: user.name,
           value: user.user_id,
         }));
-        // setUserList(response.data.msg);
         setItems(dropdownItems);
       } else {
         setUserList([]);
@@ -105,7 +118,6 @@ export const AddCommitteeMembers = ({ route }) => {
       userViewUsers();
     }
   }, [userdata]);
-  console.log('user list:', items);
 
   //-------------------add members api---------------------------
 
@@ -140,8 +152,7 @@ export const AddCommitteeMembers = ({ route }) => {
           },
         });
       }
-
-      console.log('Add committee member response:', res);
+      membersApi();
     } catch (error) {
       console.log(error);
       Toast.show({
@@ -155,147 +166,153 @@ export const AddCommitteeMembers = ({ route }) => {
       });
     }
   };
-  console.log('set value :', value);
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <View>
-        <ImageBackground
-          source={AppImages.Rectangle2}
-          style={styles.RectangleImg}
-        >
-          <View style={styles.main}>
-            <View style={styles.TopView}>
-              <View style={styles.backAndText}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
-                </TouchableOpacity>
-                <Text style={styles.h1}>Add Committee Members</Text>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 50 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View>
+          <ImageBackground
+            source={AppImages.Rectangle2}
+            style={styles.RectangleImg}
+          >
+            <View style={styles.main}>
+              <View style={styles.TopView}>
+                <View style={styles.backAndText}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image
+                      source={AppIcons.arrowBack}
+                      style={styles.arrowBack}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.h1}>Add Committee Members</Text>
+                </View>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.h4}>
+                  Select a user from the list to add into this committee
+                </Text>
               </View>
             </View>
-            <View style={styles.textView}>
-              <Text style={styles.h4}>
-                Select a user from the list to add into this committee
-              </Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-      {/* ------------------------------------------------------------------ */}
-      <View style={styles.dropdownMain}>
-        <View style={[styles.dropDownView, { zIndex: 2000 }]}>
-          <Text style={styles.label}>Select Committee no</Text>
-          <DropDownPicker
-            open={open2}
-            items={items2}
-            setOpen={setOpen2}
-            value={value2}
-            setValue={setValue2}
-            setItems={setItems2}
-            placeholder="Choose members ID"
-            style={styles.dropDown}
-            // maxHeight={300}
-            dropDownContainerStyle={{
-              // maxHeight: 300,
-              borderColor: '#ccc',
-              borderRadius: 10,
-              backgroundColor: '#f7f4f4ff',
-              color: '#000',
-            }}
-            // flatListProps={{
-            //   nestedScrollEnabled: true,
-            //   showsVerticalScrollIndicator: true,
-            // }}
-            // listMode="SCROLLVIEW"
-            // listMode="MODAL" // 🔥 KEY FIX
-            // modalTitle="Select Committee No"
-            // modalProps={{
-            //   animationType: 'slide',
-            // }}
-            // modalContentContainerStyle={{
-            //   backgroundColor: '#fff',
-            // }}
-            ArrowDownIconComponent={() => (
-              <Icon name="arrow-drop-down" size={24} color="#666" />
-            )}
-            ArrowUpIconComponent={() => (
-              <Icon name="arrow-drop-up" size={24} color="#666" />
-            )}
-          />
+          </ImageBackground>
         </View>
         {/* ------------------------------------------------------------------ */}
-        <View style={[styles.dropDownView, { zIndex: 1000 }]}>
-          <Text style={styles.label}>Select Member</Text>
-          <DropDownPicker
-            open={open}
-            items={items}
-            setOpen={setOpen}
-            value={value}
-            setValue={setValue}
-            setItems={setItems}
-            placeholder="Choose user"
-            style={styles.dropDown}
-            // maxHeight={300}
-            dropDownContainerStyle={{
-              // maxHeight: 300,
-              borderColor: '#ccc',
-              borderRadius: 10,
-              backgroundColor: '#f7f4f4ff',
-              color: '#000',
-            }}
-            // flatListProps={{
-            //   nestedScrollEnabled: true,
-            //   showsVerticalScrollIndicator: true,
-            // }}
-            // listMode="FLATLIST"
-            // listMode="MODAL"
-            // modalTitle="Select Committee No"
-            // modalProps={{
-            //   animationType: 'slide',
-            // }}
-            // modalContentContainerStyle={{
-            //   backgroundColor: '#fff',
-            // }}
-            ArrowDownIconComponent={() => (
-              <Icon name="arrow-drop-down" size={24} color="#666" />
-            )}
-            ArrowUpIconComponent={() => (
-              <Icon name="arrow-drop-up" size={24} color="#666" />
-            )}
-          />
+        <View style={styles.dropdownMain}>
+          <View style={[styles.dropDownView, { zIndex: 2000 }]}>
+            <Text style={styles.label}>Select Committee no</Text>
+            <DropDownPicker
+              open={open2}
+              items={items2}
+              setOpen={setOpen2}
+              value={value2}
+              setValue={setValue2}
+              setItems={setItems2}
+              placeholder="Choose members ID"
+              style={styles.dropDown}
+              dropDownContainerStyle={{
+                borderColor: '#ccc',
+                borderRadius: 10,
+                backgroundColor: '#f7f4f4ff',
+                color: '#000',
+              }}
+              flatListProps={{
+                nestedScrollEnabled: true,
+                showsVerticalScrollIndicator: true,
+              }}
+              listMode="MODAL"
+              modalTitle="Select Committee No"
+              modalProps={{
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: '#ffffff',
+              }}
+              ArrowDownIconComponent={() => (
+                <Icon name="arrow-drop-down" size={24} color="#666" />
+              )}
+              ArrowUpIconComponent={() => (
+                <Icon name="arrow-drop-up" size={24} color="#666" />
+              )}
+            />
+          </View>
+          {/* ------------------------------------------------------------------ */}
+          <View style={[styles.dropDownView, { zIndex: 1000 }]}>
+            <Text style={styles.label}>Select Member</Text>
+            <DropDownPicker
+              open={open}
+              items={items}
+              setOpen={setOpen}
+              value={value}
+              setValue={setValue}
+              setItems={setItems}
+              placeholder="Choose user"
+              style={styles.dropDown}
+              dropDownContainerStyle={{
+                borderColor: '#ccc',
+                borderRadius: 10,
+                backgroundColor: '#f7f4f4ff',
+                color: '#000',
+              }}
+              flatListProps={{
+                nestedScrollEnabled: true,
+                showsVerticalScrollIndicator: true,
+              }}
+              listMode="MODAL"
+              modalTitle="Select Committee No"
+              modalProps={{
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: '#fff',
+              }}
+              ArrowDownIconComponent={() => (
+                <Icon name="arrow-drop-down" size={24} color="#666" />
+              )}
+              ArrowUpIconComponent={() => (
+                <Icon name="arrow-drop-up" size={24} color="#666" />
+              )}
+            />
+          </View>
         </View>
-      </View>
-      {/* ---------------------------------------------------------------- */}
+        {/* ---------------------------------------------------------------- */}
 
-      <View style={styles.buttons}>
-        <View style={styles.btnView}>
-          <CustomButton
-            title="Add Member"
-            onPress={() => addCommitteeMember()}
+        <View style={styles.buttons}>
+          <View style={styles.btnView}>
+            <CustomButton
+              title="Add Member"
+              onPress={() => addCommitteeMember()}
+            />
+          </View>
+        </View>
+        {/* ------------------------------------------------------------------- */}
+        <View style={styles.tableMainView}>
+          <View style={styles.tableHeader}>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Member # </Text>
+            </View>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Name </Text>
+            </View>
+          </View>
+          <FlatList
+            data={membersList}
+            keyExtractor={(item, index) => index.toString()}
+            scrollEnabled={false}
+            renderItem={({ item, index }) => (
+              <View style={styles.tableRow}>
+                <View style={styles.Rowcell}>
+                  <Text style={styles.text}>{index + 1}</Text>
+                </View>
+                <View style={styles.Rowcell}>
+                  <Text style={styles.text}>{item.user_name}</Text>
+                </View>
+              </View>
+            )}
           />
         </View>
-      </View>
-      {/* ------------------------------------------------------------------- */}
-      <View style={styles.tableMainView}>
-        <View style={styles.tableHeader}>
-          <View style={styles.cell}>
-            <Text style={styles.headerText}>Member # </Text>
-          </View>
-          <View style={styles.cell}>
-            <Text style={styles.headerText}>Name </Text>
-          </View>
-        </View>
-        {/* {multipleData.members.map(item => (
-          <View style={styles.tableRow} key={item.committe_member_id}>
-            <View style={styles.Rowcell}>
-              <Text style={styles.text}>Member {item.committe_member_id}</Text>
-            </View>
-            <View style={styles.Rowcell}>
-              <Text style={styles.text}>{item.user_name}</Text>
-            </View>
-          </View>
-        ))} */}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -391,48 +408,100 @@ const styles = ScaledSheet.create({
   //---------table-------------------
   tableMainView: {
     width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 15,
     backgroundColor: AppColors.background,
-    padding: 10,
-    elevation: 5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3, // Android shadow
   },
+
   tableHeader: {
-    // backgroundColor:AppColors.primary,
+    backgroundColor: AppColors.primary,
     width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     flexDirection: 'row',
-    padding: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
+
   cell: {
     width: '50%',
-    backgroundColor: AppColors.primary,
-    margin: 2,
-    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+
   headerText: {
-    textAlign: 'center',
-    fontSize: moderateScale(20),
-    padding: 5,
+    fontSize: moderateScale(17),
+    fontWeight: '600',
     color: AppColors.title,
   },
+
   tableRow: {
     width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     flexDirection: 'row',
-    padding: 5,
+    paddingVertical: 8,
+    backgroundColor: AppColors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.placeholder + '40', // light divider
   },
-  text: {
-    textAlign: 'center',
-    fontSize: moderateScale(20),
-    padding: 5,
-    color: AppColors.bodyText,
-  },
+
   Rowcell: {
     width: '50%',
-    margin: 2,
-    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 6,
   },
+
+  text: {
+    fontSize: moderateScale(15),
+    color: AppColors.bodyText,
+  },
+
+  // tableMainView: {
+  //   width: '100%',
+  //   padding: 10,
+  //   backgroundColor: AppColors.background,
+  //   marginTop: 15,
+  // },
+  // tableHeader: {
+  //   backgroundColor: AppColors.primary,
+  //   width: '100%',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  //   flexDirection: 'row',
+  //   borderTopRightRadius: 10,
+  //   borderTopLeftRadius: 10,
+
+  //   padding: 5,
+  // },
+  // cell: {
+  //   width: '50%',
+  //   backgroundColor: AppColors.primary,
+  //   margin: 2,
+  //   borderRadius: 10,
+  // },
+  // headerText: {
+  //   textAlign: 'center',
+  //   fontSize: moderateScale(18),
+  //   padding: 5,
+  //   color: AppColors.title,
+  // },
+  // tableRow: {
+  //   width: '100%',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  //   flexDirection: 'row',
+  // },
+  // text: {
+  //   textAlign: 'center',
+  //   fontSize: moderateScale(16),
+  //   color: AppColors.bodyText,
+  // },
+  // Rowcell: {
+  //   width: '50%',
+  //   height: 30,
+  //   borderColor: AppColors.placeholder,
+  //   borderWidth: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
 });

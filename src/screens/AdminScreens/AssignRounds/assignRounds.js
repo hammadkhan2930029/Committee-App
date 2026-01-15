@@ -13,33 +13,69 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { CustomButtonLight } from '../../../components/customeButtonLight';
-import { navigate } from '../../../navigations/navigationService';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
 
 export const AssignRounds = ({ route }) => {
   //---------------------------------------------
   const navigation = useNavigation();
-  const { details } = route.params;
-  const committeeID = details.committee_id;
+  const { multipleData } = route.params;
+  const committeeMembers = multipleData.members || [];
+  const committeeRounds = multipleData.rounds || [];
+  console.log('committeeMembers', committeeMembers);
+  console.log('committeeMemcommitteeRoundsbers', committeeRounds);
 
-  console.log('committee id :', committeeID);
-  //----------------------------------------------
-  const [rounds, setRounds] = useState(null);
+  // ---------- Members Dropdown ----------
+  const [openMember, setOpenMember] = useState(false);
+  const [memberValue, setMemberValue] = useState(null);
+  const [memberItems, setMemberItems] = useState(
+    committeeMembers.map(item => ({
+      label: item.user_name,
+      value: item.user_id,
+    })),
+  );
+  console.log('members value :', memberValue);
+  // ---------- Rounds Dropdown ----------
+  const [openRound, setOpenRound] = useState(false);
+  const [roundValue, setRoundValue] = useState(null);
+  const [roundItems, setRoundItems] = useState(
+    committeeRounds.map(item => ({
+      label: item.round_no,
+      value: item.committee_round_id,
+    })),
+  );
+  console.log('round value :', roundValue);
 
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  //--------------------assign round api--------------------------
+  const roundApi = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('committee_round_id[]', roundValue);
+      formData.append('committee_member_id[]', memberValue);
 
-  const [items, setItems] = useState([
-    { label: 'Member1', value: 'Member1' },
-    { label: 'Member2', value: 'Member2' },
-    { label: 'Member3', value: 'Member3' },
-  ]);
-  //--------------------view committe members--------------------------
+      const res = await api.post('/user/assign-rounds-to-members', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
+      console.log('FULL RESPONSE:', res.data);
+
+      if (res?.data?.code === '200') {
+        console.log('SUCCESS MSG:', res.data.msg[0].response);
+      }
+      if (res?.data?.code === '200') {
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: res.data.msg[0].response,
+        });
+      }
+    } catch (error) {
+      console.log('error :', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -70,51 +106,70 @@ export const AssignRounds = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
-        <View style={styles.dropDownView}>
-          <Text style={styles.label}>Select Member</Text>
-          <DropDownPicker
-            open={open}
-            items={items}
-            setOpen={setOpen}
-            value={value}
-            setValue={setValue}
-            setItems={setItems}
-            placeholder="Choose member"
-            style={styles.dropDown}
-            dropDownContainerStyle={{
-              borderColor: '#ccc',
-              borderRadius: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderWidth: 1,
-              borderColor: '#ccc',
-              borderRadius: '10@ms',
-              backgroundColor: '#f7f4f4ff',
-              paddingHorizontal: '10@ms',
-            }}
-            listMode="SCROLLVIEW"
-            ArrowDownIconComponent={({ style }) => (
-              <Icon name="arrow-drop-down" size={24} color="#666" />
-            )}
-            ArrowUpIconComponent={({ style }) => (
-              <Icon name="arrow-drop-up" size={24} color="#666" />
-            )}
-          />
-        </View>
-        <View style={styles.textInput}>
-          <CustomInputWithIcon
-            label="Amount Per Member"
-            placeholder="Enter amount per member"
-            type="numeric"
-            value={rounds}
-            onChangeText={setRounds}
-            rightIcon={<Icon name="edit" size={20} color="#666" />}
-          />
+        <View>
+          <View style={[styles.dropDownView, { zIndex: 2000 }]}>
+            <Text style={styles.label}>Select Committee Member</Text>
+            <DropDownPicker
+              open={openMember}
+              value={memberValue}
+              items={memberItems}
+              setOpen={setOpenMember}
+              setValue={setMemberValue}
+              setItems={setMemberItems}
+              placeholder="Choose member"
+              // listMode="SCROLLVIEW"
+              listMode="MODAL"
+              modalTitle="Select Committee No"
+              modalProps={{
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: '#ffffff',
+              }}
+              style={styles.dropDown}
+              dropDownContainerStyle={styles.dropDown}
+              ArrowDownIconComponent={() => (
+                <Icon name="arrow-drop-down" size={24} color="#666" />
+              )}
+              ArrowUpIconComponent={() => (
+                <Icon name="arrow-drop-up" size={24} color="#666" />
+              )}
+            />
+          </View>
+          <View style={[styles.dropDownView, { zIndex: 1000 }]}>
+            <Text style={styles.label}>Select Round</Text>
+            <DropDownPicker
+              open={openRound}
+              value={roundValue}
+              items={roundItems}
+              setOpen={setOpenRound}
+              setValue={setRoundValue}
+              setItems={setRoundItems}
+              placeholder="Choose round"
+              // listMode="SCROLLVIEW"
+              listMode="MODAL"
+              modalTitle="Select Committee No"
+              modalProps={{
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: '#ffffff',
+              }}
+              style={styles.dropDown}
+              dropDownContainerStyle={styles.dropDown}
+              ArrowDownIconComponent={() => (
+                <Icon name="arrow-drop-down" size={24} color="#666" />
+              )}
+              ArrowUpIconComponent={() => (
+                <Icon name="arrow-drop-up" size={24} color="#666" />
+              )}
+            />
+          </View>
         </View>
 
         <View style={styles.buttons}>
           <View style={styles.btnView}>
-            <CustomButton title="Assign Round" />
+            <CustomButton title="Assign Round" onPress={() => roundApi()} />
           </View>
         </View>
       </ScrollView>

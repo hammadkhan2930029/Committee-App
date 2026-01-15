@@ -27,8 +27,7 @@ export const AdminProfile = () => {
     const parsedUser = JSON.parse(user);
     setUserData(parsedUser);
 
-    console.log(parsedUser.full_name); // Hammad
-    console.log(parsedUser.user_id); // 11
+ 
   };
   useFocusEffect(() => {
     getData();
@@ -41,12 +40,6 @@ export const AdminProfile = () => {
     await AsyncStorage.removeItem('token');
     navigation.replace('Login');
   };
-  // useEffect(() => {
-  //   logout();
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 2000);
-  // }, []);
 
   return (
     <View style={styles.container}>
@@ -55,9 +48,6 @@ export const AdminProfile = () => {
         barStyle="dark-content"
       />
       <View style={styles.arrowBackView}>
-        {/* <TouchableOpacity>
-          <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
-        </TouchableOpacity> */}
         <TouchableOpacity style={styles.arrowIcon}>
           <Icon name="keyboard-arrow-left" size={26} color={AppColors.title} />
         </TouchableOpacity>

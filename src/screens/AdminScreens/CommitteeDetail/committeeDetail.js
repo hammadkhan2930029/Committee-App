@@ -139,7 +139,7 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.btnView}>
             <CustomButtonLight
               title="Assign Rounds"
-              onPress={() => navigate('AssignRounds', { details: details })}
+              onPress={() => navigate('AssignRounds', { multipleData: multipleData })}
             />
           </View>
         </View>

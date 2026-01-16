@@ -100,7 +100,7 @@ export const MembersDetails = ({ route }) => {
         </View>
         <View style={styles.btn}>
           <CustomButton
-            title="Edit User"
+            title="Edit member"
             onPress={() => navigation.navigate('EditMember', { item: item })}
           />
         </View>
@@ -111,6 +111,7 @@ export const MembersDetails = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor: AppColors.background,
   },
   arrowBack: {
     width: 28,
@@ -230,7 +231,7 @@ const styles = ScaledSheet.create({
   committeeDetails: {
     width: '90%',
     borderColor: AppColors.primary,
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 10,
     padding: 15,
     marginTop: 5,

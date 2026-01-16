@@ -106,6 +106,8 @@ export const PaymentDetails = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor: AppColors.background,
+
   },
   arrowBack: {
     width: 28,

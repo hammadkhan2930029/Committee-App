@@ -15,16 +15,16 @@ import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { navigate } from '../../../navigations/navigationService';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const CommitteeList = () => {
-
   const [loading, setLoading] = useState(false);
   const [listView, setListView] = useState([]);
+  const navigation = useNavigation();
   //----------------------------------------------
   const [userData, setUserData] = useState(null);
 
@@ -40,7 +40,7 @@ export const CommitteeList = () => {
       loadUser();
     }, []),
   );
-    //---thousand separator---only display ke liye-------
+  //---thousand separator---only display ke liye-------
   const formatNumber = value => {
     if (!value) return '';
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -70,6 +70,8 @@ export const CommitteeList = () => {
   useEffect(() => {
     committeeList();
   }, [userData]);
+
+ 
 
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
@@ -181,7 +183,14 @@ export const CommitteeList = () => {
                   </TouchableOpacity>
                   <Text style={styles.h1}>Committees</Text>
                 </View>
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>Manage all your active and</Text>
@@ -198,11 +207,11 @@ export const CommitteeList = () => {
           <View style={styles.Committee_View}>
             <FlatList
               data={listView}
-              keyExtractor={(item, index) =>
-                item?.id.toString() || index.toString()
-              }
+              keyExtractor={(item, index) => index.toString()}
               renderItem={item => {
                 const datalist = item.item;
+                console.log('data list:', datalist);
+
                 return (
                   <View style={styles.Committee_View}>
                     <TouchableOpacity
@@ -210,7 +219,12 @@ export const CommitteeList = () => {
                         navigate('CommitteeDetails', { id: datalist.id })
                       }
                     >
-                      <View style={styles.Dashboardcard}>
+                      <View
+                        style={[
+                          styles.Dashboardcard,
+                          { display: datalist.name ? 'flex' : 'none' },
+                        ]}
+                      >
                         <View style={styles.first_view}>
                           <View>
                             <Text style={styles.family}>{datalist.name}</Text>
@@ -261,9 +275,22 @@ export const CommitteeList = () => {
                         </View>
                       </View>
                     </TouchableOpacity>
+                    <View
+                      style={[
+                        styles.dataEmpty,
+                        { display: datalist.name ? 'none' : 'flex' },
+                      ]}
+                    >
+                      <Text style={styles.emptyText}>Data not available</Text>
+                    </View>
                   </View>
                 );
               }}
+              ListEmptyComponent={() => (
+                <View style={styles.dataEmpty}>
+                  <Text style={styles.emptyText}>Data not available</Text>
+                </View>
+              )}
             />
           </View>
         )}
@@ -418,5 +445,14 @@ const styles = ScaledSheet.create({
 
     resizeMode: 'contain',
     elevation: 10,
+  },
+  dataEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+  },
+  emptyText: {
+    fontSize: moderateScale(18),
+    color: AppColors.placeholder,
   },
 });

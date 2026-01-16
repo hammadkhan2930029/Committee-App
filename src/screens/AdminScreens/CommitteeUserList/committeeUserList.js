@@ -145,7 +145,10 @@ export const CommitteeUserList = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
       <View style={styles.addView}>
-        <TouchableOpacity activeOpacity={0.8} onPress={()=> navigation.navigate('CreateMembers')}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('CreateMembers')}
+        >
           <Image source={AppIcons.Add} style={styles.add} />
         </TouchableOpacity>
       </View>
@@ -168,7 +171,14 @@ export const CommitteeUserList = () => {
                   </TouchableOpacity>
                   <Text style={styles.h1}>Users</Text>
                 </View>
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>Manage all users and view </Text>
@@ -186,28 +196,35 @@ export const CommitteeUserList = () => {
           }
           renderItem={({ item }) => (
             <View style={styles.Committee_View}>
-              <TouchableOpacity
-                style={styles.Dashboardcard}
-                onPress={() =>
-                  navigation.navigate('MembersDetails', { item: item })
-                }
-              >
-                <View style={styles.first_view}>
-                  <View style={styles.userMale_View}>
-                    <Image source={AppIcons.userMale} style={styles.userMale} />
+              
+                <TouchableOpacity
+                  style={[styles.Dashboardcard,{display:item.name ? 'flex':'none'}]}
+                  onPress={() =>
+                    navigation.navigate('MembersDetails', { item: item })
+                  }
+                >
+                  <View style={styles.first_view}>
+                    <View style={styles.userMale_View}>
+                      <Image
+                        source={AppIcons.userMale}
+                        style={styles.userMale}
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.Name}>{item.name}</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.Name}>{item.name}</Text>
+                  <View style={styles.first_view}>
+                    <View style={styles.details}>
+                      <Text style={styles.one}>Phone:</Text>
+                      <Text style={styles.count}>{item.phone}</Text>
+                    </View>
                   </View>
+                </TouchableOpacity>
+            
+                <View style={[styles.dataEmpty,{display:item.name ? 'none':'flex'}]}>
+                  <Text style={styles.emptyText}>Data not available</Text>
                 </View>
-                <View style={styles.first_view}>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Phone:</Text>
-                    <Text style={styles.count}>{item.phone}</Text>
-                  </View>
-                </View>
-                
-              </TouchableOpacity>
             </View>
           )}
         />
@@ -370,5 +387,15 @@ const styles = ScaledSheet.create({
     width: 25,
     height: 25,
     resizeMode: 'contain',
+  },
+  //----------------------------
+  dataEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+  },
+  emptyText: {
+    fontSize: moderateScale(18),
+    color: AppColors.placeholder,
   },
 });

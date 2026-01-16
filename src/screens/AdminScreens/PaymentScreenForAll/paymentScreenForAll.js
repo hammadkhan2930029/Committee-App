@@ -133,7 +133,6 @@ const demoData = [
   },
 ];
 
-
 export const Payments = () => {
   const navigation = useNavigation();
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -165,7 +164,14 @@ export const Payments = () => {
                   </TouchableOpacity>
                   <Text style={styles.h1}>Payments</Text>
                 </View>
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>Monitor all committee payments </Text>
@@ -292,62 +298,6 @@ export const Payments = () => {
               </TouchableOpacity>
             )}
           />
-          {/* {filterData.map((item, index) => {
-            return (
-              <TouchableOpacity
-                style={styles.cards}
-                key={index}
-                onPress={() =>
-                  navigation.navigate('PaymentDetails', { item: item })
-                }
-              >
-                <View style={styles.left}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.fund}>{item.fund}</Text>
-
-                  <View style={styles.amountView}>
-                    <Text style={styles.amount}>Amount :</Text>
-                    <Text style={styles.amount2}>{item.amount}</Text>
-                  </View>
-                </View>
-                <View style={styles.right}>
-                  <View
-                    style={[
-                      item.status === 'Paid'
-                        ? styles.paid
-                        : item.status === 'Pending'
-                        ? styles.pending
-                        : item.status === 'Overdue'
-                        ? styles.overDue
-                        : null,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.CardStatus,
-                        {
-                          color:
-                            item.status === 'Overdue'
-                              ? AppColors.bodyText
-                              : AppColors.title,
-                        },
-                      ]}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
-                  <View>
-                    <Text style={styles.date}>{''}</Text>
-                  </View>
-                  <View style={styles.dateView}>
-                    <Text style={styles.date}>Date :</Text>
-
-                    <Text style={styles.date2}>{item.date}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })} */}
         </View>
       </ScrollView>
     </View>

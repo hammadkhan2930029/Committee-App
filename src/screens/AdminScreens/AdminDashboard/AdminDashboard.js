@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StatusBar,
@@ -13,14 +13,105 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
 
 export const AdminDashboard = () => {
-    const navigation = useNavigation()
+  const navigation = useNavigation();
+  const [Loading, setLoading] = useState(null);
+
+  const [listView, setListView] = useState([]);
+  const [userList, setUserList] = useState([]);
+
+  //----------------------------------------------
+  const [userData, setUserData] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  //----------get committee list----------------------
+
+  const committeeList = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(
+        `/user/view-committees/${userData.user_id}`,
+      );
+
+      setListView(response.data.msg);
+      if (response.data.msg) {
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    committeeList();
+  }, [userData]);
+  //-----------total committee count------------------------
+
+  const totalCount = Array.isArray(listView)
+    ? listView.filter(item => item?.id).length
+    : 0;
+
+  console.log('count:', totalCount);
+
+  console.log('list view :', listView);
+  //-------------total user count---------------------------
+
+  const userViewUsers = async () => {
+    if (!userData?.user_id) return;
+    try {
+      const response = await api.get(`/user/view-users/${userData.user_id}`);
+      console.log('response:', response.data.msg);
+      if (Array.isArray(response.data.msg)) {
+        setUserList(response.data.msg);
+      } else {
+        setUserList([]);
+      }
+    } catch (error) {
+      console.log('error :', error);
+    }
+  };
+
+  useEffect(() => {
+    if (userData?.user_id) {
+      userViewUsers();
+    }
+  }, [userData]);
+
+  console.log(userData);
+
+  const totalUserCount = Array.isArray(userList)
+    ? userList.filter(
+        item =>
+          item &&
+          typeof item === 'object' &&
+          item.user_id !== undefined &&
+          item.user_id !== null,
+      ).length
+    : 0;
+
+  console.log('totalUserCount:', totalUserCount);
+
+  //---------------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -34,16 +125,19 @@ export const AdminDashboard = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <Text style={styles.h1}>Admin Dashboard</Text>
-                <TouchableOpacity onPress={()=> navigation.navigate('AdminProfile')}>
-
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
                 </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h2}>
                   Hello, Hammad{' '}
-                 
-                   <Icon name="waving-hand" size={30} color='#FED22D'/>
+                  <Icon name="waving-hand" size={30} color="#FED22D" />
                 </Text>
                 <Text style={styles.h4}>Here’s your admin overview.</Text>
               </View>
@@ -53,11 +147,14 @@ export const AdminDashboard = () => {
         {/* ---------------------------------------------- */}
         <View style={styles.Dashboardcard_View}>
           {/* -------Active BCs------- */}
-          <TouchableOpacity activeOpacity={0.7} onPress={()=>navigation.navigate("CommitteeList")}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('CommitteeList')}
+          >
             <View style={styles.Dashboardcard}>
               <View>
                 <View style={styles.imgText}>
-                  <Icon name="group-add" size={34} color={AppColors.link}/>
+                  <Icon name="group-add" size={34} color={AppColors.link} />
                   <Text style={styles.activeBC}>Active BCs</Text>
                 </View>
                 <Text style={styles.activeBC_details}>
@@ -65,7 +162,7 @@ export const AdminDashboard = () => {
                 </Text>
               </View>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>08</Text>
+                <Text style={styles.counter_text}>{totalCount ?? 0}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -74,13 +171,13 @@ export const AdminDashboard = () => {
             <View style={styles.Dashboardcard}>
               <View>
                 <View style={styles.imgText}>
-                 <Icon name="groups" size={34} color={AppColors.link}/>
+                  <Icon name="groups" size={34} color={AppColors.link} />
                   <Text style={styles.activeBC}>Total Users</Text>
                 </View>
                 <Text style={styles.activeBC_details}>3 joined this week </Text>
               </View>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>25</Text>
+                <Text style={styles.counter_text}>{totalUserCount}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -89,7 +186,7 @@ export const AdminDashboard = () => {
             <View style={styles.Dashboardcard}>
               <View>
                 <View style={styles.imgText}>
-                 <Ionicons name="briefcase" size={34} color={AppColors.link}/>
+                  <Ionicons name="briefcase" size={34} color={AppColors.link} />
                   <Text style={styles.activeBC}>Pending Payments</Text>
                 </View>
                 <Text style={styles.activeBC_details}>Awaiting approval </Text>
@@ -104,9 +201,12 @@ export const AdminDashboard = () => {
           <CustomButton
             title="Create Committee"
             style={styles.createCommittee}
-            onPress={()=> navigate('CreateCommittee')}
+            onPress={() => navigate('CreateCommittee')}
           />
-          <TouchableOpacity style={styles.CreateUser}  onPress={()=> navigation.navigate('CreateMembers')}>
+          <TouchableOpacity
+            style={styles.CreateUser}
+            onPress={() => navigation.navigate('CreateMembers')}
+          >
             <Text style={styles.CreateUser_text}>Create User</Text>
           </TouchableOpacity>
         </View>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -17,12 +17,18 @@ import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
 import { api } from '../../../services/api';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Loader } from '../../Loader/loader';
+import Toast from 'react-native-toast-message';
+
 
 export const CommitteeDetails = ({ route }) => {
   const { id } = route.params;
   console.log('ID :', id);
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [multipleData, setMultipleData] = useState([]);
 
   //---thousand separator---only display ke liye-------
@@ -44,10 +50,51 @@ export const CommitteeDetails = ({ route }) => {
       console.log('Try catch error :', error);
     }
   };
-  useEffect(() => {
-    committeeDetails();
-  }, [id]);
-  console.log('committee details 2:', details);
+  useFocusEffect(
+    useCallback(() => {
+      committeeDetails();
+    }, [id]),
+  );
+  console.log('committee details 2:', details.committee_id);
+  //----------------delete committee-------------------
+  const deleteCommittee = async () => {
+    setLoading(true);
+    try {
+      const response = await api.delete(
+        `/user/delete-committee/${details.committee_id}`,
+      );
+      const result = response?.data?.msg[0]?.response;
+     
+      if (response?.data?.code === '200' && result) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: result,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.goBack();
+        setLoading(false);
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: 'something error',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+      console.log('delete :', response);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -79,7 +126,13 @@ export const CommitteeDetails = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
+
         <View style={styles.BCDetails}>
+          <View style={styles.deleteIconView}>
+            <TouchableOpacity onPress={() => deleteCommittee()}>
+              <Icon name="delete" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -139,11 +192,14 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.btnView}>
             <CustomButtonLight
               title="Assign Rounds"
-              onPress={() => navigate('AssignRounds', { multipleData: multipleData })}
+              onPress={() =>
+                navigate('AssignRounds', { multipleData: multipleData })
+              }
             />
           </View>
         </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -210,11 +266,14 @@ const styles = ScaledSheet.create({
   },
   //----------------------------------
   BCDetails: {
-    width: '100%',
-
-    padding: 30,
+    width: '95%',
+    alignSelf: 'center',
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: AppColors.background,
+    elevation: 5,
+    borderRadius: 10,
   },
   row: {
     width: '100%',
@@ -241,6 +300,12 @@ const styles = ScaledSheet.create({
   },
   btnView: {
     width: '50%',
-    margin: 5,
+    marginTop: 15,
+  },
+  deleteIconView: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    padding: 10,
   },
 });

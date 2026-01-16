@@ -65,15 +65,41 @@ export const AssignRounds = ({ route }) => {
       if (res?.data?.code === '200') {
         console.log('SUCCESS MSG:', res.data.msg[0].response);
       }
-      if (res?.data?.code === '200') {
+
+      const data = res?.data?.msg[0]?.response;
+
+      if (data && res?.data?.code === '200') {
         Toast.show({
-          type: 'success',
+          type: 'customToast',
           text1: 'Success',
-          text2: res.data.msg[0].response,
+          text2: data,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: 'something error',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
         });
       }
     } catch (error) {
       console.log('error :', error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2: 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
     }
   };
 
@@ -179,6 +205,8 @@ export const AssignRounds = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor: AppColors.background,
+
   },
   arrowBack: {
     width: 28,

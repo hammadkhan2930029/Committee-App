@@ -35,10 +35,10 @@ export const AdminProfile = () => {
   console.log('user data :', userdata);
   //-----------------logout--------------------------
   const logout = async () => {
+    navigation.replace('Login');
     setIsLoading(true);
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
-    navigation.replace('Login');
   };
 
   return (
@@ -48,7 +48,7 @@ export const AdminProfile = () => {
         barStyle="dark-content"
       />
       <View style={styles.arrowBackView}>
-        <TouchableOpacity style={styles.arrowIcon}>
+        <TouchableOpacity style={styles.arrowIcon} onPress={()=> navigation.goBack()}>
           <Icon name="keyboard-arrow-left" size={26} color={AppColors.title} />
         </TouchableOpacity>
         <TouchableOpacity>

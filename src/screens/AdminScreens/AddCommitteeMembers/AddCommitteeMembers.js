@@ -74,6 +74,7 @@ export const AddCommitteeMembers = ({ route }) => {
   useEffect(() => {
     membersApi();
   }, [committeeID]);
+  console.log('member api :', membersList);
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -82,7 +83,7 @@ export const AddCommitteeMembers = ({ route }) => {
         const user = await getStoredUser();
         if (user) {
           setUserData(user);
-          console.log(user.full_name, user.user_id);
+          // console.log(user.full_name, user.user_id);
         }
       };
       loadUser();
@@ -94,7 +95,7 @@ export const AddCommitteeMembers = ({ route }) => {
   const userViewUsers = async () => {
     if (!userdata?.user_id) return;
 
-    console.log(userdata.user_id);
+    // console.log(userdata.user_id);
 
     try {
       const response = await api.get(`/user/view-users/${userdata.user_id}`);
@@ -166,6 +167,50 @@ export const AddCommitteeMembers = ({ route }) => {
       });
     }
   };
+  //-------------------------delete member api---------------------------
+  const deleteCommitteeMember = async committeeMemberID => {
+    try {
+      const response = await api.delete(
+        `/user/delete-committee-member/${committeeMemberID}`,
+      );
+      const result = response?.data;
+      if (result.code === '200' && result.msg[0].response) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: result.msg[0].response,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: 'something error',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+      membersApi();
+      console.log('delete Committee Member :', response);
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Warning',
+        text2: 'something error',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: 'orange',
+        },
+      });
+    }
+  };
+  //----------------------------------------------------------------
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -295,18 +340,35 @@ export const AddCommitteeMembers = ({ route }) => {
             <View style={styles.cell}>
               <Text style={styles.headerText}>Name </Text>
             </View>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Action </Text>
+            </View>
           </View>
           <FlatList
             data={membersList}
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={false}
             renderItem={({ item, index }) => (
-              <View style={styles.tableRow}>
+              <View
+                style={[
+                  styles.tableRow,
+                  { display: item.user_name ? 'flex' : 'none' },
+                ]}
+              >
                 <View style={styles.Rowcell}>
                   <Text style={styles.text}>{index + 1}</Text>
                 </View>
                 <View style={styles.Rowcell}>
                   <Text style={styles.text}>{item.user_name}</Text>
+                </View>
+                <View style={styles.Rowcell}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      deleteCommitteeMember(item.committe_member_id)
+                    }
+                  >
+                    <Icon name="delete" size={24} color="red" />
+                  </TouchableOpacity>
                 </View>
               </View>
             )}
@@ -419,12 +481,16 @@ const styles = ScaledSheet.create({
     backgroundColor: AppColors.primary,
     width: '100%',
     flexDirection: 'row',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    // paddingVertical: 10,
+    // paddingHorizontal: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 15,
   },
 
   cell: {
-    width: '50%',
+    width: '33%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -438,70 +504,23 @@ const styles = ScaledSheet.create({
   tableRow: {
     width: '100%',
     flexDirection: 'row',
-    paddingVertical: 8,
     backgroundColor: AppColors.background,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.placeholder + '40', // light divider
+    borderBottomColor: AppColors.placeholder + '40',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 15,
   },
 
   Rowcell: {
-    width: '50%',
+    width: '33%',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 6,
   },
 
   text: {
     fontSize: moderateScale(15),
     color: AppColors.bodyText,
   },
-
-  // tableMainView: {
-  //   width: '100%',
-  //   padding: 10,
-  //   backgroundColor: AppColors.background,
-  //   marginTop: 15,
-  // },
-  // tableHeader: {
-  //   backgroundColor: AppColors.primary,
-  //   width: '100%',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   flexDirection: 'row',
-  //   borderTopRightRadius: 10,
-  //   borderTopLeftRadius: 10,
-
-  //   padding: 5,
-  // },
-  // cell: {
-  //   width: '50%',
-  //   backgroundColor: AppColors.primary,
-  //   margin: 2,
-  //   borderRadius: 10,
-  // },
-  // headerText: {
-  //   textAlign: 'center',
-  //   fontSize: moderateScale(18),
-  //   padding: 5,
-  //   color: AppColors.title,
-  // },
-  // tableRow: {
-  //   width: '100%',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   flexDirection: 'row',
-  // },
-  // text: {
-  //   textAlign: 'center',
-  //   fontSize: moderateScale(16),
-  //   color: AppColors.bodyText,
-  // },
-  // Rowcell: {
-  //   width: '50%',
-  //   height: 30,
-  //   borderColor: AppColors.placeholder,
-  //   borderWidth: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
 });

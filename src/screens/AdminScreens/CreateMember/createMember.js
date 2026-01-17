@@ -199,7 +199,7 @@ export const CreateMembers = () => {
                 />
 
                 <View style={styles.btnView}>
-                  <CustomButton title="Create User" onPress={handleSubmit} />
+                  <CustomButton title="Create member" onPress={handleSubmit} />
                 </View>
               </View>
             )}

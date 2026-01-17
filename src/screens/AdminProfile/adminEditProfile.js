@@ -24,7 +24,7 @@ import { Loader } from '../Loader/loader';
 
 export const AdminEditProfile = ({ route }) => {
   const { user } = route.params;
-  console.log('user :', user);
+  console.log('user :', user.full_name);
   const [userdata, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,8 +44,8 @@ export const AdminEditProfile = ({ route }) => {
     setIsLoading(true);
     try {
       var formData = new FormData();
-      formData.append('full_name', value.fullName);
-      formData.append('phone', value.phoneNumber);
+      formData.append('full_name', value.fullName || user.full_name);
+      formData.append('phone', value.phoneNumber || user.phone);
       formData.append('user_id', user.user_id);
       const res = await api.post('/user/edit-profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -125,12 +125,12 @@ export const AdminEditProfile = ({ route }) => {
         <View style={styles.detailView}>
           <Formik
             initialValues={{
-              fullName: '',
-              phoneNumber: '',
+              fullName: user.full_name || '',
+              phoneNumber: user.phone || '',
             }}
             onSubmit={(values, { resetForm }) => {
               editProfile(values);
-              // resetForm();
+              resetForm();
             }}
           >
             {({

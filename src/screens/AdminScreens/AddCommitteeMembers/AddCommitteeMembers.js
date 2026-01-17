@@ -474,15 +474,14 @@ const styles = ScaledSheet.create({
     backgroundColor: AppColors.background,
     borderRadius: 12,
     overflow: 'hidden',
-    elevation: 3, // Android shadow
+    elevation: 3, 
   },
 
   tableHeader: {
     backgroundColor: AppColors.primary,
     width: '100%',
     flexDirection: 'row',
-    // paddingVertical: 10,
-    // paddingHorizontal: 5,
+   
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',

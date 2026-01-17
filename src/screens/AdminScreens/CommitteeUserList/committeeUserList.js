@@ -13,85 +13,10 @@ import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
-import { CustomButton } from '../../../components/customButton';
-import { navigate } from '../../../navigations/navigationService';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStoredUser } from '../../../Utils/getUser';
 
-const membersData = [
-  {
-    id: 1,
-    name: 'Bilal Ahmed',
-    phone: '+92 301 5566778',
-    status: 'Active',
-    joinedBCs: 5,
-  },
-  {
-    id: 2,
-    name: 'Ali Khan',
-    phone: '+92 312 9876543',
-    status: 'Inactive',
-    joinedBCs: 3,
-  },
-  {
-    id: 3,
-    name: 'Usman Raza',
-    phone: '+92 333 4455667',
-    status: 'Active',
-    joinedBCs: 7,
-  },
-  {
-    id: 4,
-    name: 'Ahmed Hassan',
-    phone: '+92 300 1122334',
-    status: 'Active',
-    joinedBCs: 2,
-  },
-  {
-    id: 5,
-    name: 'Hassan Ali',
-    phone: '+92 321 7788990',
-    status: 'Inactive',
-    joinedBCs: 1,
-  },
-  {
-    id: 6,
-    name: 'Fahad Iqbal',
-    phone: '+92 345 6677889',
-    status: 'Active',
-    joinedBCs: 6,
-  },
-  {
-    id: 7,
-    name: 'Saad Ahmed',
-    phone: '+92 334 5566778',
-    status: 'Active',
-    joinedBCs: 4,
-  },
-  {
-    id: 8,
-    name: 'Ahsan Javed',
-    phone: '+92 310 9988776',
-    status: 'Inactive',
-    joinedBCs: 2,
-  },
-  {
-    id: 9,
-    name: 'Hamza Noor',
-    phone: '+92 322 3344556',
-    status: 'Active',
-    joinedBCs: 8,
-  },
-  {
-    id: 10,
-    name: 'Zain Malik',
-    phone: '+92 311 2233445',
-    status: 'Active',
-    joinedBCs: 5,
-  },
-];
 
 export const CommitteeUserList = () => {
   const [userdata, setUserData] = useState();
@@ -133,12 +58,17 @@ export const CommitteeUserList = () => {
     }
   };
 
-  useEffect(() => {
-    if (userdata?.user_id) {
-      userViewUsers();
-    }
-  }, [userdata]);
+  // useEffect(() => {
+  //   if (userdata?.user_id) {
+  //     userViewUsers();
+  //   }
+  // }, [userdata]);
   console.log(userList);
+  useFocusEffect(
+    useCallback(() => {
+      userViewUsers();
+    }, [userdata?.user_id]),
+  );
   //---------------------------------------------
 
   return (
@@ -196,35 +126,39 @@ export const CommitteeUserList = () => {
           }
           renderItem={({ item }) => (
             <View style={styles.Committee_View}>
-              
-                <TouchableOpacity
-                  style={[styles.Dashboardcard,{display:item.name ? 'flex':'none'}]}
-                  onPress={() =>
-                    navigation.navigate('MembersDetails', { item: item })
-                  }
-                >
-                  <View style={styles.first_view}>
-                    <View style={styles.userMale_View}>
-                      <Image
-                        source={AppIcons.userMale}
-                        style={styles.userMale}
-                      />
-                    </View>
-                    <View>
-                      <Text style={styles.Name}>{item.name}</Text>
-                    </View>
+              <TouchableOpacity
+                style={[
+                  styles.Dashboardcard,
+                  { display: item.name ? 'flex' : 'none' },
+                ]}
+                onPress={() =>
+                  navigation.navigate('MembersDetails', { item: item })
+                }
+              >
+                <View style={styles.first_view}>
+                  <View style={styles.userMale_View}>
+                    <Image source={AppIcons.userMale} style={styles.userMale} />
                   </View>
-                  <View style={styles.first_view}>
-                    <View style={styles.details}>
-                      <Text style={styles.one}>Phone:</Text>
-                      <Text style={styles.count}>{item.phone}</Text>
-                    </View>
+                  <View>
+                    <Text style={styles.Name}>{item.name}</Text>
                   </View>
-                </TouchableOpacity>
-            
-                <View style={[styles.dataEmpty,{display:item.name ? 'none':'flex'}]}>
-                  <Text style={styles.emptyText}>Data not available</Text>
                 </View>
+                <View style={styles.first_view}>
+                  <View style={styles.details}>
+                    <Text style={styles.one}>Phone:</Text>
+                    <Text style={styles.count}>{item.phone}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+              <View
+                style={[
+                  styles.dataEmpty,
+                  { display: item.name ? 'none' : 'flex' },
+                ]}
+              >
+                <Text style={styles.emptyText}>Data not available</Text>
+              </View>
             </View>
           )}
         />

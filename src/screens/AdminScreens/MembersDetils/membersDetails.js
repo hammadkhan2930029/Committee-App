@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   View,
@@ -15,12 +15,44 @@ import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { api } from '../../../services/api';
+import Toast from 'react-native-toast-message';
+import { Loader } from '../../Loader/loader';
 
 export const MembersDetails = ({ route }) => {
+  //--------------------------------------
   const { item } = route.params;
+  const userID = item.user_id;
   console.log('Items :', item);
-
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  //--------------------------------------
+  const deleteMember = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/user/delete-user/${userID}`);
+      const result = response.data.msg[0];
+      console.log('delete member response :', result.response);
+
+      Toast.show({
+        type: 'customToast',
+        text1: 'Success',
+        text2: result.response,
+        props: {
+          bgColor: AppColors.background,
+          borderColor: 'green',
+        },
+      });
+      navigation.goBack();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  //--------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -53,8 +85,15 @@ export const MembersDetails = ({ route }) => {
         <View style={styles.informationCard_View}>
           <View style={styles.informationCard}>
             <View style={styles.CardHeader}>
-              <Icon name="person" size={24} color={AppColors.background} />
-              <Text style={styles.headerText}>Member Information</Text>
+              <View style={styles.headingIcon}>
+                <Icon name="person" size={24} color={AppColors.background} />
+                <Text style={styles.headerText}>Member Information</Text>
+              </View>
+              <View>
+                <TouchableOpacity onPress={() => deleteMember()}>
+                  <Icon name="delete" size={24} color={AppColors.background} />
+                </TouchableOpacity>
+              </View>
             </View>
             <View style={styles.cardDetails}>
               <View style={styles.row}>
@@ -78,6 +117,12 @@ export const MembersDetails = ({ route }) => {
             </View>
           </View>
         </View>
+        <View style={styles.btn}>
+          <CustomButton
+            title="Edit member"
+            onPress={() => navigation.navigate('EditMember', { item: item })}
+          />
+        </View>
         <View style={styles.informationCard_View}>
           <View style={styles.secondH1_view}>
             <Text style={styles.secondH1}>Joined Committees</Text>
@@ -98,13 +143,8 @@ export const MembersDetails = ({ route }) => {
             </TouchableOpacity>
           ))}
         </View>
-        <View style={styles.btn}>
-          <CustomButton
-            title="Edit member"
-            onPress={() => navigation.navigate('EditMember', { item: item })}
-          />
-        </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -176,11 +216,15 @@ const styles = ScaledSheet.create({
   CardHeader: {
     backgroundColor: AppColors.primary,
     padding: 15,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,
+  },
+  headingIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerText: {
     color: AppColors.title,

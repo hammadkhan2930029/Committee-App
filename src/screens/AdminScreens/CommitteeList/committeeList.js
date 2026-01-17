@@ -61,6 +61,7 @@ export const CommitteeList = () => {
       if (response.data.msg) {
         setLoading(false);
       }
+      console.log('committee :', response.data.msg);
     } catch (error) {
       console.log(error);
     } finally {
@@ -70,8 +71,6 @@ export const CommitteeList = () => {
   useEffect(() => {
     committeeList();
   }, [userData]);
-
- 
 
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {

@@ -13,20 +13,75 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { CustomButtonLight } from '../../../components/customeButtonLight';
-import { navigate } from '../../../navigations/navigationService';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
 import { Formik } from 'formik';
+import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
+import Toast from 'react-native-toast-message';
 
 export const EditMember = ({ route }) => {
+  //--------------------------------------------
   const { item } = route.params;
-  console.log('edite members :', item);
+  console.log('edite members :', item.user_id);
+  const userID = item.user_id;
   const [rounds, setRounds] = useState(null);
-
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  //--------------------------------------------
+  const editMember = async value => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('full_name', value.fullName || item.name);
+      formData.append('phone', value.phone || item.phone);
+      formData.append('user_id', userID);
+
+      const response = await api.post('/user/edit-user', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const result = response.data.msg[0];
+      console.log('edit member data :', result.response);
+      if (result.response === 'user updated') {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: result.response ,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.goBack();
+        setLoading(false);
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: result.response,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2: 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -54,7 +109,15 @@ export const EditMember = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
-        <Formik initialValues={{ fullName: '', phone: '' }}>
+        <Formik
+          initialValues={{
+            fullName: item.name || '',
+            phone: item.phone || '',
+          }}
+          onSubmit={values => {
+            editMember(values);
+          }}
+        >
           {({ values, handleChange, handleBlur, handleSubmit }) => (
             <View>
               <View style={styles.textInput}>
@@ -63,7 +126,8 @@ export const EditMember = ({ route }) => {
                   placeholder={item.name}
                   type="text"
                   value={values.fullName}
-                  onChangeText={handleChange}
+                  onChangeText={handleChange('fullName')}
+                  onBlur={handleBlur('fullName')}
                   rightIcon={<Icon name="edit" size={20} color="#666" />}
                 />
                 <CustomInputWithIcon
@@ -71,7 +135,8 @@ export const EditMember = ({ route }) => {
                   placeholder={item.phone}
                   type="numeric"
                   value={values.phone}
-                  onChangeText={handleChange}
+                  onChangeText={handleChange('phone')}
+                  onBlur={handleBlur('phone')}
                   rightIcon={<Icon name="edit" size={20} color="#666" />}
                 />
               </View>
@@ -85,6 +150,7 @@ export const EditMember = ({ route }) => {
           )}
         </Formik>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -92,7 +158,6 @@ const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.background,
-
   },
   arrowBack: {
     width: 28,

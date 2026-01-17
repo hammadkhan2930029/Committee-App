@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -14,19 +15,22 @@ import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 
 export const AssignRounds = ({ route }) => {
+  const [roundList, setRoundList] = useState([]);
   //---------------------------------------------
   const navigation = useNavigation();
   const { multipleData } = route.params;
   const committeeMembers = multipleData.members || [];
   const committeeRounds = multipleData.rounds || [];
-  console.log('committeeMembers', committeeMembers);
-  console.log('committeeMemcommitteeRoundsbers', committeeRounds);
+  const committeeID = multipleData.msg[0].committee_id;
+  // console.log('multi :', multipleData.msg[0].committee_id);
+  // console.log('committeeMembers', committeeMembers);
+  // console.log('committeeMemcommitteeRoundsbers', committeeRounds);
 
   // ---------- Members Dropdown ----------
   const [openMember, setOpenMember] = useState(false);
@@ -34,10 +38,10 @@ export const AssignRounds = ({ route }) => {
   const [memberItems, setMemberItems] = useState(
     committeeMembers.map(item => ({
       label: item.user_name,
-      value: item.user_id,
+      value: item.committe_member_id,
     })),
   );
-  console.log('members value :', memberValue);
+  // console.log('members value :', memberValue);
   // ---------- Rounds Dropdown ----------
   const [openRound, setOpenRound] = useState(false);
   const [roundValue, setRoundValue] = useState(null);
@@ -47,7 +51,24 @@ export const AssignRounds = ({ route }) => {
       value: item.committee_round_id,
     })),
   );
-  console.log('round value :', roundValue);
+  //-------------user view committee rounds--------------------------
+  const viewCommitteeRound = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-rounds/${committeeID}`,
+      );
+      const result = await response.data?.msg;
+      setRoundList(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      viewCommitteeRound();
+    }, []),
+  );
+  console.log('view committee round:', roundList);
 
   //--------------------assign round api--------------------------
   const roundApi = async () => {
@@ -78,6 +99,7 @@ export const AssignRounds = ({ route }) => {
             borderColor: 'green',
           },
         });
+        viewCommitteeRound();
       } else {
         Toast.show({
           type: 'customToast',
@@ -100,6 +122,20 @@ export const AssignRounds = ({ route }) => {
           borderColor: '#ff5252',
         },
       });
+    }
+  };
+
+  //----------------------delete committee round ----------------------
+  const deleteCommitteeRound = async roundID => {
+    try {
+      const response = await api.delete(
+        `/user/delete-committee-round/${roundID}`,
+      );
+      const result = await response.data.msg[0].response;
+      viewCommitteeRound();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -143,7 +179,6 @@ export const AssignRounds = ({ route }) => {
               setValue={setMemberValue}
               setItems={setMemberItems}
               placeholder="Choose member"
-              // listMode="SCROLLVIEW"
               listMode="MODAL"
               modalTitle="Select Committee No"
               modalProps={{
@@ -172,7 +207,6 @@ export const AssignRounds = ({ route }) => {
               setValue={setRoundValue}
               setItems={setRoundItems}
               placeholder="Choose round"
-              // listMode="SCROLLVIEW"
               listMode="MODAL"
               modalTitle="Select Committee No"
               modalProps={{
@@ -198,6 +232,49 @@ export const AssignRounds = ({ route }) => {
             <CustomButton title="Assign Round" onPress={() => roundApi()} />
           </View>
         </View>
+        {/* ------------------------------------------------------------------- */}
+        <View style={styles.tableMainView}>
+          <View style={styles.tableHeader}>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Round no </Text>
+            </View>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Name </Text>
+            </View>
+            <View style={styles.cell}>
+              <Text style={styles.headerText}>Action </Text>
+            </View>
+          </View>
+          <FlatList
+            data={roundList}
+            keyExtractor={(item, index) => index.toString()}
+            scrollEnabled={false}
+            renderItem={({ item, index }) => (
+              <View
+                style={[
+                  styles.tableRow,
+                  { display: item.committe_member_name ? 'flex' : 'none' },
+                ]}
+              >
+                <View style={styles.Rowcell}>
+                  <Text style={styles.text}>{item.round_no}</Text>
+                </View>
+                <View style={styles.Rowcell}>
+                  <Text style={styles.text}>{item.committe_member_name}</Text>
+                </View>
+                <View style={styles.Rowcell}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      deleteCommitteeRound(item.committee_round_id)
+                    }
+                  >
+                    <Icon name="delete" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          />
+        </View>
       </ScrollView>
     </View>
   );
@@ -206,7 +283,6 @@ const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.background,
-
   },
   arrowBack: {
     width: 28,
@@ -284,5 +360,60 @@ const styles = ScaledSheet.create({
   textInput: {
     width: '100%',
     padding: 15,
+  },
+  //---------table-------------------
+  tableMainView: {
+    width: '100%',
+    marginTop: 15,
+    backgroundColor: AppColors.background,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+  },
+
+  tableHeader: {
+    backgroundColor: AppColors.primary,
+    width: '100%',
+    flexDirection: 'row',
+
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 15,
+  },
+
+  cell: {
+    width: '33%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  headerText: {
+    fontSize: moderateScale(17),
+    fontWeight: '600',
+    color: AppColors.title,
+  },
+
+  tableRow: {
+    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: AppColors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.placeholder + '40',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 15,
+  },
+
+  Rowcell: {
+    width: '33%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  text: {
+    fontSize: moderateScale(15),
+    color: AppColors.bodyText,
   },
 });

@@ -69,6 +69,7 @@ export const ResetPassword = () => {
             borderColor: 'green',
           },
         });
+        navigation.goBack()
       } else {
         Toast.show({
           type: 'customToast',

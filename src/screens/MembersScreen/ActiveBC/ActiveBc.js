@@ -5,89 +5,219 @@ import {
   Image,
   TouchableOpacity,
   Text,
-  StatusBar
+  StatusBar,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { AppColors } from '../../../constant/appColors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { api } from '../../../services/api';
+import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { getStoredUser } from '../../../Utils/getUser';
+import { navigate } from '../../../navigations/navigationService';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const ActiveBCs = () => {
+  const [userData, setUserData] = useState();
+  const [committeeList, setCommitteeList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  //-----------------get user data --------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  const userID = userData?.user_id;
+  console.log(userID);
+  //-----------------myCommitteeList---------------------------
+  const myCommitteeList = async () => {
+    try {
+      const response = await api.get(`/user/my-committees/${userID}`);
+      const result = response?.data?.msg;
+      console.log('my committee list :', result);
+      setCommitteeList(result);
+      if (result) {
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log('try catch error :', error);
+    }
+  };
+  useEffect(() => {
+    if (userID) {
+      myCommitteeList();
+    }
+  }, [userID]);
+  //----------------------Skeleton-----------------------------
+  const MySkeleton = () => {
+    return (
+      <View>
+        {[...Array(6)].map((_, index) => (
+          <SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item
+              justifyContent="center"
+              alignItems="center"
+            >
+              <View
+                style={{
+                  backgroundColor: AppColors.background,
+                  padding: 10,
+                  borderRadius: 20,
+                  margin: 10,
+                  borderColor: AppColors.primary,
+                  borderWidth: 1,
+                  height: 420,
+                  width: '95%',
+                  height: 120,
+                }}
+              >
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  padding={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  {/* Text */}
+                  <SkeletonPlaceholder.Item>
+                    <SkeletonPlaceholder.Item
+                      width={120}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                  <SkeletonPlaceholder.Item
+                    justifyContent="flex-end"
+                    alignItems="flex-end"
+                  >
+                    <SkeletonPlaceholder.Item
+                      width={80}
+                      height={25}
+                      borderRadius={30}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={120}
+                      height={20}
+                      borderRadius={4}
+                    />
+                    <SkeletonPlaceholder.Item
+                      marginTop={6}
+                      width={80}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                </SkeletonPlaceholder.Item>
+              </View>
+            </SkeletonPlaceholder.Item>
+          </SkeletonPlaceholder>
+        ))}
+      </View>
+    );
+  };
   return (
     <View style={styles.container}>
-        <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView style={styles.scroll_View}>
-        <View>
-          <ImageBackground
-            source={AppImages.Rectangle}
-            style={styles.RectangleImg}
-          >
-            <View style={styles.main}>
-              <View style={styles.TopView}>
-                <View style={styles.backAndText}>
-                  <TouchableOpacity
-                    // onPress={() => navigation.goBack()}
-                    style={styles.arrowIcon}
-                  >
-                    <Icon
-                      name="keyboard-arrow-left"
-                      size={26}
-                      color={AppColors.link}
-                    />
-                    {/* <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
-                    /> */}
-                  </TouchableOpacity>
-                  <Text style={styles.h1}>My Active BCs </Text>
-                </View>
-              </View>
-              <View style={styles.textView}>
-                <Text style={styles.h4}>View all BCs you’ve joined.</Text>
+      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
+
+      <View>
+        <ImageBackground
+          source={AppImages.Rectangle}
+          style={styles.RectangleImg}
+        >
+          <View style={styles.main}>
+            <View style={styles.TopView}>
+              <View style={styles.backAndText}>
+                <TouchableOpacity style={styles.arrowIcon}>
+                  <Icon
+                    name="keyboard-arrow-left"
+                    size={26}
+                    color={AppColors.link}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.h1}>My Active BCs </Text>
               </View>
             </View>
-          </ImageBackground>
-        </View>
+            <View style={styles.textView}>
+              <Text style={styles.h4}>View all BCs you’ve joined.</Text>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+      {loading ? (
+        <MySkeleton />
+      ) : (
         <View style={styles.Committee_View}>
-          {[...Array(5)].map((_, index) => (
-            <TouchableOpacity 
-            // onPress={() => navigate('CommitteeDetails')}
-            >
-              <View style={styles.Dashboardcard}>
-                <View style={styles.first_view}>
-                  <View>
-                    <Text style={styles.family}>Family Fund BC</Text>
+          <FlatList
+            data={committeeList}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={item => {
+              console.log('item :', item.item);
+              const data = item.item;
+              return (
+                <TouchableOpacity
+                  onPress={() => navigate('PaymentUser', { data: data })}
+                >
+                  <View style={styles.Dashboardcard}>
+                    <View style={styles.first_view}>
+                      <View>
+                        <Text style={styles.family}>{data.name}</Text>
+                      </View>
+                      <TouchableOpacity style={styles.BtnActive}>
+                        <Text style={styles.active}>{data.status}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.first_view}>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Members : </Text>
+                        <Text style={styles.count}> {data.total_member}</Text>
+                      </View>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Amount per Member :</Text>
+                        <Text style={styles.count}>
+                          {' '}
+                          {data.amount_per_member}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.first_view}>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Round : </Text>
+                        <Text style={styles.count}> {data.total_rounds}</Text>
+                      </View>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Start Date :</Text>
+                        <Text style={styles.count}> {data.start_date}</Text>
+                      </View>
+                    </View>
                   </View>
-                  <TouchableOpacity style={styles.BtnActive}>
-                    <Text style={styles.active}>Active</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.first_view}>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Members : </Text>
-                    <Text style={styles.count}> 25</Text>
-                  </View>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Amount per Member :</Text>
-                    <Text style={styles.count}> 4,000</Text>
-                  </View>
-                </View>
-                <View style={styles.first_view}>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Round : </Text>
-                    <Text style={styles.count}> 10</Text>
-                  </View>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Start Date :</Text>
-                    <Text style={styles.count}> Dec 2025</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                </TouchableOpacity>
+              );
+            }}
+          />
         </View>
-      </ScrollView>
+      )}
     </View>
   );
 };
@@ -103,10 +233,10 @@ const styles = ScaledSheet.create({
   arrowIcon: {
     backgroundColor: AppColors.background,
     borderRadius: 20,
-    width:25,
-    height:25,
-    justifyContent:'center',
-    alignItems:'center'
+    width: 25,
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scroll_View: {
     marginBottom: 60,
@@ -155,13 +285,14 @@ const styles = ScaledSheet.create({
   },
   //------------------------------
   Committee_View: {
+    width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -40,
   },
   Dashboardcard: {
-    width: '90%',
+    width: '95%',
     backgroundColor: AppColors.background,
     justifyContent: 'center',
 
@@ -189,16 +320,14 @@ const styles = ScaledSheet.create({
     backgroundColor: AppColors.primary,
     borderRadius: 20,
     padding: 5,
-    width:100,
-
-    
+    width: 100,
   },
   complete: {
     fontSize: moderateScale(15),
     color: AppColors.title,
     paddingLeft: 7,
     paddingRight: 7,
-    textAlign:'center'
+    textAlign: 'center',
   },
   BtnActive: {
     backgroundColor: AppColors.cardLight,
@@ -206,14 +335,14 @@ const styles = ScaledSheet.create({
     padding: 5,
     borderColor: AppColors.primary,
     borderWidth: 1,
-    width:100,
+    width: 100,
   },
   active: {
     fontSize: moderateScale(15),
     color: AppColors.link,
     paddingLeft: 7,
     paddingRight: 7,
-    textAlign:'center'
+    textAlign: 'center',
   },
   details: {
     justifyContent: 'center',

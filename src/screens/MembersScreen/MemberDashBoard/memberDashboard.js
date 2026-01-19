@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -13,13 +13,28 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import { getStoredUser } from '../../../Utils/getUser';
 
 export const MembersDashboard = () => {
   const navigation = useNavigation();
+  const [userdata, setUserdata] = useState();
+  //-----------get user aysnc Storage------------------
+  useFocusEffect(
+    useCallback(() => {
+      const loader = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserdata(user);
+          console.log('user', user);
+        }
+      };
+      loader();
+    }, []),
+  );
+  // console.log('User Data :', userdata);
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -33,13 +48,19 @@ export const MembersDashboard = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <Text style={styles.h1}>Member Dashboard</Text>
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h2}>
-                  Hello, Hammad{' '}
-                  
-                  <Icon name="waving-hand" size={30} color='#FED22D'/>
+                  Hello, {userdata?.full_name || 'Member'}{' '}
+                  <Icon name="waving-hand" size={30} color="#FED22D" />
                 </Text>
                 <Text style={styles.h4}>Here’s your BC overview.</Text>
               </View>
@@ -57,7 +78,7 @@ export const MembersDashboard = () => {
           >
             <View>
               <View style={styles.imgText}>
-                <Icon name="person-add-alt" size={34} color={AppColors.link}/>
+                <Icon name="person-add-alt" size={34} color={AppColors.link} />
                 <Text style={styles.activeBC}>My Active BCs</Text>
               </View>
             </View>
@@ -72,7 +93,7 @@ export const MembersDashboard = () => {
           <TouchableOpacity activeOpacity={0.7} style={styles.Dashboardcard}>
             <View>
               <View style={styles.imgText}>
-                <Icon name="calendar-today" size={34} color={AppColors.link}/>
+                <Icon name="calendar-today" size={34} color={AppColors.link} />
                 <Text style={styles.activeBC}>Upcoming Payment</Text>
               </View>
             </View>
@@ -85,7 +106,7 @@ export const MembersDashboard = () => {
           <TouchableOpacity activeOpacity={0.7} style={styles.Dashboardcard}>
             <View>
               <View style={styles.imgText}>
-                <Icon name="cloud-upload" size={34} color={AppColors.link}/>
+                <Icon name="cloud-upload" size={34} color={AppColors.link} />
 
                 <Text style={styles.activeBC}>Slip Status</Text>
               </View>
@@ -98,7 +119,6 @@ export const MembersDashboard = () => {
             </View>
           </TouchableOpacity>
         </View>
-       
       </ScrollView>
     </View>
   );
@@ -167,12 +187,12 @@ const styles = ScaledSheet.create({
     borderRadius: 20,
     margin: 10,
   },
-  view2:{
-    width:'100%',
-    justifyContent:'space-between',
-    alignItems:'center',
-    flexDirection:'row',
-    padding:5
+  view2: {
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 5,
   },
   group: {
     width: 35,
@@ -228,16 +248,15 @@ const styles = ScaledSheet.create({
     color: AppColors.primary,
     fontWeight: 'bold',
   },
-  btnView:{
-    backgroundColor:AppColors.primary,
-    paddingLeft:15,
-    paddingRight:15,
-    borderRadius:15
+  btnView: {
+    backgroundColor: AppColors.primary,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 15,
   },
-  btn:{
-    color:AppColors.title,
-    fontSize:moderateScale(16),
-    padding:3
-  }
-
+  btn: {
+    color: AppColors.title,
+    fontSize: moderateScale(16),
+    padding: 3,
+  },
 });

@@ -3,14 +3,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //---------------------members-----------------------------------------
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 import { ActiveBCs } from '../screens/MembersScreen/ActiveBC/ActiveBc';
-import { PaymentUser } from '../screens/MembersScreen/Payment/payment';
-import { UserProfile } from '../screens/MembersScreen/Profile/userProfile';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
 import { AppColors } from '../constant/appColors';
+import { AdminProfile } from '../screens/AdminProfile/adminProfile';
 
 const UserTab = createBottomTabNavigator();
 
@@ -69,14 +66,14 @@ export const BottomTabNavigationUser = () => {
         component={ActiveBCs}
         options={{ headerShown: false }}
       />
-      <UserTab.Screen
+      {/* <UserTab.Screen
         name="PaymentUser"
         component={PaymentUser}
         options={{ headerShown: false }}
-      />
+      /> */}
       <UserTab.Screen
         name="UserProfile"
-        component={UserProfile}
+        component={AdminProfile}
         options={{ headerShown: false }}
       />
     </UserTab.Navigator>

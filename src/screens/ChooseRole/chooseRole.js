@@ -204,6 +204,7 @@ const styles = ScaledSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation:5
   },
   view1: {
     flexDirection: 'row',
@@ -241,6 +242,7 @@ const styles = ScaledSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
+     elevation:5
   },
   view2: {
     flexDirection: 'row',

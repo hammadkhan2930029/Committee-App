@@ -17,8 +17,18 @@ import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export const PaymentUser = () => {
+export const PaymentUser = ({ route }) => {
+  const { data } = route.params;
+  console.log('Data :', data);
   const navigation = useNavigation();
+  //---thousand separator---only display ke liye-------
+  const formatNumber = value => {
+    if (!value) return '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  //---- User input se commas remove karne ke liye-------
+  const removeCommas = value => value.replace(/,/g, '');
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -41,9 +51,9 @@ export const PaymentUser = () => {
                 </View>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h4}>ABC Group BC</Text>
+                <Text style={styles.h4}>{data.name}</Text>
                 <View style={styles.activeBtn}>
-                  <Text style={styles.active}>Active</Text>
+                  <Text style={styles.active}>{data.status}</Text>
                 </View>
               </View>
             </View>
@@ -52,31 +62,33 @@ export const PaymentUser = () => {
         <View style={styles.BCDetails}>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{data.total_member}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Rounds</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{data.total_rounds}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Rounds Per Month</Text>
-            <Text style={styles.text2}>12</Text>
+            <Text style={styles.text2}>{data.rounds_per_month}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Amount Per Member</Text>
-            <Text style={styles.text2}>PKR 2,000</Text>
+            <Text style={styles.text2}>
+              PKR {formatNumber(data.amount_per_member)}
+            </Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Amount</Text>
-            <Text style={styles.text2}>PKR 60,000</Text>
+            <Text style={styles.text2}>PKR {formatNumber(data.total)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Date</Text>
-            <Text style={styles.text2}>Dec 2025</Text>
+            <Text style={styles.text2}>{data.start_date}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Due On</Text>
-            <Text style={styles.text2}>15th every month</Text>
+            <Text style={styles.text2}>{data.due_on}</Text>
           </View>
         </View>
         <View></View>
@@ -133,7 +145,9 @@ export const PaymentUser = () => {
             </View>
             <View style={styles.paymentCardRow}>
               <Text style={styles.label}>Slip</Text>
-              <TouchableOpacity onPress={()=> navigation.navigate('UploadSlip')}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('UploadSlip')}
+              >
                 <View style={styles.slipView}>
                   <Text style={styles.value_slip}>View Slip</Text>
                   <Icon

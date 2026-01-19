@@ -83,7 +83,7 @@ export const AddCommitteeMembers = ({ route }) => {
         const user = await getStoredUser();
         if (user) {
           setUserData(user);
-          // console.log(user.full_name, user.user_id);
+
         }
       };
       loadUser();

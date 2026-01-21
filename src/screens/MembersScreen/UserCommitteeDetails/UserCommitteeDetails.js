@@ -16,19 +16,43 @@ import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { api } from '../../../services/api';
+import { useEffect, useState } from 'react';
 
-export const PaymentUser = ({ route }) => {
+export const UserCommitteeDetails = ({ route }) => {
   const { data } = route.params;
-  console.log('Data :', data);
+  const [details, setDetails] = useState([]);
   const navigation = useNavigation();
-  //---thousand separator---only display ke liye-------
+  //----------------------------------------------
   const formatNumber = value => {
     if (!value) return '';
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  //---- User input se commas remove karne ke liye-------
+  //--------------------------------------------------
   const removeCommas = value => value.replace(/,/g, '');
+  //----------committee details---------------------------
+  const committeeDetails = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-detail/${data?.committee_id}`,
+      );
+      const result = response.data.msg[0];
+      console.log('committee details :', response);
+      if (result) {
+        setDetails(result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (data.committee_id) {
+      committeeDetails();
+    }
+  }, [data]);
+  console.log('committee details 2:', details);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -51,47 +75,55 @@ export const PaymentUser = ({ route }) => {
                 </View>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h4}>{data.name}</Text>
+                <Text style={styles.h4}>{details?.name}</Text>
                 <View style={styles.activeBtn}>
-                  <Text style={styles.active}>{data.status}</Text>
+                  <Text style={styles.active}>{details?.status}</Text>
                 </View>
               </View>
             </View>
           </ImageBackground>
         </View>
+
         <View style={styles.BCDetails}>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
-            <Text style={styles.text2}>{data.total_member}</Text>
+            <Text style={styles.text2}>{details?.total_member}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Rounds</Text>
-            <Text style={styles.text2}>{data.total_rounds}</Text>
+            <Text style={styles.text2}>{details?.total_rounds}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Rounds Per Month</Text>
-            <Text style={styles.text2}>{data.rounds_per_month}</Text>
+            <Text style={styles.text2}>{details?.rounds_per_month}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Amount Per Member</Text>
             <Text style={styles.text2}>
-              PKR {formatNumber(data.amount_per_member)}
+              PKR {formatNumber(details?.amount_per_member)}
             </Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Amount</Text>
-            <Text style={styles.text2}>PKR {formatNumber(data.total)}</Text>
+            <Text style={styles.text2}>PKR {formatNumber(details?.total)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Date</Text>
-            <Text style={styles.text2}>{data.start_date}</Text>
+            <Text style={styles.text2}>{details?.start_date}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Due On</Text>
-            <Text style={styles.text2}>{data.due_on}</Text>
+            <Text style={styles.text2}>{details?.due_on}</Text>
           </View>
         </View>
-        <View></View>
+        <View style={styles.paymentBTN}>
+          <CustomButton
+            title="Add payment"
+            onPress={() =>
+              navigation.navigate('UploadSlip', { committeeData: details })
+            }
+          />
+        </View>
         <View style={styles.paymentStatus_view}>
           {/* -----------------------Submitted---------------------------------- */}
           <View style={styles.paymentStatus}>
@@ -145,9 +177,7 @@ export const PaymentUser = ({ route }) => {
             </View>
             <View style={styles.paymentCardRow}>
               <Text style={styles.label}>Slip</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('UploadSlip')}
-              >
+              <TouchableOpacity>
                 <View style={styles.slipView}>
                   <Text style={styles.value_slip}>View Slip</Text>
                   <Icon
@@ -226,9 +256,7 @@ const styles = ScaledSheet.create({
   container: {
     flex: 1,
   },
-  scroll: {
-    marginBottom: 60,
-  },
+
   arrowBack: {
     width: 28,
     height: 28,
@@ -412,5 +440,9 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  paymentBTN: {
+    // backgroundColor:'green',
+    padding: 15,
   },
 });

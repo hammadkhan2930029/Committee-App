@@ -176,45 +176,65 @@ export const ActiveBCs = () => {
               console.log('item :', item.item);
               const data = item.item;
               return (
-                <TouchableOpacity
-                  onPress={() => navigate('PaymentUser', { data: data })}
-                >
-                  <View style={styles.Dashboardcard}>
-                    <View style={styles.first_view}>
-                      <View>
-                        <Text style={styles.family}>{data.name}</Text>
+                <View>
+                  <TouchableOpacity
+                    onPress={() => navigate('UserCommitteeDetails', { data: data })}
+                  >
+                    <View
+                      style={[
+                        styles.Dashboardcard,
+                        { display: data.name ? 'flex' : 'none' },
+                      ]}
+                    >
+                      <View style={styles.first_view}>
+                        <View>
+                          <Text style={styles.family}>{data.name}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.BtnActive}>
+                          <Text style={styles.active}>{data.status}</Text>
+                        </TouchableOpacity>
                       </View>
-                      <TouchableOpacity style={styles.BtnActive}>
-                        <Text style={styles.active}>{data.status}</Text>
-                      </TouchableOpacity>
+                      <View style={styles.first_view}>
+                        <View style={styles.details}>
+                          <Text style={styles.one}>Members : </Text>
+                          <Text style={styles.count}> {data.total_member}</Text>
+                        </View>
+                        <View style={styles.details}>
+                          <Text style={styles.one}>Amount per Member :</Text>
+                          <Text style={styles.count}>
+                            {' '}
+                            {data.amount_per_member}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.first_view}>
+                        <View style={styles.details}>
+                          <Text style={styles.one}>Round : </Text>
+                          <Text style={styles.count}> {data.total_rounds}</Text>
+                        </View>
+                        <View style={styles.details}>
+                          <Text style={styles.one}>Start Date :</Text>
+                          <Text style={styles.count}> {data.start_date}</Text>
+                        </View>
+                      </View>
                     </View>
-                    <View style={styles.first_view}>
-                      <View style={styles.details}>
-                        <Text style={styles.one}>Members : </Text>
-                        <Text style={styles.count}> {data.total_member}</Text>
-                      </View>
-                      <View style={styles.details}>
-                        <Text style={styles.one}>Amount per Member :</Text>
-                        <Text style={styles.count}>
-                          {' '}
-                          {data.amount_per_member}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.first_view}>
-                      <View style={styles.details}>
-                        <Text style={styles.one}>Round : </Text>
-                        <Text style={styles.count}> {data.total_rounds}</Text>
-                      </View>
-                      <View style={styles.details}>
-                        <Text style={styles.one}>Start Date :</Text>
-                        <Text style={styles.count}> {data.start_date}</Text>
-                      </View>
-                    </View>
+                  </TouchableOpacity>
+                  <View
+                    style={[
+                      styles.dataEmpty,
+                      { display: data.name ? 'none' : 'flex' },
+                    ]}
+                  >
+                    <Text style={styles.emptyText}>Data not available</Text>
                   </View>
-                </TouchableOpacity>
+                </View>
               );
             }}
+            ListEmptyComponent={() => (
+              <View style={styles.dataEmpty}>
+                <Text style={styles.emptyText}>Data not available</Text>
+              </View>
+            )}
           />
         </View>
       )}
@@ -360,4 +380,17 @@ const styles = ScaledSheet.create({
     fontWeight: '600',
   },
   //-----------------------------
+  dataEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+    marginTop:50
+
+  
+
+  },
+  emptyText: {
+    fontSize: moderateScale(18),
+    color: AppColors.placeholder,
+  },
 });

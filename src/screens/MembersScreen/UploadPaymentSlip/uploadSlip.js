@@ -21,7 +21,10 @@ import { useState } from 'react';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export const UploadSlip = () => {
+export const UploadSlip = ({ route }) => {
+  const { committeeData } = route.params;
+  const data = committeeData;
+  console.log('Details :', data);
   const navigation = useNavigation();
   //---------------------------
   const [imageUri, setImageUri] = useState(null);

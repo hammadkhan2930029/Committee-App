@@ -1,13 +1,11 @@
+//-----------------------members tab bottom navigator---------------------------------
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-//---------------------members-----------------------------------------
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 import { ActiveBCs } from '../screens/MembersScreen/ActiveBC/ActiveBc';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-
 import { AppColors } from '../constant/appColors';
 import { AdminProfile } from '../screens/AdminProfile/adminProfile';
+import { PaymentHistory } from '../screens/MembersScreen/PaymentHistory/paymentHistory';
 
 const UserTab = createBottomTabNavigator();
 
@@ -21,9 +19,9 @@ export const BottomTabNavigationUser = () => {
             icon = focused ? 'home' : 'home';
           } else if (route.name === 'ActiveBCs') {
             icon = focused ? 'groups' : 'groups';
-          } else if (route.name === 'PaymentUser') {
+          } else if (route.name === 'PaymentHistory') {
             icon = focused ? 'credit-card' : 'credit-card';
-          } else if (route.name === 'UserProfile') {
+          } else if (route.name === 'AdminProfile') {
             icon = focused ? 'person' : 'person';
           }
           return (
@@ -66,13 +64,13 @@ export const BottomTabNavigationUser = () => {
         component={ActiveBCs}
         options={{ headerShown: false }}
       />
-      {/* <UserTab.Screen
-        name="PaymentUser"
-        component={PaymentUser}
-        options={{ headerShown: false }}
-      /> */}
       <UserTab.Screen
-        name="UserProfile"
+        name="PaymentHistory"
+        component={PaymentHistory}
+        options={{ headerShown: false }}
+      />
+      <UserTab.Screen
+        name="AdminProfile"
         component={AdminProfile}
         options={{ headerShown: false }}
       />

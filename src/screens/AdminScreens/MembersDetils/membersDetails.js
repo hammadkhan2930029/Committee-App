@@ -108,12 +108,12 @@ export const MembersDetails = ({ route }) => {
                 <Text style={styles.title}>Joined BCs</Text>
                 <Text style={styles.value}>{item.joinedBCs} Committees</Text>
               </View>
-              <View style={styles.row}>
+              {/* <View style={styles.row}>
                 <Text style={styles.title}>Status </Text>
                 <View style={styles.activeBtn}>
                   <Text style={styles.active}>{item.status}</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
         </View>

@@ -22,7 +22,7 @@ import { UserEditProfile } from '../screens/MembersScreen/UserEditProfile/userEd
 import { UserProfile } from '../screens/MembersScreen/Profile/userProfile';
 import { UploadSlip } from '../screens/MembersScreen/UploadPaymentSlip/uploadSlip';
 import { PaymentHistory } from '../screens/MembersScreen/PaymentHistory/paymentHistory';
-import { PaymentUser } from '../screens/MembersScreen/Payment/payment';
+import { UserCommitteeDetails } from '../screens/MembersScreen/UserCommitteeDetails/UserCommitteeDetails';
 import { Login } from '../screens/Auth/Login/login';
 
 const Stack = createNativeStackNavigator();
@@ -61,7 +61,7 @@ export const AppNavigator = () => {
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="UploadSlip" component={UploadSlip} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
-      <Stack.Screen name="PaymentUser" component={PaymentUser} />
+      <Stack.Screen name="UserCommitteeDetails" component={UserCommitteeDetails} />
 
       {/* <Stack.Screen name="Login" component={Login} /> */}
     </Stack.Navigator>

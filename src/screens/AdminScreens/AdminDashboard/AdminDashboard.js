@@ -19,17 +19,16 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
 
 export const AdminDashboard = () => {
   const navigation = useNavigation();
-  const [Loading, setLoading] = useState(null);
+  const [Loading, setLoading] = useState(true);
 
-  const [listView, setListView] = useState([]);
-  const [userList, setUserList] = useState([]);
+  const [counter, setCounter] = useState([]);
 
   //----------------------------------------------
-  const [userData, setUserData] = useState(null);
-
+  const [userData, setUserData] = useState();
   useFocusEffect(
     useCallback(() => {
       const loadUser = async () => {
@@ -42,17 +41,17 @@ export const AdminDashboard = () => {
       loadUser();
     }, []),
   );
-  //----------get committee list----------------------
 
-  const committeeList = async () => {
-    setLoading(true);
+  //---------------Total User total active bCs------------------------------
+  const counterApi = async () => {
     try {
       const response = await api.get(
-        `/user/view-committees/${userData.user_id}`,
+        `/user/dashboard-counters/${userData.user_id}`,
       );
+      const result = response.data.msg[0];
 
-      setListView(response.data.msg);
-      if (response.data.msg) {
+      setCounter(result);
+      if (result) {
         setLoading(false);
       }
     } catch (error) {
@@ -62,56 +61,12 @@ export const AdminDashboard = () => {
     }
   };
   useEffect(() => {
-    committeeList();
-  }, [userData]);
-  //-----------total committee count------------------------
-
-  const totalCount = Array.isArray(listView)
-    ? listView.filter(item => item?.id).length
-    : 0;
-
-  console.log('count:', totalCount);
-
-  console.log('list view :', listView);
-  //-------------total user count---------------------------
-
-  const userViewUsers = async () => {
-    if (!userData?.user_id) return;
-    try {
-      const response = await api.get(`/user/view-users/${userData.user_id}`);
-      console.log('response:', response.data.msg);
-      if (Array.isArray(response.data.msg)) {
-        setUserList(response.data.msg);
-      } else {
-        setUserList([]);
-      }
-    } catch (error) {
-      console.log('error :', error);
-    }
-  };
-
-  useEffect(() => {
     if (userData?.user_id) {
-      userViewUsers();
+      counterApi();
     }
   }, [userData]);
-
-  console.log(userData);
-
-  const totalUserCount = Array.isArray(userList)
-    ? userList.filter(
-        item =>
-          item &&
-          typeof item === 'object' &&
-          item.user_id !== undefined &&
-          item.user_id !== null,
-      ).length
-    : 0;
-
-  console.log('totalUserCount:', totalUserCount);
-
-  //---------------------------------------------
-
+  console.log('counter :', counter);
+  //----------------------------------------------------------------------------
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -124,7 +79,7 @@ export const AdminDashboard = () => {
           >
             <View style={styles.main}>
               <View style={styles.TopView}>
-                <Text style={styles.h1}>Admin Dashboard</Text>
+                <Text style={styles.h1}>Dashboard</Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('AdminProfile')}
                 >
@@ -162,7 +117,9 @@ export const AdminDashboard = () => {
                 </Text>
               </View>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>{totalCount ?? 0}</Text>
+                <Text style={styles.counter_text}>
+                  {counter.total_active_committees ?? 0}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -177,7 +134,7 @@ export const AdminDashboard = () => {
                 <Text style={styles.activeBC_details}>3 joined this week </Text>
               </View>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>{totalUserCount}</Text>
+                <Text style={styles.counter_text}>{counter.total_users}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -192,7 +149,9 @@ export const AdminDashboard = () => {
                 <Text style={styles.activeBC_details}>Awaiting approval </Text>
               </View>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>05</Text>
+                <Text style={styles.counter_text}>
+                  {counter.pending_payments}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -211,6 +170,7 @@ export const AdminDashboard = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Loader visible={Loading}/>
     </View>
   );
 };

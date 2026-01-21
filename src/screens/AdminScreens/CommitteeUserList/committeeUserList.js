@@ -16,13 +16,13 @@ import { AppIcons } from '../../../constant/appIcons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
 import { getStoredUser } from '../../../Utils/getUser';
-
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const CommitteeUserList = () => {
   const [userdata, setUserData] = useState();
   const [userList, setUserList] = useState([]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigation = useNavigation();
 
@@ -50,6 +50,7 @@ export const CommitteeUserList = () => {
       console.log('response:', response.data.msg);
       if (Array.isArray(response.data.msg)) {
         setUserList(response.data.msg);
+        setIsLoading(false);
       } else {
         setUserList([]);
       }
@@ -58,11 +59,6 @@ export const CommitteeUserList = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (userdata?.user_id) {
-  //     userViewUsers();
-  //   }
-  // }, [userdata]);
   console.log(userList);
   useFocusEffect(
     useCallback(() => {
@@ -70,6 +66,71 @@ export const CommitteeUserList = () => {
     }, [userdata?.user_id]),
   );
   //---------------------------------------------
+  const MySkeleton = () => {
+    return (
+      <View>
+        {[...Array(6)].map((_, index) => (
+          <SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item
+              justifyContent="center"
+              alignItems="center"
+            >
+              <View
+                style={{
+                  backgroundColor: AppColors.background,
+                  padding: 10,
+                  borderRadius: 20,
+                  margin: 10,
+                  borderColor: AppColors.primary,
+                  borderWidth: 1,
+                  height: 420,
+                  width: '95%',
+                  height: 120,
+                }}
+              >
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  padding={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  {/* Text */}
+                  <SkeletonPlaceholder.Item>
+                    <View
+                      style={{
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <SkeletonPlaceholder.Item
+                        width={50}
+                        height={50}
+                        borderRadius={25}
+                      />
+                      <SkeletonPlaceholder.Item
+                        width={60}
+                        height={20}
+                        borderRadius={4}
+                        marginLeft={3}
+                      />
+                    </View>
+
+                    <SkeletonPlaceholder.Item
+                      marginTop={8}
+                      width={150}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                </SkeletonPlaceholder.Item>
+              </View>
+            </SkeletonPlaceholder.Item>
+          </SkeletonPlaceholder>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -119,49 +180,56 @@ export const CommitteeUserList = () => {
         </View>
 
         {/* ---------------------------------------------- */}
-        <FlatList
-          data={userList}
-          keyExtractor={(item, index) =>
-            item.id?.toString() || index.toString()
-          }
-          renderItem={({ item }) => (
-            <View style={styles.Committee_View}>
-              <TouchableOpacity
-                style={[
-                  styles.Dashboardcard,
-                  { display: item.name ? 'flex' : 'none' },
-                ]}
-                onPress={() =>
-                  navigation.navigate('MembersDetails', { item: item })
-                }
-              >
-                <View style={styles.first_view}>
-                  <View style={styles.userMale_View}>
-                    <Image source={AppIcons.userMale} style={styles.userMale} />
+        {isLoading ? (
+          <MySkeleton />
+        ) : (
+          <FlatList
+            data={userList}
+            keyExtractor={(item, index) =>
+              item.id?.toString() || index.toString()
+            }
+            renderItem={({ item }) => (
+              <View style={styles.Committee_View}>
+                <TouchableOpacity
+                  style={[
+                    styles.Dashboardcard,
+                    { display: item.name ? 'flex' : 'none' },
+                  ]}
+                  onPress={() =>
+                    navigation.navigate('MembersDetails', { item: item })
+                  }
+                >
+                  <View style={styles.first_view}>
+                    <View style={styles.userMale_View}>
+                      <Image
+                        source={AppIcons.userMale}
+                        style={styles.userMale}
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.Name}>{item.name}</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.Name}>{item.name}</Text>
+                  <View style={styles.first_view}>
+                    <View style={styles.details}>
+                      <Text style={styles.one}>Phone:</Text>
+                      <Text style={styles.count}>{item.phone}</Text>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.first_view}>
-                  <View style={styles.details}>
-                    <Text style={styles.one}>Phone:</Text>
-                    <Text style={styles.count}>{item.phone}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
 
-              <View
-                style={[
-                  styles.dataEmpty,
-                  { display: item.name ? 'none' : 'flex' },
-                ]}
-              >
-                <Text style={styles.emptyText}>Data not available</Text>
+                <View
+                  style={[
+                    styles.dataEmpty,
+                    { display: item.name ? 'none' : 'flex' },
+                  ]}
+                >
+                  <Text style={styles.emptyText}>Data not available</Text>
+                </View>
               </View>
-            </View>
-          )}
-        />
+            )}
+          />
+        )}
       </ScrollView>
     </View>
   );

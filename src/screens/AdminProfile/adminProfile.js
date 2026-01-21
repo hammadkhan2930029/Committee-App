@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Image,
@@ -18,78 +18,94 @@ import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const AdminProfile = () => {
-  const [userdata, setUserData] = useState('');
+  const [userdata, setUserData] = useState(null);
   const [isLodaing, setIsLoading] = useState(false);
   const navigation = useNavigation();
   //-----------------get data--------------------
   const getData = async () => {
     const user = await AsyncStorage.getItem('user');
-    const parsedUser = JSON.parse(user);
-    setUserData(parsedUser);
-
- 
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setUserData(parsedUser);
+    } else {
+      setUserData(null);
+    }
   };
-  useFocusEffect(() => {
-    getData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, []),
+  );
   console.log('user data :', userdata);
   //-----------------logout--------------------------
   const logout = async () => {
-    navigation.replace('Login');
     setIsLoading(true);
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
+    navigation.replace('Login');
+    // setTimeout(() => {
+    //   setIsLoading();
+    // }, 2000);
   };
 
-  return (
-    <View style={styles.container}>
-      <StatusBar
-        backgroundColor={AppColors.background}
-        barStyle="dark-content"
-      />
-      <View style={styles.arrowBackView}>
-        <TouchableOpacity style={styles.arrowIcon} onPress={()=> navigation.goBack()}>
-          <Icon name="keyboard-arrow-left" size={26} color={AppColors.title} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="settings" size={26} color={AppColors.link} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.profileView}>
-        <Text style={styles.profile}>Profile</Text>
-      </View>
-      <View style={styles.profileView}>
-        <Image source={AppImages.profileAvatar} style={styles.profileImage} />
-      </View>
-      <View style={styles.nameView}>
-        <Text style={styles.name}>{userdata.full_name}</Text>
-        <Text style={styles.admin}>Admin</Text>
-      </View>
-      <View style={styles.detailView}>
-        <View style={styles.detail}>
-          <Text style={styles.text1}>Full Name : </Text>
-          <Text style={styles.text2}> {userdata.full_name}</Text>
-        </View>
-        <View style={styles.detail}>
-          <Text style={styles.text1}>Phone Number : </Text>
-          <Text style={styles.text2}> {userdata.phone}</Text>
-        </View>
-      </View>
-      <View style={styles.BtnView}>
-        <CustomButton
-          title="Edit Profile"
-          onPress={() =>
-            navigation.navigate('AdminEditProfile', { user: userdata })
-          }
+  if (userdata) {
+    return (
+      <View style={styles.container}>
+        <StatusBar
+          backgroundColor={AppColors.background}
+          barStyle="dark-content"
         />
-        <TouchableOpacity style={styles.button} onPress={() => logout()}>
-          <Text style={styles.text}>Log Out</Text>
-        </TouchableOpacity>
+        <View style={styles.arrowBackView}>
+          <TouchableOpacity
+            style={styles.arrowIcon}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon
+              name="keyboard-arrow-left"
+              size={26}
+              color={AppColors.title}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon name="settings" size={26} color={AppColors.link} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.profileView}>
+          <Text style={styles.profile}>Profile</Text>
+        </View>
+        <View style={styles.profileView}>
+          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
+        </View>
+        <View style={styles.nameView}>
+          <Text style={styles.name}>{userdata?.full_name}</Text>
+          <Text style={styles.admin}>Admin</Text>
+        </View>
+        <View style={styles.detailView}>
+          <View style={styles.detail}>
+            <Text style={styles.text1}>Full Name : </Text>
+            <Text style={styles.text2}> {userdata?.full_name}</Text>
+          </View>
+          <View style={styles.detail}>
+            <Text style={styles.text1}>Phone Number : </Text>
+            <Text style={styles.text2}> {userdata?.phone}</Text>
+          </View>
+        </View>
+        <View style={styles.BtnView}>
+          <CustomButton
+            title="Edit Profile"
+            onPress={() =>
+              navigation.navigate('AdminEditProfile', { user: userdata })
+            }
+          />
+          <TouchableOpacity style={styles.button} onPress={() => logout()}>
+            <Text style={styles.text}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
+        <Loader visible={isLodaing} />
       </View>
-      <Loader visible={isLodaing} />
-    </View>
-  );
+    );
+  }
 };
 const styles = ScaledSheet.create({
   container: {

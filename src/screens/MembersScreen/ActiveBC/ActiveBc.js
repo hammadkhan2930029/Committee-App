@@ -21,9 +21,9 @@ import { navigate } from '../../../navigations/navigationService';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const ActiveBCs = () => {
-  const [userData, setUserData] = useState();
   const [committeeList, setCommitteeList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState();
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -39,6 +39,12 @@ export const ActiveBCs = () => {
   );
   const userID = userData?.user_id;
   console.log(userID);
+  //-----------------------------------------------------------
+   const formatNumber = value => {
+    if (value === null || value === undefined) return '';
+
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
   //-----------------myCommitteeList---------------------------
   const myCommitteeList = async () => {
     try {
@@ -61,7 +67,7 @@ export const ActiveBCs = () => {
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
     return (
-      <View>
+      <View >
         {[...Array(6)].map((_, index) => (
           <SkeletonPlaceholder>
             <SkeletonPlaceholder.Item
@@ -178,7 +184,9 @@ export const ActiveBCs = () => {
               return (
                 <View>
                   <TouchableOpacity
-                    onPress={() => navigate('UserCommitteeDetails', { data: data })}
+                    onPress={() =>
+                      navigate('UserCommitteeDetails', { data: data })
+                    }
                   >
                     <View
                       style={[
@@ -203,7 +211,7 @@ export const ActiveBCs = () => {
                           <Text style={styles.one}>Amount per Member :</Text>
                           <Text style={styles.count}>
                             {' '}
-                            {data.amount_per_member}
+                            {formatNumber(data.amount_per_member)}
                           </Text>
                         </View>
                       </View>
@@ -384,10 +392,7 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 15,
-    marginTop:50
-
-  
-
+    marginTop: 50,
   },
   emptyText: {
     fontSize: moderateScale(18),

@@ -7,40 +7,51 @@ import {
   ImageBackground,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import { CustomButtonLight } from '../../../components/customeButtonLight';
-import { navigate } from '../../../navigations/navigationService';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
 import { useEffect, useState } from 'react';
+import { DisabledButton } from '../../../components/disabledButton';
+import { Loader } from '../../Loader/loader';
 
 export const UserCommitteeDetails = ({ route }) => {
+  //---------------------------------------------
+
   const { data } = route.params;
   const [details, setDetails] = useState([]);
+  const [roundList, setRoundList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+
   //----------------------------------------------
+
   const formatNumber = value => {
-    if (!value) return '';
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (value === null || value === undefined) return '';
+
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  //--------------------------------------------------
-  const removeCommas = value => value.replace(/,/g, '');
   //----------committee details---------------------------
+
   const committeeDetails = async () => {
     try {
       const response = await api.get(
         `/user/view-committee-detail/${data?.committee_id}`,
       );
-      const result = response.data.msg[0];
-      console.log('committee details :', response);
+      console.log('response :', response);
+      const result = response?.data?.msg[0];
+      const rounds = response?.data?.rounds;
       if (result) {
         setDetails(result);
+        setRoundList(rounds);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       }
     } catch (error) {
       console.log(error);
@@ -51,7 +62,27 @@ export const UserCommitteeDetails = ({ route }) => {
       committeeDetails();
     }
   }, [data]);
-  console.log('committee details 2:', details);
+  console.log('roundList', roundList);
+
+  //-------------------------------------------------
+
+  const now = new Date();
+  const month = now.toLocaleString('en-us', {
+    month: 'short',
+    year: 'numeric',
+  });
+  console.log('date :', month);
+
+  //------------------------------------------------
+  const memberCountMap  = roundList.reduce((acc, item) => {
+    const id = item?.committee_member_id;
+    if (!id) return acc;
+    acc[id] = (acc[id] || 0) + 1;
+    let count = acc;
+    return count;
+  }, {});
+
+  console.log('filter :', memberCountMap);
 
   return (
     <View style={styles.container}>
@@ -83,7 +114,7 @@ export const UserCommitteeDetails = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
-
+        {/* ---------------------------------------------------------------- */}
         <View style={styles.BCDetails}>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
@@ -116,139 +147,71 @@ export const UserCommitteeDetails = ({ route }) => {
             <Text style={styles.text2}>{details?.due_on}</Text>
           </View>
         </View>
-        <View style={styles.paymentBTN}>
-          <CustomButton
-            title="Add payment"
-            onPress={() =>
-              navigation.navigate('UploadSlip', { committeeData: details })
-            }
-          />
-        </View>
-        <View style={styles.paymentStatus_view}>
-          {/* -----------------------Submitted---------------------------------- */}
-          <View style={styles.paymentStatus}>
-            <View style={styles.cardHeader}>
-              <View>
-                <Text style={styles.status}>Your Payment Status</Text>
-              </View>
-              <View style={styles.statustype}>
-                <Text style={styles.statustypeText}>Submitted</Text>
-              </View>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Payment Date</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Paid Amount</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Verification Status</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Slip</Text>
-              <Text style={styles.value}>No slip submitted</Text>
-            </View>
-          </View>
+        {/* -----------------------Submitted---------------------------------- */}
+        <FlatList
+          data={roundList}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={item => {
+            const data = item?.item;
 
-          {/* ------------------paid--------------------- */}
-          <View style={styles.paymentStatus}>
-            <View style={styles.cardHeader}>
-              <View>
-                <Text style={styles.status}>Your Payment Status</Text>
-              </View>
-              <View style={styles.statustype_paid}>
-                <Text style={styles.statustypeText}>Paid</Text>
-              </View>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Payment Date</Text>
-              <Text style={styles.value}>15 Feb 2025</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Paid Amount</Text>
-              <Text style={styles.value}>PKR 3,000</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Verification Status</Text>
-              <Text style={styles.value}>Verified</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Slip</Text>
-              <TouchableOpacity>
-                <View style={styles.slipView}>
-                  <Text style={styles.value_slip}>View Slip</Text>
-                  <Icon
-                    name="keyboard-arrow-right"
-                    size={20}
-                    color={AppColors.link}
-                  />
+            return (
+              <View style={styles.paymentStatus_view}>
+                <View style={styles.paymentStatus}>
+                  <View style={styles.cardHeader}>
+                    <View>
+                      <Text style={styles.status}>Your Payment Status</Text>
+                    </View>
+                    <View style={styles.statustype}>
+                      <Text style={styles.statustypeText}>{data.status}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.paymentCardRow}>
+                    <Text style={styles.label}>Round No.</Text>
+                    <Text style={styles.value}>{data.round_no}</Text>
+                  </View>
+                  <View style={styles.paymentCardRow}>
+                    <Text style={styles.label}>Name</Text>
+                    <Text style={styles.value}>
+                      {data?.committee_member_name
+                        ? data?.committee_member_name
+                        : 'null'}
+                    </Text>
+                  </View>
+                  <View style={styles.paymentCardRow}>
+                    <Text style={styles.label}>Month</Text>
+                    <Text style={styles.value}>{data.round_month}</Text>
+                  </View>
+
+                  <View style={styles.paymentBTN}>
+                    {month === data.round_month ? (
+                      <CustomButton
+                        title="Payment Now"
+                        onPress={() =>
+                          navigation.navigate('UploadSlip', {
+                            singleRoundAmount: details?.amount_per_member,
+                            amount:
+                              details?.amount_per_member *
+                              (memberCountMap[data.committee_member_id] || 1),
+
+                            memberCount:
+                              memberCountMap[data.committee_member_id] || 1,
+
+                            data: data,
+                          })
+                        }
+                      />
+                    ) : (
+                      <DisabledButton title="Payment Now" />
+                    )}
+                  </View>
                 </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {/* ------------------OverDue--------------------- */}
-          <View style={styles.paymentStatus}>
-            <View style={styles.cardHeader}>
-              <View>
-                <Text style={styles.status}>Your Payment Status</Text>
               </View>
-              <View style={styles.statustype_Overdue}>
-                <Text style={styles.statustypeText}>Overdue</Text>
-              </View>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Payment Date</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Paid Amount</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Verification Status</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Slip</Text>
-              <View style={styles.slipView}>
-                <Text style={styles.value_slip}>No Slip submitted</Text>
-              </View>
-            </View>
-          </View>
-          {/* ------------------Rejected--------------------- */}
-          <View style={styles.paymentStatus}>
-            <View style={styles.cardHeader}>
-              <View>
-                <Text style={styles.status}>Your Payment Status</Text>
-              </View>
-              <View style={styles.statustype_Rejected}>
-                <Text style={styles.statustypeText}>Rejected</Text>
-              </View>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Payment Date</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Last Paid Amount</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Verification Status</Text>
-              <Text style={styles.value}>-</Text>
-            </View>
-            <View style={styles.paymentCardRow}>
-              <Text style={styles.label}>Slip</Text>
-              <View style={styles.slipView}>
-                <Text style={styles.value_slip}>No Slip submitted</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+            );
+          }}
+        />
+        {/* ---------------------------------------------------------------- */}
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -377,13 +340,13 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(18),
   },
   statustype: {
-    backgroundColor: AppColors.placeholder,
+    backgroundColor: AppColors.background,
     width: 80,
     padding: 3,
     borderRadius: 15,
   },
   statustype_paid: {
-    backgroundColor: 'green',
+    backgroundColor: '#008200',
     width: 80,
     padding: 3,
     borderRadius: 15,
@@ -403,7 +366,7 @@ const styles = ScaledSheet.create({
   statustypeText: {
     textAlign: 'center',
     fontSize: moderateScale(14),
-    color: AppColors.title,
+    color: AppColors.link,
   },
   paymentCardRow: {
     justifyContent: 'space-between',

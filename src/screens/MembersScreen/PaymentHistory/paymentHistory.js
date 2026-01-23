@@ -10,16 +10,60 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppIcons } from '../../../constant/appIcons';
 import { AppImages } from '../../../constant/appImages';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-// keyboard-arrow-left
+import { api } from '../../../services/api';
+import { useCallback, useEffect, useState } from 'react';
+import { getStoredUser } from '../../../Utils/getUser';
+import { Loader } from '../../Loader/loader';
+
 export const PaymentHistory = () => {
   const navigation = useNavigation();
+  const [userData, setUserData] = useState();
+  const [history, setHistory] = useState([]);
+  const [loading, setLoding] = useState(true);
+  //-----------------get user data --------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  const userID = userData?.user_id;
+  console.log(userID);
+  //-----------------------------------
+  const UserPaymentHistory = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-payments/list/${userID}`,
+      );
+      const result = response?.data?.msg;
+      console.log('payment history :', result);
+      if (result) {
+        setHistory(result);
+        setLoding(false);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoding(false);
+    }
+  };
+  useEffect(() => {
+    UserPaymentHistory();
+  }, [userID]);
 
   return (
     <View style={styles.conatiner}>
@@ -52,8 +96,59 @@ export const PaymentHistory = () => {
             </View>
           </ImageBackground>
         </View>
-        <View style={styles.card_view}>
-          {[...Array(8)].map((_, index) => (
+
+        <FlatList
+          data={history}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={item => {
+            const items = item.item;
+            return (
+              <View style={styles.card_view}>
+                <View style={styles.card}>
+                  <View style={styles.header}>
+                    <View style={styles.cardHeader}>
+                      <Text style={styles.name}>{items.committe_name}</Text>
+                      <Text style={styles.status}>{items.status}</Text>
+                    </View>
+                    <View styles={styles.monthView}>
+                      <Text style={styles.month}>
+                        Round Month : {items.round_month}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.cardMiddle}>
+                    <Text style={styles.amountPermember}>
+                      {items.amount_per_member}
+                    </Text>
+                    <Text style={styles.amountPermemberText}>
+                      Amount per Member
+                    </Text>
+                  </View>
+                  {/* <View style={styles.leftData}>
+                    <View style={styles.view}>
+                      <Text style={styles.text1}>Round Month :</Text>
+                      <Text style={styles.text2}>{' ' + items.round_month}</Text>
+                    </View>
+                    <View style={styles.view}>
+                      <Text style={styles.text1}>Amount: </Text>
+                      <Text style={styles.text2}> PKR 3,000</Text>
+                    </View>
+                    <View style={styles.view}>
+                      <Text style={styles.text1}>Slip: </Text>
+                      <Text style={styles.text2}> Approved</Text>
+                    </View>
+                  </View>
+                  <View style={styles.rightData}>
+                    <View style={styles.status_view}>
+                      <Text style={styles.status_text}>Paid</Text>
+                    </View>
+                  </View> */}
+                </View>
+              </View>
+            );
+          }}
+        />
+        {/* {[...Array(8)].map((_, index) => (
             <View style={styles.card}>
               <View style={styles.leftData}>
                 <View style={styles.view}>
@@ -75,9 +170,9 @@ export const PaymentHistory = () => {
                 </View>
               </View>
             </View>
-          ))}
-        </View>
+          ))} */}
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -143,8 +238,8 @@ const styles = ScaledSheet.create({
   card: {
     width: '90%',
     backgroundColor: AppColors.background,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
+    justifyContent: 'center',
+    flexDirection: 'column',
     padding: 10,
     borderRadius: 20,
     borderColor: AppColors.primary,
@@ -179,5 +274,52 @@ const styles = ScaledSheet.create({
   status_text: {
     color: AppColors.title,
     fontSize: moderateScale(16),
+  },
+  //---------------------------------
+  header: {
+    borderBottomColor: AppColors.primary,
+    borderBottomWidth: 1,
+  },
+  cardHeader: {
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 10,
+  },
+  name: {
+    color: AppColors.blackText,
+    fontSize: moderateScale(18),
+    fontWeight: '700',
+  },
+  status: {
+    backgroundColor: AppColors.primary,
+    textAlign: 'center',
+    padding: 6,
+    color: AppColors.title,
+    borderRadius: 15,
+  },
+  monthView: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  month: {
+    textAlign: 'center',
+    fontSize: moderateScale(16),
+    padding: 10,
+  },
+  amountPermember: {
+    textAlign: 'center',
+    fontSize: moderateScale(16),
+    color: AppColors.link,
+    padding: 3,
+    fontWeight:'700'
+  },
+  amountPermemberText: {
+    textAlign: 'center',
+    fontSize: moderateScale(16),
+    color: AppColors.bodyText,
+    padding: 3,
   },
 });

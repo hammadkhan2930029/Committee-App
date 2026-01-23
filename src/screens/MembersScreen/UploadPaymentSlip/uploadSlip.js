@@ -9,166 +9,355 @@ import {
   Modal,
   TextInput,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppIcons } from '../../../constant/appIcons';
 import { AppImages } from '../../../constant/appImages';
 import { CustomButton } from '../../../components/customButton';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Toast from 'react-native-toast-message';
+import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
+import { CustomInput } from '../../../components/customTextInput';
+import { string } from 'yup';
+import { DisabledButton } from '../../../components/disabledButton';
 
 export const UploadSlip = ({ route }) => {
-  const { committeeData } = route.params;
-  const data = committeeData;
-  console.log('Details :', data);
+  //-------------------------------------------------
+  const { amount, data, memberCount,singleRoundAmount } = route.params;
+
+  console.log('amount :', amount);
+
+  console.log('data', data);
+  console.log('memberCount', memberCount);
+
   const navigation = useNavigation();
-  //---------------------------
+  //-------------------------------------------------
   const [imageUri, setImageUri] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userAmount, setUserAmount] = useState();
 
-  //------------------------------------
+  //-------------------------------------------------
+  const [userData, setUserData] = useState();
+
+  //-----------------get user data --------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+  const userID = userData?.user_id;
+  console.log('userID', userID);
+  //-------------------------------------------------
   const options = {
     mediaType: 'photo',
     quality: 0.7,
     selectionLimit: 1,
   };
-  //------------------------------------
-  const openCamera = () => {
-    setModalVisible(false);
-    launchCamera(options, response => {
-      if (response.didCancel) return;
+  //----------------------------------------------
 
-      if (response.errorCode) {
-        Alert.alert('Error', response.errorMessage);
-        return;
-      }
+  const formatNumber = value => {
+    if (value === null || value === undefined) return '';
 
-      setImageUri(response.assets[0].uri);
-    });
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
-  //------------------------------------
+
+  //-------------------------------------------------
+  // const openCamera = () => {
+  //   setModalVisible(false);
+  //   launchCamera(options, response => {
+  //     if (response.didCancel) return;
+
+  //     if (response.errorCode) {
+  //       // Alert.alert('Error', response.errorMessage);
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Warning',
+  //         text2: response.errorMessage,
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'orange',
+  //         },
+  //       });
+
+  //       return;
+  //     }
+
+  //     setImageUri(response.assets[0].uri);
+  //   });
+  // };
+  //-------------------------------------------------
+  const allowedTypes = ['image/jpg', 'image/png', 'image/webp'];
+
+  const isValidImageType = asset => {
+    if (!asset) return false;
+    return allowedTypes.includes(asset.type);
+  };
+  //-------------------------------------------------
+  const getFileExtension = filename =>
+    filename?.split('.').pop()?.toLowerCase();
+
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+  //-------------------------------------------------
   const openGallery = () => {
     setModalVisible(false);
     launchImageLibrary(options, response => {
       if (response.didCancel) return;
 
       if (response.errorCode) {
-        Alert.alert('Error', response.errorMessage);
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: response.errorMessage,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+        return;
+      }
+      const asset = response?.assets?.[0];
+      const ext = getFileExtension(asset.fileName);
+
+      if (!isValidImageType(asset) && !allowedExtensions.includes(ext)) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Invalid Format',
+          text2: 'Only JPG, PNG, and WEBP images are allowed.',
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'red',
+          },
+        });
         return;
       }
 
-      setImageUri(response.assets[0].uri);
+      setImageUri(asset.uri);
     });
   };
-
   console.log('image picker :', imageUri);
+  //------------------------------------------------
+
+  //-------------------------------------------------
+  const uploadPaymentSlip = async () => {
+    if (!imageUri) {
+      Toast.show({
+        type: 'customToast',
+        text1: 'Warning',
+        text2: 'Please select payment slip image',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: 'orange',
+        },
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('user_id', userID);
+      formData.append('committee_round_id', data.committee_round_id);
+      formData.append('amount', userAmount);
+      formData.append('pay_slip', {
+        uri: imageUri,
+        name: 'payment-slip.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('committee_id', data.committee_id);
+      formData.append('committee_member_id', data.committee_member_id);
+
+      const response = await api.post(
+        '/user/send/committee-payment',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      );
+      console.log(response);
+      Toast.show({
+        type: 'customToast',
+        text1: 'Success',
+        text2: response?.data?.msg?.[0]?.response || 'Uploaded',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: 'green',
+        },
+      });
+
+      setImageUri(null);
+      navigation.goBack();
+    } catch (error) {
+      Toast.show({
+        type: 'customToast',
+        text1: 'Error',
+        text2: 'Server error, please try again',
+        props: {
+          bgColor: AppColors.background,
+          borderColor: '#ff5252',
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const str = String(amount);
 
   return (
     <View style={styles.conatiner}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <View>
-        <ImageBackground
-          source={AppImages.Rectangle}
-          style={styles.RectangleImg}
-        >
-          <View style={styles.main}>
-            <View style={styles.TopView}>
-              <View style={styles.backAndText}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
-                </TouchableOpacity>
-                <Text style={styles.h1}>Upload Payment Slip </Text>
-              </View>
-            </View>
-            <View style={styles.textView}>
-              <Text style={styles.h4}>
-                Submit your payment slip for this month.
-              </Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-      <View style={styles.details}>
-        <View style={styles.data}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Amount Due</Text>
-            <Text style={styles.value}>PKR 3,000</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Due Date</Text>
-            <Text style={styles.value}>15 Feb 2025</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Status</Text>
-            <View style={styles.btn}>
-              <Text style={styles.btnText}>Pending</Text>
-            </View>
-          </View>
-          <View style={styles.uploadSlip}>
-            <View>
-              <CustomInputWithIcon
-                label="Choose File"
-                placeholder="Choose File"
-                editable={false} // ❌ typing band
-                pointerEvents="none" // ❌ focus disable
-                rightIcon={<Icon name="file-upload" size={20} color="#666" />}
-              />
-
-              {/* Overlay Press Area */}
-              <TouchableOpacity
-                style={StyleSheet.absoluteFill}
-                onPress={() => setModalVisible(true)}
-                activeOpacity={0.7}
-              />
-            </View>
-          </View>
-          <View style={styles.customBTN}>
-            <CustomButton title="Submit Slip" />
-          </View>
-          {/* ----------------------------- */}
-          <Modal
-            visible={modalVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setModalVisible(false)}
+      <ScrollView>
+        <View>
+          <ImageBackground
+            source={AppImages.Rectangle}
+            style={styles.RectangleImg}
           >
-            <View style={styles.overlay}>
-              <View style={styles.modalBox}>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.title}>Select Image</Text>
+            <View style={styles.main}>
+              <View style={styles.TopView}>
+                <View style={styles.backAndText}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image
+                      source={AppIcons.arrowBack}
+                      style={styles.arrowBack}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.h1}>Upload Payment Slip </Text>
                 </View>
-
-                <TouchableOpacity style={styles.optionBtn} onPress={openCamera}>
-                  <Text style={styles.optionText}>📷 Camera</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.optionBtn}
-                  onPress={openGallery}
-                >
-                  <Text style={styles.optionText}>🖼️ Gallery</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.cancelText}>Cancel</Text>
-                </TouchableOpacity>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.h4}>
+                  Submit your payment slip for this month.
+                </Text>
               </View>
             </View>
-          </Modal>
-
-          {/* ----------------------------- */}
-          {imageUri && (
-            <Image source={{ uri: imageUri }} style={styles.image} />
-          )}
+          </ImageBackground>
         </View>
-      </View>
+        <View style={styles.details}>
+          <View style={styles.data}>
+              
+            <View style={styles.row}>
+              <Text style={styles.label}>Single Round Amount</Text>
+              <Text style={styles.value}>PKR {formatNumber(singleRoundAmount)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Round Month</Text>
+              <Text style={styles.value}>{data.round_month}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Rounds</Text>
+              <Text style={styles.value}>{memberCount}</Text>
+            </View>
+             <View style={styles.row}>
+              <Text style={styles.label}>Total Amount</Text>
+              <Text style={styles.value}>PKR {formatNumber(amount)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Due Date</Text>
+              <Text style={styles.value}>{data.due_date}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Status</Text>
+              <View style={styles.btn}>
+                <Text style={styles.btnText}>{data.status}</Text>
+              </View>
+            </View>
+            <View style={styles.uploadSlip}>
+              <View
+                style={[
+                  styles.decView,
+                  { display: userAmount > 0 ? 'flex' : 'none' },
+                ]}
+              >
+                <Text style={styles.decValue}>{userAmount - amount}</Text>
+              </View>
+              <CustomInput
+                label="Amount"
+                type="numeric"
+                placeholder={formatNumber(str)}
+                value={userAmount}
+                onChangeText={setUserAmount}
+              />
+              <View>
+                <CustomInputWithIcon
+                  label="Choose File"
+                  placeholder="Choose File"
+                  editable={false}
+                  pointerEvents="none"
+                  rightIcon={<Icon name="file-upload" size={20} color="#666" />}
+                />
+
+                {/* Overlay Press Area */}
+                <TouchableOpacity
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => setModalVisible(true)}
+                  activeOpacity={0.7}
+                />
+              </View>
+            </View>
+            <View style={styles.customBTN}>
+              {userAmount > 0 && imageUri ? (
+                <CustomButton
+                  title="Submit Slip"
+                  onPress={() => uploadPaymentSlip()}
+                />
+              ) : (
+                <DisabledButton title="Submit Slip" />
+              )}
+            </View>
+            {/* ----------------------------- */}
+            <Modal
+              visible={modalVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View style={styles.overlay}>
+                <View style={styles.modalBox}>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.title}>Select Image</Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.optionBtn}
+                    onPress={openGallery}
+                  >
+                    <Text style={styles.optionText}>🖼️ Gallery</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.cancelBtn}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.cancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* ----------------------------- */}
+            {imageUri && (
+              <Image source={{ uri: imageUri }} style={styles.image} />
+            )}
+          </View>
+        </View>
+      </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -286,7 +475,7 @@ const styles = ScaledSheet.create({
   modalBox: {
     backgroundColor: '#fff',
     width: '80%',
-    height: 200,
+    height: 160,
     borderRadius: 12,
   },
   title: {
@@ -314,9 +503,10 @@ const styles = ScaledSheet.create({
     fontWeight: '700',
   },
   image: {
-    width: 200,
+    width: '80%',
     height: 200,
-    marginTop: 20,
+    resizeMode: 'contain',
+    marginTop: 10,
     borderRadius: 10,
     alignSelf: 'center',
   },
@@ -327,5 +517,15 @@ const styles = ScaledSheet.create({
     borderTopLeftRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  decView: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  decValue: {
+    color: 'red',
+    marginBottom: -20,
+    fontSize: moderateScale(14),
+    padding: 5,
   },
 });

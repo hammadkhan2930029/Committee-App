@@ -77,30 +77,7 @@ export const UploadSlip = ({ route }) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  //-------------------------------------------------
-  // const openCamera = () => {
-  //   setModalVisible(false);
-  //   launchCamera(options, response => {
-  //     if (response.didCancel) return;
-
-  //     if (response.errorCode) {
-  //       // Alert.alert('Error', response.errorMessage);
-  //       Toast.show({
-  //         type: 'customToast',
-  //         text1: 'Warning',
-  //         text2: response.errorMessage,
-  //         props: {
-  //           bgColor: AppColors.background,
-  //           borderColor: 'orange',
-  //         },
-  //       });
-
-  //       return;
-  //     }
-
-  //     setImageUri(response.assets[0].uri);
-  //   });
-  // };
+  
   //-------------------------------------------------
   const allowedTypes = ['image/jpg', 'image/png', 'image/webp'];
 

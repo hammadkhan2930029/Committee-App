@@ -23,6 +23,8 @@ import { UserProfile } from '../screens/MembersScreen/Profile/userProfile';
 import { UploadSlip } from '../screens/MembersScreen/UploadPaymentSlip/uploadSlip';
 import { PaymentHistory } from '../screens/MembersScreen/PaymentHistory/paymentHistory';
 import { UserCommitteeDetails } from '../screens/MembersScreen/UserCommitteeDetails/UserCommitteeDetails';
+import { UserPaymentDetails } from '../screens/MembersScreen/UserPaymentDetails/userPaymentDetail';
+import { EditPayments } from '../screens/MembersScreen/EditPayments/editePayment';
 import { Login } from '../screens/Auth/Login/login';
 
 const Stack = createNativeStackNavigator();
@@ -61,9 +63,13 @@ export const AppNavigator = () => {
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="UploadSlip" component={UploadSlip} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
-      <Stack.Screen name="UserCommitteeDetails" component={UserCommitteeDetails} />
+      <Stack.Screen
+        name="UserCommitteeDetails"
+        component={UserCommitteeDetails}
+      />
+      <Stack.Screen name="UserPaymentDetails" component={UserPaymentDetails} />
+      <Stack.Screen name="EditPayments" component={EditPayments} />
 
-      {/* <Stack.Screen name="Login" component={Login} /> */}
     </Stack.Navigator>
   );
 };

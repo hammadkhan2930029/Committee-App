@@ -22,6 +22,8 @@ import { api } from '../../../services/api';
 import { useCallback, useEffect, useState } from 'react';
 import { getStoredUser } from '../../../Utils/getUser';
 import { Loader } from '../../Loader/loader';
+import { CustomButton } from '../../../components/customButton';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 export const PaymentHistory = () => {
   const navigation = useNavigation();
@@ -43,7 +45,13 @@ export const PaymentHistory = () => {
   );
   const userID = userData?.user_id;
   console.log(userID);
-  //-----------------------------------
+  //------------------------------------------------------
+  const formatNumber = value => {
+    if (value === null || value === undefined) return '';
+
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+  //------------------------------------------------------
   const UserPaymentHistory = async () => {
     try {
       const response = await api.get(
@@ -62,13 +70,128 @@ export const PaymentHistory = () => {
     }
   };
   useEffect(() => {
-    UserPaymentHistory();
+    if (userID) {
+      UserPaymentHistory();
+    }
   }, [userID]);
+  //----------------------Skeleton-----------------------------
+  const MySkeleton = () => {
+    return (
+      <View>
+        {[...Array(6)].map((_, index) => (
+          <View
+            style={{
+              backgroundColor: AppColors.background,
+              padding: 10,
+              borderRadius: 20,
+              margin: 10,
+              borderColor: AppColors.placeholder,
+              borderWidth: 1,
+              width: '95%',
+              elevation: 5,
+            }}
+          >
+            <SkeletonPlaceholder>
+              <SkeletonPlaceholder.Item
+                justifyContent="center"
+                alignItems="center"
+                backgroundColor={AppColors.background}
+                elevation={5}
+              >
+                {/* Text */}
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  padding={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  <SkeletonPlaceholder.Item
+                    width={120}
+                    height={20}
+                    borderRadius={4}
+                  />
+                  <SkeletonPlaceholder.Item
+                    marginTop={6}
+                    width={80}
+                    height={20}
+                    borderRadius={10}
+                  />
+                </SkeletonPlaceholder.Item>
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  paddingLeft={10}
+                  paddingRight={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  <SkeletonPlaceholder.Item
+                    width={80}
+                    height={20}
+                    borderRadius={4}
+                  />
+                  <SkeletonPlaceholder.Item
+                    marginTop={6}
+                    width={60}
+                    height={20}
+                    borderRadius={4}
+                  />
+                </SkeletonPlaceholder.Item>
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  paddingLeft={10}
+                  paddingRight={10}
+                  paddingTop={8}
+                >
+                  <SkeletonPlaceholder.Item
+                    width={'100%'}
+                    height={3}
+                    borderRadius={4}
+                  />
+                </SkeletonPlaceholder.Item>
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  paddingLeft={10}
+                  paddingRight={10}
+                  paddingTop={8}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <SkeletonPlaceholder.Item
+                    width={60}
+                    height={20}
+                    borderRadius={4}
+                  />
+                  <SkeletonPlaceholder.Item
+                    marginTop={6}
+                    width={120}
+                    height={20}
+                    borderRadius={4}
+                  />
+                </SkeletonPlaceholder.Item>
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  paddingLeft={10}
+                  paddingRight={10}
+                  paddingTop={8}
+                >
+                  <SkeletonPlaceholder.Item
+                    width={'100%'}
+                    height={35}
+                    borderRadius={10}
+                  />
+                </SkeletonPlaceholder.Item>
+              </SkeletonPlaceholder.Item>
+            </SkeletonPlaceholder>
+          </View>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.conatiner}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView>
+      <ScrollView  style={styles.scroll}>
         <View>
           <ImageBackground
             source={AppImages.Rectangle}
@@ -96,89 +219,74 @@ export const PaymentHistory = () => {
             </View>
           </ImageBackground>
         </View>
+        {loading ? (
+          <MySkeleton />
+        ) : (
+          <FlatList
+            data={history}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={item => {
+              const items = item?.item;
+              return (
+                <View >
+                  <Text
+                    style={[styles.msg, { display: items.committe_name ? 'none' : 'flex' }]}
+                  >
+                    Data not available
+                  </Text>
 
-        <FlatList
-          data={history}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={item => {
-            const items = item.item;
-            return (
-              <View style={styles.card_view}>
-                <View style={styles.card}>
-                  <View style={styles.header}>
-                    <View style={styles.cardHeader}>
-                      <Text style={styles.name}>{items.committe_name}</Text>
-                      <Text style={styles.status}>{items.status}</Text>
-                    </View>
-                    <View styles={styles.monthView}>
-                      <Text style={styles.month}>
-                        Round Month : {items.round_month}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.cardMiddle}>
-                    <Text style={styles.amountPermember}>
-                      {items.amount_per_member}
-                    </Text>
-                    <Text style={styles.amountPermemberText}>
-                      Amount per Member
-                    </Text>
-                  </View>
-                  {/* <View style={styles.leftData}>
-                    <View style={styles.view}>
-                      <Text style={styles.text1}>Round Month :</Text>
-                      <Text style={styles.text2}>{' ' + items.round_month}</Text>
-                    </View>
-                    <View style={styles.view}>
-                      <Text style={styles.text1}>Amount: </Text>
-                      <Text style={styles.text2}> PKR 3,000</Text>
-                    </View>
-                    <View style={styles.view}>
-                      <Text style={styles.text1}>Slip: </Text>
-                      <Text style={styles.text2}> Approved</Text>
+                  <View style={styles.card_view}>
+                    <View style={styles.card}>
+                      <View style={styles.header}>
+                        <View style={styles.cardHeader}>
+                          <Text style={styles.name}>{items.committe_name}</Text>
+                          <View style={styles.status_view}>
+                            <Text style={styles.status_text}>
+                              {items.status}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.monthView}>
+                          <Text style={styles.month}>
+                            Round # {items.round_no}
+                          </Text>
+                          <Text style={styles.month}>{items.round_month}</Text>
+                        </View>
+                      </View>
+                      <View style={styles.cardMiddle}>
+                        <Text style={styles.amountPermember}>
+                          {formatNumber(items.amount_per_member)}
+                        </Text>
+                        <Text style={styles.amountPermemberText}>
+                          Amount per Member
+                        </Text>
+                      </View>
+
+                      <View style={styles.btnView}>
+                        <CustomButton
+                          title="Payment Details"
+                          onPress={() =>
+                            navigation.navigate('UserPaymentDetails', {
+                              item: items,
+                            })
+                          }
+                        />
+                      </View>
                     </View>
                   </View>
-                  <View style={styles.rightData}>
-                    <View style={styles.status_view}>
-                      <Text style={styles.status_text}>Paid</Text>
-                    </View>
-                  </View> */}
                 </View>
-              </View>
-            );
-          }}
-        />
-        {/* {[...Array(8)].map((_, index) => (
-            <View style={styles.card}>
-              <View style={styles.leftData}>
-                <View style={styles.view}>
-                  <Text style={styles.text1}>February</Text>
-                  <Text style={styles.text2}> 2025</Text>
-                </View>
-                <View style={styles.view}>
-                  <Text style={styles.text1}>Amount: </Text>
-                  <Text style={styles.text2}> PKR 3,000</Text>
-                </View>
-                <View style={styles.view}>
-                  <Text style={styles.text1}>Slip: </Text>
-                  <Text style={styles.text2}> Approved</Text>
-                </View>
-              </View>
-              <View style={styles.rightData}>
-                <View style={styles.status_view}>
-                  <Text style={styles.status_text}>Paid</Text>
-                </View>
-              </View>
-            </View>
-          ))} */}
+              );
+            }}
+          />
+        )}
       </ScrollView>
-      <Loader visible={loading} />
     </View>
   );
 };
 const styles = ScaledSheet.create({
   conatiner: {
     flex: 1,
+    backgroundColor: AppColors.background,
   },
   arrowBack: {
     backgroundColor: AppColors.background,
@@ -234,6 +342,9 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
+    // backgroundColor:'yellow',
+    marginBottom:10
+
   },
   card: {
     width: '90%',
@@ -245,36 +356,9 @@ const styles = ScaledSheet.create({
     borderColor: AppColors.primary,
     borderWidth: 1,
     marginTop: 8,
+    elevation: 3,
   },
-  view: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-    padding: 5,
-  },
-  text1: {
-    color: AppColors.blackText,
-    fontSize: moderateScale(16),
-    fontWeight: '500',
-  },
-  text2: {
-    color: AppColors.link,
-    fontSize: moderateScale(16),
-    fontWeight: '400',
-  },
-  status_view: {
-    width: 80,
-    backgroundColor: AppColors.primary,
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 15,
-    elevation: 5,
-  },
-  status_text: {
-    color: AppColors.title,
-    fontSize: moderateScale(16),
-  },
+
   //---------------------------------
   header: {
     borderBottomColor: AppColors.primary,
@@ -292,20 +376,27 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(18),
     fontWeight: '700',
   },
-  status: {
+  status_view: {
+    width: 80,
     backgroundColor: AppColors.primary,
-    textAlign: 'center',
-    padding: 6,
-    color: AppColors.title,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 15,
+    elevation: 5,
+  },
+  status_text: {
+    color: AppColors.title,
+    fontSize: moderateScale(16),
   },
   monthView: {
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    flexDirection: 'row',
+    padding: 5,
   },
   month: {
-    textAlign: 'center',
     fontSize: moderateScale(16),
     padding: 10,
   },
@@ -314,7 +405,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(16),
     color: AppColors.link,
     padding: 3,
-    fontWeight:'700'
+    fontWeight: '700',
   },
   amountPermemberText: {
     textAlign: 'center',
@@ -322,4 +413,15 @@ const styles = ScaledSheet.create({
     color: AppColors.bodyText,
     padding: 3,
   },
+  btnView: {
+    marginTop: 5,
+  },
+  msg: {
+    textAlign: 'center',
+    fontSize: moderateScale(16),
+    padding: 15,
+  },
+  scroll:{
+    marginBottom:65,
+  }
 });

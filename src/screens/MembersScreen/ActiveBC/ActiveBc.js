@@ -40,7 +40,7 @@ export const ActiveBCs = () => {
   const userID = userData?.user_id;
   console.log(userID);
   //-----------------------------------------------------------
-   const formatNumber = value => {
+  const formatNumber = value => {
     if (value === null || value === undefined) return '';
 
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -67,25 +67,24 @@ export const ActiveBCs = () => {
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
     return (
-      <View >
+      <View>
         {[...Array(6)].map((_, index) => (
-          <SkeletonPlaceholder>
-            <SkeletonPlaceholder.Item
-              justifyContent="center"
-              alignItems="center"
-            >
-              <View
-                style={{
-                  backgroundColor: AppColors.background,
-                  padding: 10,
-                  borderRadius: 20,
-                  margin: 10,
-                  borderColor: AppColors.primary,
-                  borderWidth: 1,
-                  height: 420,
-                  width: '95%',
-                  height: 120,
-                }}
+          <View
+            style={{
+              backgroundColor: AppColors.background,
+              padding: 10,
+              borderRadius: 20,
+              margin: 10,
+              borderColor: AppColors.placeholder,
+              borderWidth: 1,
+              elevation:5,
+              width: '95%',
+            }}
+          >
+            <SkeletonPlaceholder>
+              <SkeletonPlaceholder.Item
+                justifyContent="center"
+                alignItems="center"
               >
                 <SkeletonPlaceholder.Item
                   width={'100%'}
@@ -136,9 +135,9 @@ export const ActiveBCs = () => {
                     />
                   </SkeletonPlaceholder.Item>
                 </SkeletonPlaceholder.Item>
-              </View>
-            </SkeletonPlaceholder.Item>
-          </SkeletonPlaceholder>
+              </SkeletonPlaceholder.Item>
+            </SkeletonPlaceholder>
+          </View>
         ))}
       </View>
     );

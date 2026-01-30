@@ -120,12 +120,16 @@ export const Payments = ({ route }) => {
   console.log('status check :', selectedStatus);
   //----------------------------------------------------
 
-  const filterData =
-    selectedStatus === 'All'
+  const hasPayments = paymentList.length > 0;
+
+  const filterData = hasPayments
+    ? selectedStatus === 'All'
       ? paymentList
-      : paymentList?.filter(
+      : paymentList.filter(
           item => item?.status?.toLowerCase() === selectedStatus?.toLowerCase(),
-        );
+        )
+    : [];
+
   //-----------------------------------------------------
   const formatNumber = value => {
     if (value === null || value === undefined) return '';
@@ -154,10 +158,11 @@ export const Payments = ({ route }) => {
 
   console.log('paymentList :', paymentList);
   //----------------------------------------------
-  const paidAmount = paymentList?.map(item => item?.paid_amount);
-  const totalCollection = paidAmount?.reduce((accumulator, currentValue) => {
-    return accumulator + Number(currentValue);
-  }, 0);
+  const totalCollection = hasPayments
+    ? paymentList.reduce((sum, item) => {
+        return sum + Number(item?.paid_amount || 0);
+      }, 0)
+    : 0;
 
   console.log('paidAmount :', totalCollection);
   //-----------------------------------------------
@@ -184,6 +189,14 @@ export const Payments = ({ route }) => {
       type: 'paid',
     },
   ];
+  if (!paymentList.length) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Text style={{ textAlign: 'center' }}>No payments available</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -221,7 +234,7 @@ export const Payments = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
-        {paymentList ? (
+        {paymentList.length === 0 ? (
           <View>
             <View style={styles.horizontalCards}>
               <FlatList
@@ -349,7 +362,7 @@ export const Payments = ({ route }) => {
           </View>
         ) : (
           <View>
-            <Text style={{ textAlign: 'center' }}>Data not available</Text>
+            <Text style={{ textAlign: 'center',padding:10 }}>No payments available</Text>
           </View>
         )}
       </ScrollView>

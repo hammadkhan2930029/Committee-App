@@ -26,6 +26,7 @@ import { UserCommitteeDetails } from '../screens/MembersScreen/UserCommitteeDeta
 import { UserPaymentDetails } from '../screens/MembersScreen/UserPaymentDetails/userPaymentDetail';
 import { EditPayments } from '../screens/MembersScreen/EditPayments/editePayment';
 import { Login } from '../screens/Auth/Login/login';
+import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,10 @@ export const AppNavigator = () => {
       />
       <Stack.Screen name="UserPaymentDetails" component={UserPaymentDetails} />
       <Stack.Screen name="EditPayments" component={EditPayments} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Payments" component={Payments} />
+
+
 
     </Stack.Navigator>
   );

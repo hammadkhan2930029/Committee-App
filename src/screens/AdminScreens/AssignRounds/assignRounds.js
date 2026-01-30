@@ -28,9 +28,8 @@ export const AssignRounds = ({ route }) => {
   const committeeMembers = multipleData.members || [];
   const committeeRounds = multipleData.rounds || [];
   const committeeID = multipleData.msg[0].committee_id;
-  // console.log('multi :', multipleData.msg[0].committee_id);
-  // console.log('committeeMembers', committeeMembers);
-  // console.log('committeeMemcommitteeRoundsbers', committeeRounds);
+  const [mark, setMark] = useState('');
+
 
   // ---------- Members Dropdown ----------
   const [openMember, setOpenMember] = useState(false);
@@ -41,7 +40,7 @@ export const AssignRounds = ({ route }) => {
       value: item.committe_member_id,
     })),
   );
-  // console.log('members value :', memberValue);
+  
   // ---------- Rounds Dropdown ----------
   const [openRound, setOpenRound] = useState(false);
   const [roundValue, setRoundValue] = useState(null);
@@ -138,6 +137,25 @@ export const AssignRounds = ({ route }) => {
       console.log(error);
     }
   };
+  //----------------------mark committee round----------------------------
+  const markRound = async roundID => {
+    try {
+      const response = await api.get(
+        `/user/mark-committee-round/paid/${roundID}`,
+      );
+      const result = await response.data.msg[0].response;
+      setMark(result);
+      console.log('round mark :', result);
+      viewCommitteeRound()
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log('round mark 2:', mark);
+  //----------------------------------------
+  const hasAnyPaid = roundList.some(
+    item => item.status?.toLowerCase() === 'paid',
+  );
 
   return (
     <View style={styles.container}>
@@ -242,6 +260,9 @@ export const AssignRounds = ({ route }) => {
               <Text style={styles.headerText}>Name </Text>
             </View>
             <View style={styles.cell}>
+              <Text style={styles.headerText}>Mark </Text>
+            </View>
+            <View style={styles.cell}>
               <Text style={styles.headerText}>Action </Text>
             </View>
           </View>
@@ -249,30 +270,57 @@ export const AssignRounds = ({ route }) => {
             data={roundList}
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={false}
-            renderItem={({ item, index }) => (
-              <View
-                style={[
-                  styles.tableRow,
-                  { display: item.committe_member_name ? 'flex' : 'none' },
-                ]}
-              >
-                <View style={styles.Rowcell}>
-                  <Text style={styles.text}>{item.round_no}</Text>
+            renderItem={({ item, index }) => {
+              console.log(item.status);
+
+              return (
+                <View
+                  style={[
+                    styles.tableRow,
+                    { display: item.committe_member_name ? 'flex' : 'none' },
+                  ]}
+                >
+                  <View style={styles.Rowcell}>
+                    <Text style={styles.text}>{item.round_no}</Text>
+                  </View>
+                  <View style={styles.Rowcell}>
+                    <Text style={styles.text}>{item.committe_member_name}</Text>
+                  </View>
+                  <View style={styles.Rowcell}>
+                    <TouchableOpacity
+                      disabled={item.status?.toLowerCase() === 'paid'}
+                      onPress={() => markRound(item.committee_round_id)}
+                    >
+                      <Icon
+                        name={
+                          item.status?.toLowerCase() === 'paid'
+                            ? 'bookmark-added'
+                            : 'bookmark'
+                        }
+                        size={24}
+                        color={
+                          item.status?.toLowerCase() === 'paid' ? 'gray' : 'red'
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.Rowcell}>
+                    <TouchableOpacity
+                      disabled={hasAnyPaid}
+                      onPress={() =>
+                        deleteCommitteeRound(item.committee_round_id)
+                      }
+                    >
+                      <Icon
+                        name="delete"
+                        size={24}
+                        color={hasAnyPaid ? 'gray' : 'red'}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View style={styles.Rowcell}>
-                  <Text style={styles.text}>{item.committe_member_name}</Text>
-                </View>
-                <View style={styles.Rowcell}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      deleteCommitteeRound(item.committee_round_id)
-                    }
-                  >
-                    <Icon name="delete" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
+              );
+            }}
           />
         </View>
       </ScrollView>
@@ -383,7 +431,7 @@ const styles = ScaledSheet.create({
   },
 
   cell: {
-    width: '33%',
+    width: '24%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -407,7 +455,7 @@ const styles = ScaledSheet.create({
   },
 
   Rowcell: {
-    width: '33%',
+    width: '24%',
     justifyContent: 'center',
     alignItems: 'center',
   },

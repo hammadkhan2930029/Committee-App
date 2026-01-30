@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -14,31 +14,8 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { date } from 'yup';
-import { useNavigation } from '@react-navigation/native';
-
-const summaryData = [
-  {
-    id: 1,
-    title: 'Total Collected',
-    value: 'PKR 150,000',
-    subtitle: 'All payments included',
-    type: 'collected',
-  },
-  {
-    id: 2,
-    title: 'Pending Amount',
-    value: 'PKR 25,000',
-    subtitle: 'Awaiting payments',
-    type: 'pending',
-  },
-  {
-    id: 3,
-    title: 'Paid',
-    value: '35 Payments',
-    subtitle: 'Successfully received',
-    type: 'paid',
-  },
-];
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { api } from '../../../services/api';
 
 const demoData = [
   {
@@ -133,16 +110,80 @@ const demoData = [
   },
 ];
 
-export const Payments = () => {
+export const Payments = ({ route }) => {
+  //----------------------------------------------------
+  const { committeeID } = route.params;
+  console.log('committeeID :', committeeID);
   const navigation = useNavigation();
   const [selectedStatus, setSelectedStatus] = useState('All');
+  const [paymentList, setPaymentList] = useState([]);
   console.log('status check :', selectedStatus);
+  //----------------------------------------------------
 
   const filterData =
     selectedStatus === 'All'
-      ? demoData
-      : demoData.filter(item => item.status === selectedStatus);
+      ? paymentList
+      : paymentList?.filter(
+          item => item?.status?.toLowerCase() === selectedStatus?.toLowerCase(),
+        );
+  //-----------------------------------------------------
+  const formatNumber = value => {
+    if (value === null || value === undefined) return '';
 
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+  //---------------------------------------------------
+
+  const AdminpaymentList = async () => {
+    try {
+      const response = await api.get(
+        `/admin/view-committee-payments/list/${committeeID}`,
+      );
+      const result = response?.data.msg;
+
+      setPaymentList(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      AdminpaymentList();
+    }, [committeeID]),
+  );
+
+  console.log('paymentList :', paymentList);
+  //----------------------------------------------
+  const paidAmount = paymentList?.map(item => item?.paid_amount);
+  const totalCollection = paidAmount?.reduce((accumulator, currentValue) => {
+    return accumulator + Number(currentValue);
+  }, 0);
+
+  console.log('paidAmount :', totalCollection);
+  //-----------------------------------------------
+  const summaryData = [
+    {
+      id: 1,
+      title: 'Total Collected',
+      value: 0,
+      subtitle: 'All payments included',
+      type: 'collected',
+    },
+    {
+      id: 2,
+      title: 'Pending Amount',
+      value: totalCollection,
+      subtitle: 'Awaiting payments',
+      type: 'pending',
+    },
+    {
+      id: 3,
+      title: 'Paid',
+      value: 0,
+      subtitle: 'Successfully received',
+      type: 'paid',
+    },
+  ];
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -180,125 +221,137 @@ export const Payments = () => {
             </View>
           </ImageBackground>
         </View>
-        <View style={styles.horizontalCards}>
-          <FlatList
-            data={summaryData}
-            horizontal
-            keyExtractor={item => item.id.toString()}
-            contentContainerStyle={{ paddingHorizontal: 15 }}
-            renderItem={({ item }) => (
-              <View style={styles.summaryCard}>
-                <View style={styles.cardHeader}>
-                  <Image
-                    source={
-                      item.type === 'collected'
-                        ? AppIcons.dollarbagPrimary
-                        : item.type === 'pending'
-                        ? AppIcons.sandWatchPrimary
-                        : AppIcons.checkMarkPrimary
+        {paymentList ? (
+          <View>
+            <View style={styles.horizontalCards}>
+              <FlatList
+                data={summaryData}
+                horizontal
+                keyExtractor={item => item.id.toString()}
+                contentContainerStyle={{ paddingHorizontal: 15 }}
+                renderItem={({ item }) => (
+                  <View style={styles.summaryCard}>
+                    <View style={styles.cardHeader}>
+                      <Image
+                        source={
+                          item.type === 'collected'
+                            ? AppIcons.dollarbagPrimary
+                            : item.type === 'pending'
+                            ? AppIcons.sandWatchPrimary
+                            : AppIcons.checkMarkPrimary
+                        }
+                        style={styles.cardIcon}
+                      />
+                      <Text style={styles.cardTitle}>{item.title}</Text>
+                    </View>
+                    <Text style={styles.cardValue}>
+                      {formatNumber(item.value)}
+                    </Text>
+
+                    {/* Subtitle */}
+                    <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+                  </View>
+                )}
+              />
+            </View>
+            <View>
+              <FlatList
+                data={['All', 'Paid', 'Pending', 'Overdue']}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
+                  const isSelected = selectedStatus === item;
+                  return (
+                    <TouchableOpacity
+                      style={[
+                        styles.statusList,
+                        isSelected && styles.activeStatusList,
+                      ]}
+                      onPress={() => setSelectedStatus(item)}
+                    >
+                      <View style={styles.statusView}>
+                        <Text
+                          style={[
+                            styles.status,
+                            isSelected && styles.activeStatusText,
+                          ]}
+                        >
+                          {item}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+            <View>
+              <FlatList
+                data={filterData}
+                keyExtractor={item => item?.payment_id?.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.cards}
+                    onPress={() =>
+                      navigation.navigate('PaymentDetails', { item: item })
                     }
-                    style={styles.cardIcon}
-                  />
-                  <Text style={styles.cardTitle}>{item.title}</Text>
-                </View>
-                <Text style={styles.cardValue}>{item.value}</Text>
-
-                {/* Subtitle */}
-                <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
-              </View>
-            )}
-          />
-        </View>
-        <View>
-          <FlatList
-            data={['All', 'Paid', 'Pending', 'Overdue']}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => {
-              const isSelected = selectedStatus === item;
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.statusList,
-                    isSelected && styles.activeStatusList,
-                  ]}
-                  onPress={() => setSelectedStatus(item)}
-                >
-                  <View style={styles.statusView}>
-                    <Text
-                      style={[
-                        styles.status,
-                        isSelected && styles.activeStatusText,
-                      ]}
-                    >
-                      {item}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
-        <View>
-          <FlatList
-            data={filterData}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.cards}
-                onPress={() =>
-                  navigation.navigate('PaymentDetails', { item: item })
-                }
-              >
-                <View style={styles.left}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.fund}>{item.fund}</Text>
-
-                  <View style={styles.amountView}>
-                    <Text style={styles.amount}>Amount :</Text>
-                    <Text style={styles.amount2}>{item.amount}</Text>
-                  </View>
-                </View>
-                <View style={styles.right}>
-                  <View
-                    style={[
-                      item.status === 'Paid'
-                        ? styles.paid
-                        : item.status === 'Pending'
-                        ? styles.pending
-                        : item.status === 'Overdue'
-                        ? styles.overDue
-                        : null,
-                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.CardStatus,
-                        {
-                          color:
-                            item.status === 'Overdue'
-                              ? AppColors.bodyText
-                              : AppColors.title,
-                        },
-                      ]}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
-                  <View>
-                    <Text style={styles.date}>{''}</Text>
-                  </View>
-                  <View style={styles.dateView}>
-                    <Text style={styles.date}>Date :</Text>
+                    <View style={styles.left}>
+                      <Text style={styles.name}>{item.payment_by}</Text>
+                      <Text style={styles.fund}>{item.committe_name}</Text>
 
-                    <Text style={styles.date2}>{item.date}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amount}>Paid Amount :</Text>
+                        <Text style={styles.amount2}>
+                          {formatNumber(item.paid_amount)}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.right}>
+                      <View
+                        style={[
+                          item.status.toLowerCase() === 'paid'
+                            ? styles.paid
+                            : item.status.toLowerCase() === 'pending'
+                            ? styles.pending
+                            : item.status.toLowerCase() === 'Overdue'
+                            ? styles.overDue
+                            : null,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.CardStatus,
+                            {
+                              color:
+                                item.status.toLowerCase() === 'Overdue'
+                                  ? AppColors.bodyText
+                                  : AppColors.title,
+                            },
+                          ]}
+                        >
+                          {item.status}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.date}>{''}</Text>
+                      </View>
+                      <View style={styles.dateView}>
+                        <Text style={styles.date}>Date :</Text>
+
+                        <Text style={styles.date2}>{item.pay_date}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+        ) : (
+          <View>
+            <Text style={{ textAlign: 'center' }}>Data not available</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -308,9 +361,9 @@ const styles = ScaledSheet.create({
     flex: 1,
     backgroundColor: AppColors.background,
   },
-  scrollView: {
-    marginBottom: 65,
-  },
+  // scrollView: {
+  //   marginBottom: 65,
+  // },
   arrowBack: {
     width: 28,
     height: 28,

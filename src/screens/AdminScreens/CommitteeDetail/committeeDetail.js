@@ -21,17 +21,19 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
 
-
 export const CommitteeDetails = ({ route }) => {
+  //------------------------------------
   const { id } = route.params;
   console.log('ID :', id);
+  //------------------------------------
+
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [roundList, setRoundList] = useState([]);
   const [multipleData, setMultipleData] = useState([]);
 
-  //---thousand separator---only display ke liye-------
+  //---------------------------------------------------
   const formatNumber = value => {
     if (!value) return '';
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -56,7 +58,9 @@ export const CommitteeDetails = ({ route }) => {
     }, [id]),
   );
   console.log('committee details 2:', details.committee_id);
+
   //----------------delete committee-------------------
+
   const deleteCommittee = async () => {
     setLoading(true);
     try {
@@ -64,7 +68,7 @@ export const CommitteeDetails = ({ route }) => {
         `/user/delete-committee/${details.committee_id}`,
       );
       const result = response?.data?.msg[0]?.response;
-     
+
       if (response?.data?.code === '200' && result) {
         Toast.show({
           type: 'customToast',
@@ -95,6 +99,30 @@ export const CommitteeDetails = ({ route }) => {
       setLoading(false);
     }
   };
+  //-------------user view committee rounds--------------------------
+
+  const viewCommitteeRound = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-rounds/${details.committee_id}`,
+      );
+      const result = await response.data?.msg;
+      setRoundList(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      viewCommitteeRound();
+    }, [details.committee_id]),
+  );
+  // console.log('view committee round:', roundList);
+  // console.log('details.committee_id :', details.committee_id);
+  //----------------------------------------
+  const hasAnyPaid = roundList.some(
+    item => item.status?.toLowerCase() === 'paid',
+  );
 
   return (
     <View style={styles.container}>
@@ -119,19 +147,30 @@ export const CommitteeDetails = ({ route }) => {
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>{details.name}</Text>
-                <View style={styles.activeBtn}>
-                  <Text style={styles.active}>{details.status}</Text>
-                </View>
+                <TouchableOpacity
+                  style={styles.paymentHistoryView}
+                  onPress={() => {
+                    navigation.navigate('Payments', {
+                      committeeID: details.committee_id,
+                    });
+                  }}
+                >
+                  <Image
+                    source={AppIcons.paymentHistory2}
+                    style={styles.paymentHistory}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </ImageBackground>
         </View>
 
         <View style={styles.BCDetails}>
-          <View style={styles.deleteIconView}>
-            <TouchableOpacity onPress={() => deleteCommittee()}>
-              <Icon name="delete" size={24} color="red" />
-            </TouchableOpacity>
+          <View style={styles.row}>
+            <Text style={styles.text1}>Status</Text>
+            <View style={styles.activeBtn}>
+              <Text style={styles.active}>{details.status}</Text>
+            </View>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
@@ -176,10 +215,30 @@ export const CommitteeDetails = ({ route }) => {
         <View></View>
         <View style={styles.buttons}>
           <View style={styles.btnView}>
-            <CustomButton
-              title="Edit Committee"
+            <TouchableOpacity
+              style={styles.deleteBTN}
               onPress={() => navigate('EditCommittee', { details: details })}
-            />
+            >
+              <Text style={styles.text}>Edit</Text>
+              <Icon name="edit" size={18} color={AppColors.title} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.btnView}>
+            <TouchableOpacity
+              disabled={hasAnyPaid}
+              style={[
+                styles.deleteBTN,
+                {
+                  backgroundColor: hasAnyPaid
+                    ? AppColors.placeholder
+                    : AppColors.primary,
+                },
+              ]}
+              onPress={() => deleteCommittee()}
+            >
+              <Text style={styles.text}>Delete</Text>
+              <Icon name="delete" size={18} color={AppColors.title} />
+            </TouchableOpacity>
           </View>
           <View style={styles.btnView}>
             <CustomButtonLight
@@ -253,14 +312,14 @@ const styles = ScaledSheet.create({
     padding: 5,
   },
   activeBtn: {
-    backgroundColor: AppColors.background,
+    backgroundColor: AppColors.primary,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 20,
   },
   active: {
     fontSize: moderateScale(16),
-    color: AppColors.link,
+    color: AppColors.title,
     textAlign: 'center',
     padding: 3,
   },
@@ -295,17 +354,47 @@ const styles = ScaledSheet.create({
   },
   buttons: {
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 15,
+    // backgroundColor:'green'
   },
   btnView: {
-    width: '50%',
-    marginTop: 15,
+    width: '47%',
+    marginTop: 10,
   },
   deleteIconView: {
     width: '100%',
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
-    padding: 10,
+    padding: 15,
+  },
+  paymentHistoryView: {
+    backgroundColor: AppColors.background,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 30,
+  },
+  paymentHistory: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+  },
+  //-----------------------------------
+  deleteBTN: {
+    padding: 12,
+    borderRadius: 15,
+    alignItems: 'center',
+    elevation: 5,
+    backgroundColor: AppColors.primary,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

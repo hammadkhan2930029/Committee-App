@@ -32,6 +32,9 @@ import Add from '../assets/icons/add.png';
 import CalendarActive from '../assets/icons/CalendarActive.png';
 import Cloud from '../assets/icons/Cloud.png';
 
+import paymentHistory1 from '../assets/icons/paymentHistory1.png';
+import paymentHistory2 from '../assets/icons/paymentHistory2.png';
+
 export const AppIcons = {
   wavingHand: wavingHand,
   facebook: facebook,
@@ -71,4 +74,7 @@ export const AppIcons = {
   //--------------------------------
   CalendarActive: CalendarActive,
   Cloud: Cloud,
+  //-----------------------------
+  paymentHistory1: paymentHistory1,
+  paymentHistory2: paymentHistory2,
 };

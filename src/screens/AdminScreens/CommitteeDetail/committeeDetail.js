@@ -147,31 +147,32 @@ export const CommitteeDetails = ({ route }) => {
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>{details.name}</Text>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={styles.paymentHistoryView}
                   onPress={() => {
-                    navigation.navigate('Payments', {
-                      committeeID: details.committee_id,
-                    });
+                    navigation.navigate('Payments');
                   }}
                 >
                   <Image
                     source={AppIcons.paymentHistory2}
                     style={styles.paymentHistory}
                   />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                 <View style={styles.activeBtn}>
+              <Text style={styles.active}>{details.status}</Text>
+            </View>
               </View>
             </View>
           </ImageBackground>
         </View>
 
         <View style={styles.BCDetails}>
-          <View style={styles.row}>
+          {/* <View style={styles.row}>
             <Text style={styles.text1}>Status</Text>
             <View style={styles.activeBtn}>
               <Text style={styles.active}>{details.status}</Text>
             </View>
-          </View>
+          </View> */}
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -181,11 +182,11 @@ export const CommitteeDetails = ({ route }) => {
             <Text style={styles.text2}>{details.total_rounds}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.text1}>Rounds Per Month</Text>
+            <Text style={styles.text1}>Round(s) Per Month</Text>
             <Text style={styles.text2}>{details.rounds_per_month}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.text1}>No. of Month</Text>
+            <Text style={styles.text1}>No. of Months</Text>
             <Text style={styles.text2}>{details.no_of_month}</Text>
           </View>
           <View style={styles.row}>
@@ -312,14 +313,14 @@ const styles = ScaledSheet.create({
     padding: 5,
   },
   activeBtn: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: AppColors.background,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 20,
   },
   active: {
     fontSize: moderateScale(16),
-    color: AppColors.title,
+    color: AppColors.link,
     textAlign: 'center',
     padding: 3,
   },

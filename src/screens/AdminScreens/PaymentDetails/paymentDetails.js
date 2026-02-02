@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Image,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -15,11 +16,58 @@ import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
+import { useState } from 'react';
+import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
+import Toast from 'react-native-toast-message';
+
 
 export const PaymentDetails = ({ route }) => {
+  //-------------------------------------------
+  const [loading, setLoading] = useState(false);
+
+  const [showImage, setShowImage] = useState(false);
+
   const { item } = route.params;
-  console.log('item :', item);
+  console.log('payment details :', item);
   const navigation = useNavigation();
+
+  //-------------------------------------------
+  const markPaymentVerified = async () => {
+    setLoading(true)
+    try {
+      const response = await api.get(
+        `/user/mark-payment/verified/${item.payment_id}`,
+      );
+      const result = await response?.data?.msg[0]?.response;
+      console.log('paymnet verified mrk :', result);
+      if (result === 'payment verified') {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: result,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+        navigation.goBack();
+        setLoading(false);
+      } else {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: result,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -45,7 +93,6 @@ export const PaymentDetails = ({ route }) => {
                 <Text style={styles.h4}>
                   Review slip and update payment status.
                 </Text>
-                
               </View>
             </View>
           </ImageBackground>
@@ -53,53 +100,73 @@ export const PaymentDetails = ({ route }) => {
         <View style={styles.BCDetails}>
           <View style={styles.row}>
             <Text style={styles.text1}>User Name</Text>
-            <Text style={styles.text2}>{item.name}</Text>
+            <Text style={styles.text2}>{item.payment_by}</Text>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Phone Number</Text>
-            <Text style={styles.text2}>{item.phone}</Text>
-          </View>
+
           <View style={styles.row}>
             <Text style={styles.text1}>Committee</Text>
-            <Text style={styles.text2}>{item.fund}</Text>
+            <Text style={styles.text2}>{item.committe_name}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.text1}>Month</Text>
-            <Text style={styles.text2}>{item.date}</Text>
+            <Text style={styles.text1}>Round no</Text>
+            <Text style={styles.text2}>{item.round_no}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.text1}>Amount Due</Text>
-            <Text style={styles.text2}>{item.amount}</Text>
+            <Text style={styles.text1}>Round Month</Text>
+            <Text style={styles.text2}>{item.round_month}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.text1}>Paid Amount</Text>
+            <Text style={styles.text2}>{item.paid_amount}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Status</Text>
-            {/* <Text style={styles.text2}>{item.status}</Text> */}
             <View style={styles.activeBtn}>
-                  <Text style={styles.active}>{item.status}</Text>
-                </View>
+              <Text style={styles.active}>{item.status}</Text>
+            </View>
           </View>
         </View>
         <View style={styles.fullSlip_View}>
           <View style={styles.fullSlip}>
-            <View style={styles.empty}></View>
-            <Text style={styles.tapText}>Tap to view full slip </Text>
+            {item?.pay_slip ? (
+              <TouchableOpacity onPress={() => setShowImage(true)}>
+                <Image source={{ uri: item.pay_slip }} style={styles.paySlip} />
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.tapText}>Pay Slip not available</Text>
+            )}
           </View>
         </View>
         <View style={styles.buttons}>
           <View style={styles.btnView}>
             <CustomButton
               title="Verify Payment"
-             
+              onPress={() => markPaymentVerified()}
             />
           </View>
           <View style={styles.btnView}>
-            <CustomButtonLight
-              title="Reject Slip"
-             
-            />
+            <CustomButtonLight title="Reject Slip" />
           </View>
         </View>
+        <Modal
+          visible={showImage}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowImage(false)}
+        >
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalClose}
+              onPress={() => setShowImage(false)}
+            >
+              <Text style={styles.closeText}>✕</Text>
+            </TouchableOpacity>
+
+            <Image source={{ uri: item.pay_slip }} style={styles.fullImage} />
+          </View>
+        </Modal>
       </ScrollView>
+      <Loader visible={loading}/>
     </View>
   );
 };
@@ -107,7 +174,6 @@ const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.background,
-
   },
   arrowBack: {
     width: 28,
@@ -149,7 +215,7 @@ const styles = ScaledSheet.create({
   },
 
   h4: {
-     color: AppColors.title,
+    color: AppColors.title,
     fontSize: moderateScale(16),
     opacity: 0.9,
     padding: 3,
@@ -201,7 +267,7 @@ const styles = ScaledSheet.create({
   },
   btnView: {
     width: '50%',
-    margin:5
+    margin: 5,
   },
   fullSlip_View: {
     width: '100%',
@@ -213,20 +279,49 @@ const styles = ScaledSheet.create({
     borderColor: AppColors.primary,
     borderWidth: 1,
     width: '100%',
+    resizeMode: 'contain',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    padding: 30,
-    borderRadius:15
+    padding: 10,
+    borderRadius: 15,
   },
-  empty:{
-    backgroundColor:'#bbbbbbff',
-    width:50,
-    height:50,
-    borderRadius:25
+  empty: {
+    backgroundColor: '#bbbbbbff',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
-  tapText:{
-    color:AppColors.link,
-    fontSize:moderateScale(20)
-  }
+  tapText: {
+    color: AppColors.link,
+    fontSize: moderateScale(20),
+  },
+  //------------------------------
+  paySlip: {
+    width: 250,
+    height: 250,
+    resizeMode: 'contain',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalClose: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  closeText: {
+    color: '#fff',
+    fontSize: moderateScale(28),
+    fontWeight: 'bold',
+  },
+  fullImage: {
+    width: '90%',
+    height: '80%',
+    resizeMode: 'contain',
+  },
 });

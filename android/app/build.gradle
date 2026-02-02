@@ -108,7 +108,7 @@ android {
 }
 
 dependencies {
-    implementation "com.facebook.react:react-android:0.82.1" // aapke RN version ke hisaab se
+    implementation "com.facebook.react:react-android:0.82.1" 
     implementation "com.facebook.react:hermes-android:0.82.1"
     // The version of react-native is set by the React Native Gradle Plugin
     // implementation("com.facebook.react:react-android")

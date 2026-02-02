@@ -191,7 +191,7 @@ export const PaymentHistory = () => {
   return (
     <View style={styles.conatiner}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView  style={styles.scroll}>
+      <ScrollView style={styles.scroll}>
         <View>
           <ImageBackground
             source={AppImages.Rectangle}
@@ -228,14 +228,22 @@ export const PaymentHistory = () => {
             renderItem={item => {
               const items = item?.item;
               return (
-                <View >
+                <View>
                   <Text
-                    style={[styles.msg, { display: items.committe_name ? 'none' : 'flex' }]}
+                    style={[
+                      styles.msg,
+                      { display: items.committe_name ? 'none' : 'flex' },
+                    ]}
                   >
                     Data not available
                   </Text>
 
-                  <View style={styles.card_view}>
+                  <View
+                    style={[
+                      styles.card_view,
+                      { display: items.committe_name ? 'flex' : 'none' },
+                    ]}
+                  >
                     <View style={styles.card}>
                       <View style={styles.header}>
                         <View style={styles.cardHeader}>
@@ -343,8 +351,7 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
     // backgroundColor:'yellow',
-    marginBottom:10
-
+    marginBottom: 10,
   },
   card: {
     width: '90%',
@@ -421,7 +428,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(16),
     padding: 15,
   },
-  scroll:{
-    marginBottom:65,
-  }
+  scroll: {
+    marginBottom: 65,
+  },
 });

@@ -27,6 +27,7 @@ import { UserPaymentDetails } from '../screens/MembersScreen/UserPaymentDetails/
 import { EditPayments } from '../screens/MembersScreen/EditPayments/editePayment';
 import { Login } from '../screens/Auth/Login/login';
 import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
+import { Notifications } from '../screens/MembersScreen/Notifications/notification';
 
 const Stack = createNativeStackNavigator();
 
@@ -72,9 +73,7 @@ export const AppNavigator = () => {
       <Stack.Screen name="EditPayments" component={EditPayments} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Payments" component={Payments} />
-
-
-
+      <Stack.Screen name="Notifications" component={Notifications} />
     </Stack.Navigator>
   );
 };

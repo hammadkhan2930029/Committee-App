@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, StatusBar } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, Image } from 'react-native';
 import { AppColors } from '../../constant/appColors'; // Aapki original theme
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import Animated, {
   withDelay,
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppImages } from '../../constant/appImages';
 
 export const Splash = () => {
   const navigation = useNavigation();
@@ -101,7 +102,7 @@ export const Splash = () => {
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
 
       <Animated.View style={[styles.splash_logo_view, logoStyle]}>
-        <Text>Logo</Text>
+        <Image source={AppImages.profileAvatar} style={styles.logoImage} />
       </Animated.View>
 
       <Animated.View style={[styles.headings, textStyle]}>
@@ -122,12 +123,20 @@ const styles = StyleSheet.create({
   },
   splash_logo_view: {
     backgroundColor: '#fff',
-    width: scale(120),
-    height: verticalScale(120),
-    borderRadius: 60,
+    width: '50%',
+
+    borderRadius: 90,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
+    elevation: 5,
+  },
+  logoImage: {
+    width: '100%',
+    elevation: 5,
+    borderRadius: 90,
+    borderWidth: 5,
+    borderColor: AppColors.background,
   },
   headings: {
     justifyContent: 'center',

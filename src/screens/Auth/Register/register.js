@@ -29,8 +29,8 @@ import { Loader } from '../../Loader/loader';
 
 const registerSchema = Yup.object().shape({
   name: Yup.string()
-    .min(3, 'Name kam az kam 3 characters ka ho')
-    .required('Name required hai'),
+    .min(3, 'Name must be at least 3 characters long')
+    .required('Name is required'),
 
   phone: Yup.string()
     .matches(
@@ -40,13 +40,14 @@ const registerSchema = Yup.object().shape({
     .required('Phone number is required'),
 
   password: Yup.string()
-    .min(6, 'Password kam az kam 6 characters ka ho')
-    .required('Password required hai'),
+    .min(6, 'Password must be at least 6 characters long')
+    .required('Password is required'),
 
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Password match nahi kar raha')
-    .required('Confirm password required hai'),
+    .oneOf([Yup.ref('password')], 'Passwords do not match')
+    .required('Confirm password is required'),
 });
+
 
 //-----------------------------------------
 
@@ -67,11 +68,12 @@ export const Register = () => {
       const res = await api.post('/user/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      if (res?.status === 200 && res?.data?.success) {
+      console.log('response :', res?.data?.msg[0]?.response);
+      if (res?.status === 200 && res?.data?.msg[0]?.response === 'register') {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: res.data.message || 'Login successful',
+          text2: res?.data?.msg[0]?.response || 'Login successful',
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
@@ -81,7 +83,7 @@ export const Register = () => {
         Toast.show({
           type: 'customToast',
           text1: 'Warning',
-          text2: res.data.message || 'User already exist',
+          text2: res?.data?.msg[0]?.response || 'User already exist',
           props: {
             bgColor: AppColors.background,
             borderColor: 'orange',

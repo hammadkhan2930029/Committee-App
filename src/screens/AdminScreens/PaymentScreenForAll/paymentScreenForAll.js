@@ -16,119 +16,32 @@ import { AppIcons } from '../../../constant/appIcons';
 import { date } from 'yup';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
-
-const demoData = [
-  {
-    id: 1,
-    name: 'Bilal Ahmed',
-    phone: '+92 301 5566778',
-    fund: 'Family Fund BC',
-    amount: '5,000 PKR',
-    date: 'Jan 2025',
-    status: 'Paid',
-  },
-  {
-    id: 2,
-    name: 'Ali Khan',
-    phone: '+92 312 9876543',
-    fund: 'ABC Group BC',
-    amount: '4,000 PKR',
-    date: 'Feb 2025',
-    status: 'Pending',
-  },
-  {
-    id: 3,
-    name: 'Usman Raza',
-    phone: '+92 333 4455667',
-    fund: 'Office BC',
-    amount: '6,500 PKR',
-    date: 'Mar 2025',
-    status: 'Paid',
-  },
-  {
-    id: 4,
-    name: 'Ahmed Hassan',
-    phone: '+92 300 1122334',
-    fund: 'Friends BC',
-    amount: '3,000 PKR',
-    date: 'Apr 2025',
-    status: 'Pending',
-  },
-  {
-    id: 5,
-    name: 'Hamza Ali',
-    phone: '+92 321 7788990',
-    fund: 'Monthly BC',
-    amount: '7,000 PKR',
-    date: 'May 2025',
-    status: 'Paid',
-  },
-  {
-    id: 6,
-    name: 'Saad Khan',
-    phone: '+92 345 6677889',
-    fund: 'Home BC',
-    amount: '2,500 PKR',
-    date: 'Jun 2025',
-    status: 'Pending',
-  },
-  {
-    id: 7,
-    name: 'Fahad Malik',
-    phone: '+92 334 5566778',
-    fund: 'Business BC',
-    amount: '8,000 PKR',
-    date: 'Jul 2025',
-    status: 'Overdue',
-  },
-  {
-    id: 8,
-    name: 'Zeeshan Ahmed',
-    phone: '+92 310 9988776',
-    fund: 'Community BC',
-    amount: '4,500 PKR',
-    date: 'Aug 2025',
-    status: 'Pending',
-  },
-  {
-    id: 9,
-    name: 'Awais Rafiq',
-    phone: '+92 322 3344556',
-    fund: 'Event BC',
-    amount: '6,000 PKR',
-    date: 'Sep 2025',
-    status: 'Overdue',
-  },
-  {
-    id: 10,
-    name: 'Imran Shah',
-    phone: '+92 311 2233445',
-    fund: 'Savings BC',
-    amount: '5,500 PKR',
-    date: 'Oct 2025',
-    status: 'Pending',
-  },
-];
+import { getStoredUser } from '../../../Utils/getUser';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const Payments = ({ route }) => {
   //----------------------------------------------------
-  const { committeeID } = route.params;
-  console.log('committeeID :', committeeID);
+
   const navigation = useNavigation();
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [paymentList, setPaymentList] = useState([]);
+  const [loading, setLoading] = useState(true);
   console.log('status check :', selectedStatus);
   //----------------------------------------------------
+  const [userData, setUserData] = useState(null);
 
-  const hasPayments = paymentList.length > 0;
-
-  const filterData = hasPayments
-    ? selectedStatus === 'All'
-      ? paymentList
-      : paymentList.filter(
-          item => item?.status?.toLowerCase() === selectedStatus?.toLowerCase(),
-        )
-    : [];
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
 
   //-----------------------------------------------------
   const formatNumber = value => {
@@ -140,232 +53,282 @@ export const Payments = ({ route }) => {
 
   const AdminpaymentList = async () => {
     try {
+      setLoading(true);
       const response = await api.get(
-        `/admin/view-committee-payments/list/${committeeID}`,
+        `/admin/view-committee-payments/list/${userData.user_id}`,
       );
-      const result = response?.data.msg;
 
-      setPaymentList(result);
+      setPaymentList(response?.data?.msg || []);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   useFocusEffect(
     useCallback(() => {
-      AdminpaymentList();
-    }, [committeeID]),
+      if (userData?.user_id) {
+        AdminpaymentList();
+      }
+    }, [userData]),
   );
 
-  console.log('paymentList :', paymentList);
+  console.log('paymentList :', paymentList[0]?.response);
+
+  //---------------------------------------------
+  //---------------------------------------------
+  const validPayments = paymentList.filter(
+    item => Number(item?.paid_amount) > 0,
+  );
+
+  const hasPayments = validPayments.length > 0;
+  //------------------------------------------------
+  const filterData =
+    selectedStatus === 'All'
+      ? validPayments
+      : validPayments.filter(
+          item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
+        );
+
+  // const hasPayments = paymentList?.length > 0;
+
+  // const filterData = hasPayments
+  //   ? selectedStatus === 'All'
+  //     ? paymentList
+  //     : paymentList.filter(
+  //         item => item?.status?.toLowerCase() === selectedStatus?.toLowerCase(),
+  //       )
+  //   : [];
+
   //----------------------------------------------
-  const totalCollection = hasPayments
-    ? paymentList.reduce((sum, item) => {
+
+  const requestedlist = paymentList.filter(
+    item => item?.status?.toLowerCase() === 'requested',
+  );
+
+  //------------------pending----------------------------
+
+  const pendingList = paymentList.filter(
+    item => item?.status?.toLowerCase() === 'pending',
+  );
+  const pendingAmount = hasPayments
+    ? pendingList?.reduce((sum, item) => {
         return sum + Number(item?.paid_amount || 0);
       }, 0)
     : 0;
 
-  console.log('paidAmount :', totalCollection);
+  //-----------------paid----------------------------------
+
+  const paidList = paymentList.filter(
+    item => item?.status?.toLowerCase() === 'paid',
+  );
+  const paidAmount = hasPayments
+    ? paidList.reduce((sum, item) => {
+        return sum + Number(item?.paid_amount || 0);
+      }, 0)
+    : 0;
+
   //-----------------------------------------------
   const summaryData = [
     {
-      id: 1,
-      title: 'Total Collected',
-      value: 0,
-      subtitle: 'All payments included',
-      type: 'collected',
-    },
-    {
       id: 2,
       title: 'Pending Amount',
-      value: totalCollection,
+      value: pendingAmount,
       subtitle: 'Awaiting payments',
       type: 'pending',
     },
     {
       id: 3,
-      title: 'Paid',
-      value: 0,
-      subtitle: 'Successfully received',
-      type: 'paid',
+      title: 'Pending Count',
+      value: pendingList?.length || 0,
+      subtitle: 'Awaiting payments',
+      type: 'pending_count',
     },
   ];
-  if (!paymentList.length) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Text style={{ textAlign: 'center' }}>No payments available</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
 
-      <ScrollView style={styles.scrollView}>
-        <View>
-          <ImageBackground
-            source={AppImages.Rectangle2}
-            style={styles.RectangleImg}
-          >
-            <View style={styles.main}>
-              <View style={styles.TopView}>
-                <View style={styles.backAndText}>
-                  <TouchableOpacity>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.h1}>Payments</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('AdminProfile')}
-                >
-                  <Image
-                    source={AppImages.profileAvatar}
-                    style={styles.avatar}
-                  />
+      <View>
+        <ImageBackground
+          source={AppImages.Rectangle2}
+          style={styles.RectangleImg}
+        >
+          <View style={styles.main}>
+            <View style={styles.TopView}>
+              <View style={styles.backAndText}>
+                <TouchableOpacity>
+                  <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
                 </TouchableOpacity>
+                <Text style={styles.h1}>Payments</Text>
               </View>
-              <View style={styles.textView}>
-                <Text style={styles.h4}>Monitor all committee payments </Text>
-                <Text style={styles.h4}>and pending amounts.</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AdminProfile')}
+              >
+                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+              </TouchableOpacity>
             </View>
-          </ImageBackground>
+            <View style={styles.textView}>
+              <Text style={styles.h4}>Monitor all committee payments </Text>
+              <Text style={styles.h4}>and pending amounts.</Text>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+      {!hasPayments ? (
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
+          <Text
+            style={{
+              fontSize: moderateScale(16),
+              color: AppColors.bodyText,
+            }}
+          >
+            No payments available yet
+          </Text>
         </View>
-        {paymentList.length === 0 ? (
-          <View>
-            <View style={styles.horizontalCards}>
-              <FlatList
-                data={summaryData}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                contentContainerStyle={{ paddingHorizontal: 15 }}
-                renderItem={({ item }) => (
-                  <View style={styles.summaryCard}>
-                    <View style={styles.cardHeader}>
-                      <Image
-                        source={
-                          item.type === 'collected'
-                            ? AppIcons.dollarbagPrimary
-                            : item.type === 'pending'
-                            ? AppIcons.sandWatchPrimary
-                            : AppIcons.checkMarkPrimary
-                        }
-                        style={styles.cardIcon}
-                      />
-                      <Text style={styles.cardTitle}>{item.title}</Text>
-                    </View>
-                    <Text style={styles.cardValue}>
-                      {formatNumber(item.value)}
-                    </Text>
+      ) : (
+        <View>
+          <View style={styles.cardView}>
+            <FlatList
+              data={filterData}
+              ListHeaderComponent={
+                <>
+                  <View style={styles.horizontalCards}>
+                    <FlatList
+                      data={summaryData}
+                      horizontal
+                      keyExtractor={item => item.id.toString()}
+                      contentContainerStyle={{ paddingHorizontal: 15 }}
+                      renderItem={({ item }) => (
+                        <View style={styles.summaryCard}>
+                          <View style={styles.cardHeader}>
+                            <Icon
+                              name={
+                                item.type === 'pending'
+                                  ? 'pending'
+                                  : 'countertops'
+                              }
+                              size={28}
+                              color={AppColors.link}
+                            />
+                            <Text style={styles.cardTitle}>{item.title}</Text>
+                          </View>
+                          <Text style={styles.cardValue}>
+                            {formatNumber(item.value)}
+                          </Text>
 
-                    {/* Subtitle */}
-                    <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+                          {/* Subtitle */}
+                          <Text style={styles.cardSubtitle}>
+                            {item.subtitle}
+                          </Text>
+                        </View>
+                      )}
+                    />
                   </View>
-                )}
-              />
-            </View>
-            <View>
-              <FlatList
-                data={['All', 'Paid', 'Pending', 'Overdue']}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => {
-                  const isSelected = selectedStatus === item;
-                  return (
-                    <TouchableOpacity
-                      style={[
-                        styles.statusList,
-                        isSelected && styles.activeStatusList,
+                  {/* ------------------------------------------------------- */}
+                  <View style={styles.statuslistView}>
+                    <FlatList
+                      data={[
+                        'All',
+                        'verified',
+                        'Pending',
+                        'Overdue',
+                        'Requested',
                       ]}
-                      onPress={() => setSelectedStatus(item)}
-                    >
-                      <View style={styles.statusView}>
-                        <Text
-                          style={[
-                            styles.status,
-                            isSelected && styles.activeStatusText,
-                          ]}
-                        >
-                          {item}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </View>
-            <View>
-              <FlatList
-                data={filterData}
-                keyExtractor={item => item?.payment_id?.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.cards}
-                    onPress={() =>
-                      navigation.navigate('PaymentDetails', { item: item })
-                    }
-                  >
-                    <View style={styles.left}>
-                      <Text style={styles.name}>{item.payment_by}</Text>
-                      <Text style={styles.fund}>{item.committe_name}</Text>
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item }) => {
+                        const isSelected = selectedStatus === item;
+                        return (
+                          <TouchableOpacity
+                            style={[
+                              styles.statusList,
+                              isSelected && styles.activeStatusList,
+                            ]}
+                            onPress={() => setSelectedStatus(item)}
+                          >
+                            <View style={styles.statusView}>
+                              <Text
+                                style={[
+                                  styles.status,
+                                  isSelected && styles.activeStatusText,
+                                ]}
+                              >
+                                {item}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      }}
+                    />
+                  </View>
+                </>
+              }
+              //----------------------------------------------
+              keyExtractor={item => item?.payment_id?.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.cards}
+                  onPress={() =>
+                    navigation.navigate('PaymentDetails', { item: item })
+                  }
+                >
+                  <View style={styles.left}>
+                    <Text style={styles.name}>{item.payment_by}</Text>
+                    <Text style={styles.fund}>{item.committe_name}</Text>
 
-                      <View style={styles.amountView}>
-                        <Text style={styles.amount}>Paid Amount :</Text>
-                        <Text style={styles.amount2}>
-                          {formatNumber(item.paid_amount)}
-                        </Text>
-                      </View>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amount}>Paid Amount :</Text>
+                      <Text style={styles.amount2}>
+                        {formatNumber(item.paid_amount)}
+                      </Text>
                     </View>
-                    <View style={styles.right}>
-                      <View
+                  </View>
+                  <View style={styles.right}>
+                    <View
+                      style={[
+                        item?.status?.toLowerCase() === 'verified'
+                          ? styles.paid
+                          : item?.status?.toLowerCase() === 'pending'
+                          ? styles.pending
+                          : item?.status?.toLowerCase() === 'Overdue'
+                          ? styles.overDue
+                          : item?.status?.toLowerCase() === 'requested'
+                          ? styles.requested
+                          : null,
+                      ]}
+                    >
+                      <Text
                         style={[
-                          item.status.toLowerCase() === 'paid'
-                            ? styles.paid
-                            : item.status.toLowerCase() === 'pending'
-                            ? styles.pending
-                            : item.status.toLowerCase() === 'Overdue'
-                            ? styles.overDue
-                            : null,
+                          styles.CardStatus,
+                          {
+                            color:
+                              item?.status?.toLowerCase() === 'Overdue'
+                                ? AppColors.bodyText
+                                : AppColors.title,
+                          },
                         ]}
                       >
-                        <Text
-                          style={[
-                            styles.CardStatus,
-                            {
-                              color:
-                                item.status.toLowerCase() === 'Overdue'
-                                  ? AppColors.bodyText
-                                  : AppColors.title,
-                            },
-                          ]}
-                        >
-                          {item.status}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text style={styles.date}>{''}</Text>
-                      </View>
-                      <View style={styles.dateView}>
-                        <Text style={styles.date}>Date :</Text>
-
-                        <Text style={styles.date2}>{item.pay_date}</Text>
-                      </View>
+                        {item.status}
+                      </Text>
                     </View>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
+                    <View>
+                      <Text style={styles.date}>{''}</Text>
+                    </View>
+                    <View style={styles.dateView}>
+                      <Text style={styles.date}>Date :</Text>
+
+                      <Text style={styles.date2}>{item.pay_date}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
           </View>
-        ) : (
-          <View>
-            <Text style={{ textAlign: 'center',padding:10 }}>No payments available</Text>
-          </View>
-        )}
-      </ScrollView>
+        </View>
+      )}
     </View>
   );
 };
@@ -374,9 +337,9 @@ const styles = ScaledSheet.create({
     flex: 1,
     backgroundColor: AppColors.background,
   },
-  // scrollView: {
-  //   marginBottom: 65,
-  // },
+  scrollView: {
+    marginBottom: 65,
+  },
   arrowBack: {
     width: 28,
     height: 28,
@@ -424,9 +387,7 @@ const styles = ScaledSheet.create({
     padding: 3,
   },
   //---------------------------------
-  // horizontalCards: {
-  //   marginTop: -40,
-  // },
+
   summaryCard: {
     width: 200,
     height: 130,
@@ -451,6 +412,7 @@ const styles = ScaledSheet.create({
     color: AppColors.blackText,
     fontSize: moderateScale(18),
     fontWeight: '600',
+    paddingLeft: 3,
   },
   cardValue: {
     color: AppColors.link,
@@ -462,12 +424,19 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(14),
   },
   //----------------------------------
+  statuslistView: {
+    padding: 8,
+  },
   statusList: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#f2f2f2',
-    margin: 10,
+    width: 115,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    // marginLeft: 5,
+    margin: 5,
   },
 
   activeStatusList: {
@@ -484,13 +453,18 @@ const styles = ScaledSheet.create({
     color: '#fff',
   },
   //--------------------------------------
-
+  cardView: {
+    marginTop: 5,
+  },
   cards: {
+    width: '95%',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
+    alignSelf: 'center',
     backgroundColor: AppColors.background,
-    margin: 10,
+    // margin: 10,
+    marginTop: 10,
     padding: 15,
     borderRadius: 15,
     elevation: 3,
@@ -536,13 +510,19 @@ const styles = ScaledSheet.create({
     elevation: 3,
   },
   pending: {
-    backgroundColor: 'orange',
+    backgroundColor: '#FFA800',
     borderRadius: 25,
     width: 100,
     elevation: 3,
   },
   overDue: {
     backgroundColor: AppColors.cardLight,
+    borderRadius: 25,
+    width: 100,
+    elevation: 3,
+  },
+  requested: {
+    backgroundColor: '#EC5800',
     borderRadius: 25,
     width: 100,
     elevation: 3,

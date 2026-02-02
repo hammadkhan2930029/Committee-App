@@ -39,7 +39,7 @@ const loginSchema = Yup.object().shape({
 
   password: Yup.string()
     .min(6, 'Password kam az kam 6 characters ka ho')
-    .required('Password required hai'),
+    .required('Password is required'),
 });
 //----------------------------------------------
 
@@ -156,7 +156,7 @@ export const Login = () => {
                   <View style={styles.loginCard}>
                     <View>
                       <CustomInput
-                        label="phone"
+                        label="Phone"
                         type="numeric"
                         placeholder="Enter your phone number"
                         value={values.phone}

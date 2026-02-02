@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -17,10 +17,12 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getStoredUser } from '../../../Utils/getUser';
+import { api } from '../../../services/api';
 
 export const MembersDashboard = () => {
   const navigation = useNavigation();
   const [userdata, setUserdata] = useState();
+  const [notifyList, setNotifyList] = useState([]);
   //-----------get user aysnc Storage------------------
   useFocusEffect(
     useCallback(() => {
@@ -34,7 +36,29 @@ export const MembersDashboard = () => {
       loader();
     }, []),
   );
-  // console.log('User Data :', userdata);
+  //--------------------------------------------------------
+  const notificationsApi = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-notifications/${userdata.user_id}`,
+      );
+      const result = response.data.msg;
+
+      if (response.data.code === '200') {
+        setNotifyList(result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (userdata?.user_id) {
+      notificationsApi();
+    }
+  }, [userdata]);
+  console.log('notify list :', notifyList?.length);
+  //--------------------------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -47,7 +71,7 @@ export const MembersDashboard = () => {
           >
             <View style={styles.main}>
               <View style={styles.TopView}>
-                <Text style={styles.h1}>Member Dashboard</Text>
+                <Text style={styles.h1}>Dashboard</Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('AdminProfile')}
                 >
@@ -57,12 +81,27 @@ export const MembersDashboard = () => {
                   />
                 </TouchableOpacity>
               </View>
-              <View style={styles.textView}>
-                <Text style={styles.h2}>
-                  Hello, {userdata?.full_name || 'Member'}{' '}
-                  <Icon name="waving-hand" size={30} color="#FED22D" />
-                </Text>
-                <Text style={styles.h4}>Here’s your BC overview.</Text>
+              <View style={styles.nameAndNotifiView}>
+                <View style={styles.textView}>
+                  <Text style={styles.h2}>
+                    Hello, {userdata?.full_name || 'Member'}{' '}
+                    <Icon name="waving-hand" size={30} color="#FED22D" />
+                  </Text>
+                  <Text style={styles.h4}>Here’s your BC overview.</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.notificationsView}
+                  onPress={() => navigation.navigate('Notifications')}
+                >
+                  <View>
+                    <Icon
+                      name="notifications-active"
+                      size={30}
+                      color="#FED22D"
+                    />
+                  </View>
+                  <Text style={styles.counterText}>{notifyList.length > 0 ? notifyList.length : '0'}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </ImageBackground>
@@ -167,6 +206,27 @@ const styles = ScaledSheet.create({
     color: AppColors.title,
     fontSize: moderateScale(16),
     opacity: 0.9,
+  },
+  //-----------------------------
+  nameAndNotifiView: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  notificationsView: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: AppColors.background,
+    width: 70,
+    borderRadius: 25,
+    padding: 5,
+    elevation: 5,
+  },
+  counterText: {
+    fontSize: moderateScale(18),
   },
   //----------------------------
   Dashboardcard_View: {

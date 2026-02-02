@@ -5,7 +5,7 @@ import { AppImages } from '../constant/appImages';
 import { AppIcons } from '../constant/appIcons';
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { CommitteeUserList } from '../screens/AdminScreens/CommitteeUserList/committeeUserList';
-// import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
+import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 //---------------------members-----------------------------------------
 // import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -27,9 +27,9 @@ export const BottomTabNavigation = () => {
           } else if (route.name === 'CommitteeUserList') {
             icon = focused ? 'account-group' : 'account-group-outline';
           }
-          //  else if (route.name === 'Payments') {
-          //   icon = focused ? 'briefcase-variant' : 'briefcase-variant-outline';
-          // }
+           else if (route.name === 'Payments') {
+            icon = focused ? 'briefcase-variant' : 'briefcase-variant-outline';
+          }
           return <Icon name={icon} size={30} color={focused ? AppColors.primary : AppColors.bodyText} />;
         },
         tabBarInactiveTintColor: 'black',
@@ -70,11 +70,11 @@ export const BottomTabNavigation = () => {
         component={CommitteeUserList}
         options={{ headerShown: false }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Payments"
         component={Payments}
         options={{ headerShown: false }}
-      /> */}
+      />
       {/* -----------------Members-------------------- */}
       {/* <Tab.Screen
         name="MembersDashboard"

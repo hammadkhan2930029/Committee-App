@@ -77,7 +77,7 @@ export const ActiveBCs = () => {
               margin: 10,
               borderColor: AppColors.placeholder,
               borderWidth: 1,
-              elevation:5,
+              elevation: 5,
               width: '95%',
             }}
           >
@@ -252,6 +252,7 @@ export const ActiveBCs = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor: AppColors.background,
   },
   arrowBack: {
     width: 28,

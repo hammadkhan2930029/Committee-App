@@ -41,7 +41,7 @@ export const AdminDashboard = () => {
       loadUser();
     }, []),
   );
-
+  console.log('userData', userData?.full_name);
   //---------------Total User total active bCs------------------------------
   const counterApi = async () => {
     try {
@@ -70,7 +70,7 @@ export const AdminDashboard = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView>
+      <ScrollView style={styles.dashboardScroll}>
         <View>
           <ImageBackground
             source={AppImages.Rectangle}
@@ -90,10 +90,12 @@ export const AdminDashboard = () => {
                 </TouchableOpacity>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h2}>
-                  Hello, Hammad{' '}
-                  <Icon name="waving-hand" size={30} color="#FED22D" />
-                </Text>
+                {userData?.full_name && (
+                  <Text style={styles.h2}>
+                    Hello,{userData.full_name}{' '}
+                    <Icon name="waving-hand" size={30} color="#FED22D" />
+                  </Text>
+                )}
                 <Text style={styles.h4}>Here’s your admin overview.</Text>
               </View>
             </View>
@@ -170,7 +172,7 @@ export const AdminDashboard = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Loader visible={Loading}/>
+      <Loader visible={Loading} />
     </View>
   );
 };
@@ -178,6 +180,9 @@ const styles = ScaledSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.background,
+  },
+  dashboardScroll:{
+    marginBottom:60
   },
   RectangleImg: {
     width: '100%',

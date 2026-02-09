@@ -20,6 +20,8 @@ import { api } from '../../../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
+import { RFValue } from 'react-native-responsive-fontsize';
+
 
 export const CommitteeDetails = ({ route }) => {
   //------------------------------------
@@ -117,8 +119,7 @@ export const CommitteeDetails = ({ route }) => {
       viewCommitteeRound();
     }, [details.committee_id]),
   );
-  // console.log('view committee round:', roundList);
-  // console.log('details.committee_id :', details.committee_id);
+
   //----------------------------------------
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
@@ -147,17 +148,7 @@ export const CommitteeDetails = ({ route }) => {
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>{details.name}</Text>
-                {/* <TouchableOpacity
-                  style={styles.paymentHistoryView}
-                  onPress={() => {
-                    navigation.navigate('Payments');
-                  }}
-                >
-                  <Image
-                    source={AppIcons.paymentHistory2}
-                    style={styles.paymentHistory}
-                  />
-                </TouchableOpacity> */}
+                
                  <View style={styles.activeBtn}>
               <Text style={styles.active}>{details.status}</Text>
             </View>
@@ -167,12 +158,7 @@ export const CommitteeDetails = ({ route }) => {
         </View>
 
         <View style={styles.BCDetails}>
-          {/* <View style={styles.row}>
-            <Text style={styles.text1}>Status</Text>
-            <View style={styles.activeBtn}>
-              <Text style={styles.active}>{details.status}</Text>
-            </View>
-          </View> */}
+          
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -347,11 +333,12 @@ const styles = ScaledSheet.create({
   },
   text1: {
     color: AppColors.blackText,
-    fontSize: moderateScale(18),
+    fontSize: RFValue(16),
   },
   text2: {
     color: AppColors.bodyText,
-    fontSize: moderateScale(15),
+       fontSize: RFValue(14),
+
   },
   buttons: {
     width: '100%',

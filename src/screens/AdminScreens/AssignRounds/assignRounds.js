@@ -14,14 +14,17 @@ import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useCallback, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import { Dropdown } from 'react-native-element-dropdown';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Loader } from '../../Loader/loader';
 
 export const AssignRounds = ({ route }) => {
   const [roundList, setRoundList] = useState([]);
+  const [loading, setloading] = useState(false);
   //---------------------------------------------
   const navigation = useNavigation();
   const { multipleData } = route.params;
@@ -30,20 +33,23 @@ export const AssignRounds = ({ route }) => {
   const committeeID = multipleData.msg[0].committee_id;
   const [mark, setMark] = useState('');
 
-
   // ---------- Members Dropdown ----------
   const [openMember, setOpenMember] = useState(false);
   const [memberValue, setMemberValue] = useState(null);
+  const [isFocus1, setIsFocus1] = useState(false);
+
   const [memberItems, setMemberItems] = useState(
     committeeMembers.map(item => ({
       label: item.user_name,
       value: item.committe_member_id,
     })),
   );
-  
+
   // ---------- Rounds Dropdown ----------
   const [openRound, setOpenRound] = useState(false);
   const [roundValue, setRoundValue] = useState(null);
+  const [isFocus2, setIsFocus2] = useState(false);
+
   const [roundItems, setRoundItems] = useState(
     committeeRounds.map(item => ({
       label: item.round_no,
@@ -139,6 +145,7 @@ export const AssignRounds = ({ route }) => {
   };
   //----------------------mark committee round----------------------------
   const markRound = async roundID => {
+    setloading(true);
     try {
       const response = await api.get(
         `/user/mark-committee-round/paid/${roundID}`,
@@ -146,9 +153,11 @@ export const AssignRounds = ({ route }) => {
       const result = await response.data.msg[0].response;
       setMark(result);
       console.log('round mark :', result);
-      viewCommitteeRound()
+      viewCommitteeRound();
     } catch (error) {
       console.log(error);
+    } finally {
+      setloading(false);
     }
   };
   console.log('round mark 2:', mark);
@@ -156,6 +165,32 @@ export const AssignRounds = ({ route }) => {
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
   );
+  //----------------------------------------------------------------
+
+  const renderLabel1 = () => {
+    if (memberValue || isFocus1) {
+      return (
+        <Text style={[styles.label, isFocus1 && { color: AppColors.primary }]}>
+          Select Member
+        </Text>
+      );
+    }
+    return null;
+  };
+  //----------------------------------------------------------------
+
+  const renderLabel2 = () => {
+    if (roundValue || isFocus2) {
+      return (
+        <Text style={[styles.label, isFocus2 && { color: AppColors.primary }]}>
+          Select Round
+        </Text>
+      );
+    }
+    return null;
+  };
+  
+
 
   return (
     <View style={styles.container}>
@@ -186,60 +221,78 @@ export const AssignRounds = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
-        <View>
-          <View style={[styles.dropDownView, { zIndex: 2000 }]}>
-            <Text style={styles.label}>Select Committee Member</Text>
-            <DropDownPicker
-              open={openMember}
+        <View style={styles.dropdownMain}>
+          <View style={styles.DropDowncontainer}>
+            {renderLabel1()}
+            <Dropdown
+             
+              style={[
+                styles.dropdown,
+                isFocus1 && { borderColor: AppColors.primary },
+              ]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              showsVerticalScrollIndicator={true}
+              data={memberItems}
+              maxHeight={300}
+              searchPlaceholder="Search..."
+              search
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus1 ? 'Select Member' : '...'}
               value={memberValue}
-              items={memberItems}
-              setOpen={setOpenMember}
-              setValue={setMemberValue}
-              setItems={setMemberItems}
-              placeholder="Choose member"
-              listMode="MODAL"
-              modalTitle="Select Committee No"
-              modalProps={{
-                animationType: 'slide',
+              onFocus={() => setIsFocus1(true)}
+              onBlur={() => setIsFocus1(false)}
+              onChange={item => {
+                setMemberValue(item.value);
+                setIsFocus1(false);
               }}
-              modalContentContainerStyle={{
-                backgroundColor: '#ffffff',
-              }}
-              style={styles.dropDown}
-              dropDownContainerStyle={styles.dropDown}
-              ArrowDownIconComponent={() => (
-                <Icon name="arrow-drop-down" size={24} color="#666" />
-              )}
-              ArrowUpIconComponent={() => (
-                <Icon name="arrow-drop-up" size={24} color="#666" />
+              renderLeftIcon={() => (
+                <Icon
+                  style={styles.icon}
+                  color={isFocus1 ? AppColors.primary : 'black'}
+                  name="person-add"
+                  size={20}
+                />
               )}
             />
           </View>
-          <View style={[styles.dropDownView, { zIndex: 1000 }]}>
-            <Text style={styles.label}>Select Round</Text>
-            <DropDownPicker
-              open={openRound}
+          {/* ---------------------------------------------------------------- */}
+          <View style={styles.DropDowncontainer}>
+            {renderLabel2()}
+            <Dropdown
+              style={[
+                styles.dropdown,
+                isFocus2 && { borderColor: AppColors.primary },
+              ]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              showsVerticalScrollIndicator={true}
+              iconStyle={styles.iconStyle}
+              data={roundItems}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus2 ? 'Select round' : '...'}
+              // searchPlaceholder="Search..."
               value={roundValue}
-              items={roundItems}
-              setOpen={setOpenRound}
-              setValue={setRoundValue}
-              setItems={setRoundItems}
-              placeholder="Choose round"
-              listMode="MODAL"
-              modalTitle="Select Committee No"
-              modalProps={{
-                animationType: 'slide',
+              onFocus={() => setIsFocus2(true)}
+              onBlur={() => setIsFocus2(false)}
+              onChange={item => {
+                setRoundValue(item.value);
+                setIsFocus2(false);
               }}
-              modalContentContainerStyle={{
-                backgroundColor: '#ffffff',
-              }}
-              style={styles.dropDown}
-              dropDownContainerStyle={styles.dropDown}
-              ArrowDownIconComponent={() => (
-                <Icon name="arrow-drop-down" size={24} color="#666" />
-              )}
-              ArrowUpIconComponent={() => (
-                <Icon name="arrow-drop-up" size={24} color="#666" />
+              renderLeftIcon={() => (
+                <Icon
+                  style={styles.icon}
+                  color={isFocus2 ? AppColors.primary : 'black'}
+                  name="playlist-add"
+                  size={20}
+                />
               )}
             />
           </View>
@@ -324,6 +377,7 @@ export const AssignRounds = ({ route }) => {
           />
         </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -358,7 +412,7 @@ const styles = ScaledSheet.create({
     padding: 10,
   },
   h1: {
-    fontSize: moderateScale(24),
+    fontSize: RFValue(20),
     color: AppColors.title,
     fontWeight: '600',
     marginLeft: 10,
@@ -382,6 +436,7 @@ const styles = ScaledSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 5,
   },
   btnView: {
     width: '50%',
@@ -463,5 +518,54 @@ const styles = ScaledSheet.create({
   text: {
     fontSize: moderateScale(15),
     color: AppColors.bodyText,
+  },
+  //------------------------------------
+  //---------------------------------
+  dropdownMain: {
+    backgroundColor: AppColors.background,
+    width: '95%',
+    padding: 15,
+    elevation: 5,
+    zIndex: 3000,
+    marginTop: 10,
+    alignSelf: 'center',
+    borderRadius: 15,
+  },
+  DropDowncontainer: {
+    backgroundColor: 'white',
+    padding: 10,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });

@@ -20,8 +20,41 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
+import { RFValue } from 'react-native-responsive-fontsize';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  Easing,
+} from 'react-native-reanimated';
 
 export const AdminDashboard = () => {
+
+  //--------------------------------------------
+  // const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+  // const rotation = useSharedValue(0);
+
+  // useEffect(() => {
+  //   rotation.value = withRepeat(
+  //     withTiming(20, {
+  //       duration: 400,
+  //       easing: Easing.inOut(Easing.ease),
+  //     }),
+  //     -1,
+  //     true,
+  //   );
+  // }, []);
+
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ rotate: `${rotation.value}deg` }],
+  // }));
+
+  //-------------------------------------------------
   const navigation = useNavigation();
   const [Loading, setLoading] = useState(true);
 
@@ -93,7 +126,12 @@ export const AdminDashboard = () => {
                 {userData?.full_name && (
                   <Text style={styles.h2}>
                     Hello,{userData.full_name}{' '}
-                    <Icon name="waving-hand" size={30} color="#FED22D" />
+                    <Icon
+                      name="waving-hand"
+                      size={30}
+                      color="#FED22D"
+                     
+                    />
                   </Text>
                 )}
                 <Text style={styles.h4}>Here’s your admin overview.</Text>
@@ -102,74 +140,84 @@ export const AdminDashboard = () => {
           </ImageBackground>
         </View>
         {/* ---------------------------------------------- */}
-        <View style={styles.Dashboardcard_View}>
-          {/* -------Active BCs------- */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('CommitteeList')}
-          >
-            <View style={styles.Dashboardcard}>
-              <View>
-                <View style={styles.imgText}>
-                  <Icon name="group-add" size={34} color={AppColors.link} />
-                  <Text style={styles.activeBC}>Active BCs</Text>
+        <View style={{ paddingBottom: 20 }}>
+          <View style={styles.Dashboardcard_View}>
+            {/* -------Active BCs------- */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('CommitteeList')}
+            >
+              <View style={styles.Dashboardcard}>
+                <View>
+                  <View style={styles.imgText}>
+                    <Icon name="group-add" size={34} color={AppColors.link} />
+                    <Text style={styles.activeBC}>Active BCs</Text>
+                  </View>
+                  <Text style={styles.activeBC_details}>
+                    2 starting this month
+                  </Text>
                 </View>
-                <Text style={styles.activeBC_details}>
-                  2 starting this month
-                </Text>
-              </View>
-              <View style={styles.counter}>
-                <Text style={styles.counter_text}>
-                  {counter.total_active_committees ?? 0}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          {/* -------Total Users------- */}
-          <TouchableOpacity activeOpacity={0.7}>
-            <View style={styles.Dashboardcard}>
-              <View>
-                <View style={styles.imgText}>
-                  <Icon name="groups" size={34} color={AppColors.link} />
-                  <Text style={styles.activeBC}>Total Users</Text>
+                <View style={styles.counter}>
+                  <Text style={styles.counter_text}>
+                    {counter.total_active_committees ?? 0}
+                  </Text>
                 </View>
-                <Text style={styles.activeBC_details}>3 joined this week </Text>
               </View>
-              <View style={styles.counter}>
-                <Text style={styles.counter_text}>{counter.total_users}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          {/* -------Pending Payments------- */}
-          <TouchableOpacity activeOpacity={0.7}>
-            <View style={styles.Dashboardcard}>
-              <View>
-                <View style={styles.imgText}>
-                  <Ionicons name="briefcase" size={34} color={AppColors.link} />
-                  <Text style={styles.activeBC}>Pending Payments</Text>
+            </TouchableOpacity>
+            {/* -------Total Users------- */}
+            <TouchableOpacity activeOpacity={0.7}>
+              <View style={styles.Dashboardcard}>
+                <View>
+                  <View style={styles.imgText}>
+                    <Icon name="groups" size={34} color={AppColors.link} />
+                    <Text style={styles.activeBC}>Total Users</Text>
+                  </View>
+                  <Text style={styles.activeBC_details}>
+                    3 joined this week{' '}
+                  </Text>
                 </View>
-                <Text style={styles.activeBC_details}>Awaiting approval </Text>
+                <View style={styles.counter}>
+                  <Text style={styles.counter_text}>{counter.total_users}</Text>
+                </View>
               </View>
-              <View style={styles.counter}>
-                <Text style={styles.counter_text}>
-                  {counter.pending_payments}
-                </Text>
+            </TouchableOpacity>
+            {/* -------Pending Payments------- */}
+            <TouchableOpacity activeOpacity={0.7}>
+              <View style={styles.Dashboardcard}>
+                <View>
+                  <View style={styles.imgText}>
+                    <Ionicons
+                      name="briefcase"
+                      size={34}
+                      color={AppColors.link}
+                    />
+                    <Text style={styles.activeBC}>Pending Payments</Text>
+                  </View>
+                  <Text style={styles.activeBC_details}>
+                    Awaiting approval{' '}
+                  </Text>
+                </View>
+                <View style={styles.counter}>
+                  <Text style={styles.counter_text}>
+                    {counter.pending_payments}
+                  </Text>
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.BtnView}>
-          <CustomButton
-            title="Create Committee"
-            style={styles.createCommittee}
-            onPress={() => navigate('CreateCommittee')}
-          />
-          <TouchableOpacity
-            style={styles.CreateUser}
-            onPress={() => navigation.navigate('CreateMembers')}
-          >
-            <Text style={styles.CreateUser_text}>Create User</Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.BtnView}>
+            <CustomButton
+              title="Create Committee"
+              style={styles.createCommittee}
+              onPress={() => navigate('CreateCommittee')}
+            />
+            <TouchableOpacity
+              style={styles.CreateUser}
+              onPress={() => navigation.navigate('CreateMembers')}
+            >
+              <Text style={styles.CreateUser_text}>Create User</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
       <Loader visible={Loading} />
@@ -181,8 +229,8 @@ const styles = ScaledSheet.create({
     flex: 1,
     backgroundColor: AppColors.background,
   },
-  dashboardScroll:{
-    marginBottom:60
+  dashboardScroll: {
+    marginBottom: 65,
   },
   RectangleImg: {
     width: '100%',
@@ -229,10 +277,10 @@ const styles = ScaledSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -50,
+    marginTop: -40,
   },
   Dashboardcard: {
-    width: '90%',
+    width: wp(90),
     backgroundColor: AppColors.background,
     justifyContent: 'space-between',
     alignItems: 'center',

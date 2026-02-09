@@ -9,6 +9,7 @@ import { AppColors } from '../../constant/appColors';
 import { AppIcons } from '../../constant/appIcons';
 import { CustomButton } from '../../components/customButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const ChooseRole = () => {
   const navigation = useNavigation();
@@ -38,12 +39,7 @@ export const ChooseRole = () => {
         resizeMode="cover"
       >
         <View style={styles.backgroundInnerView}>
-          <TouchableOpacity
-            style={styles.arrowBTNView}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Image source={AppIcons.arrowBack} style={styles.backIcon} />
-          </TouchableOpacity>
+         
           <View style={styles.headingsAlign}>
             <Text style={styles.h1}>Choose Your Role</Text>
             <Text style={styles.h4}>Select how you want to use the app</Text>
@@ -68,11 +64,11 @@ export const ChooseRole = () => {
           onPress={() => setSelected(1)}
         >
           <View style={styles.view1}>
-            <Image
-              source={
-                selected === 1 ? AppIcons.AdminSetting : AppIcons.AdminSetting2
-              }
-              style={styles.cardIcon}
+            
+             <Icon
+              name="admin-panel-settings"
+              size={28}
+              color={selected === 1 ? AppColors.title : AppColors.link}
             />
             <Text
               style={[
@@ -87,7 +83,7 @@ export const ChooseRole = () => {
           <Text
             style={[
               styles.card_h4,
-              { color: selected === 1 ? AppColors.subtitle : AppColors.link },
+              { color: selected === 1 ? AppColors.title : AppColors.link },
             ]}
           >
             Manage BCs and members
@@ -107,16 +103,17 @@ export const ChooseRole = () => {
           onPress={() => setSelected(2)}
         >
           <View style={styles.view2}>
-            <Image
-              source={
-                selected === 2 ? AppIcons.AdminSetting : AppIcons.AdminSetting2
-              }
-              style={styles.cardIcon2}
+           
+            <Icon
+              name="groups"
+              size={28}
+              color={selected === 2 ? AppColors.title : AppColors.link}
             />
+
             <Text
               style={[
                 styles.card2_h2,
-                { color: selected === 2 ? AppColors.title : AppColors.primary },
+                { color: selected === 2 ? AppColors.title : AppColors.link },
               ]}
             >
               Member
@@ -168,7 +165,7 @@ const styles = ScaledSheet.create({
   h4: {
     fontSize: moderateScale(18),
     color: AppColors.title,
-    opacity: 0.7,
+    opacity: 0.9,
   },
   arrowBTNView: {
     width: '100%',
@@ -204,7 +201,7 @@ const styles = ScaledSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation:5
+    elevation: 5,
   },
   view1: {
     flexDirection: 'row',
@@ -221,6 +218,7 @@ const styles = ScaledSheet.create({
     color: AppColors.title,
     fontSize: moderateScale(20),
     fontWeight: '700',
+    
   },
   card_h4: {
     color: AppColors.subtitle,
@@ -242,7 +240,7 @@ const styles = ScaledSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
-     elevation:5
+    elevation: 5,
   },
   view2: {
     flexDirection: 'row',
@@ -259,6 +257,7 @@ const styles = ScaledSheet.create({
     color: AppColors.primary,
     fontSize: moderateScale(20),
     fontWeight: '700',
+    padding:5
   },
   card2_h4: {
     color: AppColors.link,

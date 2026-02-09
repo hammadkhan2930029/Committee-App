@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, StatusBar, Image } from 'react-native';
-import { AppColors } from '../../constant/appColors'; // Aapki original theme
+import { AppColors } from '../../constant/appColors'; 
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { useNavigation } from '@react-navigation/native';
 import Animated, {
@@ -15,45 +15,12 @@ import { AppImages } from '../../constant/appImages';
 
 export const Splash = () => {
   const navigation = useNavigation();
-  //-----------------------------------------
-  // const [userData, setUserData] = useState();
-  // const getData = async () => {
-  //   const user = await AsyncStorage.getItem('user');
-  //   const parsedUser = JSON.parse(user);
-  //   setUserData(parsedUser);
-  // };
-  // useEffect(() => {
-  //   getData();
-  // }, []);
-  // console.log('splash check data:', userData);
-  //-------------------------------------------
+  
 
   const logoPosition = useSharedValue(-500);
   const contentOpacity = useSharedValue(0);
 
-  // useEffect(() => {
-  //   logoPosition.value = withSpring(0, {
-  //     damping: 12,
-  //     stiffness: 90,
-  //   });
 
-  //   contentOpacity.value = withDelay(500, withTiming(1, { duration: 1000 }));
-
-  //   const checkLogin = async () => {
-  //     const user = await AsyncStorage.getItem('user');
-  //     console.log('user splash:',user)
-
-  //     setTimeout(() => {
-  //       if (user) {
-  //         navigation.replace('ChooseRole');
-  //       } else {
-  //         navigation.replace('Login');
-  //       }
-  //     }, 3000);
-  //   };
-
-  //   checkLogin();
-  // }, []);
   useEffect(() => {
     logoPosition.value = withSpring(0, {
       damping: 12,

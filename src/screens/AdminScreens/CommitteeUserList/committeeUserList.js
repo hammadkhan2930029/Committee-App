@@ -17,6 +17,12 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
 import { getStoredUser } from '../../../Utils/getUser';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { RFValue } from 'react-native-responsive-fontsize';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const CommitteeUserList = () => {
   const [userdata, setUserData] = useState();
@@ -154,10 +160,11 @@ export const CommitteeUserList = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+                  <TouchableOpacity style={styles.backArrow}>
+                    <Icon
+                      name="keyboard-arrow-left"
+                      size={28}
+                      color={AppColors.link}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Users</Text>
@@ -239,13 +246,14 @@ const styles = ScaledSheet.create({
     flex: 1,
     backgroundColor: AppColors.background,
   },
+  backArrow: {
+    backgroundColor: AppColors.background,
+    borderRadius:20
+  },
   scrollView: {
     marginBottom: 65,
   },
-  arrowBack: {
-    width: 28,
-    height: 28,
-  },
+  
   RectangleImg: {
     width: '100%',
     height: 200,
@@ -361,21 +369,20 @@ const styles = ScaledSheet.create({
   //-----------------------------
   addView: {
     position: 'absolute',
-    top: 610,
+    // top: hp(75),
+    bottom:70,
     right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,
-
     justifyContent: 'center',
     alignItems: 'center',
-
     zIndex: 100,
   },
 
   add: {
-    width: 80,
-    height: 80,
+    width: wp(20),
+    height: hp(20),
 
     resizeMode: 'contain',
     elevation: 10,

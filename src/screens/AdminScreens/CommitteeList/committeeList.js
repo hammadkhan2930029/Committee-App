@@ -447,7 +447,8 @@ const styles = ScaledSheet.create({
   //---------------------------------
   addView: {
     position: 'absolute',
-    top: hp('80%'),
+    // top: hp('80%'),
+    bottom: hp(10),
     right: wp('5%'),
     width: wp('15%'),
     height: wp('15%'),

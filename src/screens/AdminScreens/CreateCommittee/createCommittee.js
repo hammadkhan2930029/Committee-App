@@ -240,7 +240,7 @@ export const CreateCommittee = () => {
                   />
 
                   <CustomInput
-                    label="Rounds Per Month"
+                    label="Round(s) Per Month"
                     placeholder="Enter rounds per month"
                     type="numeric"
                     value={values.roundsPerMonth}

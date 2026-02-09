@@ -20,6 +20,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
 import { getStoredUser } from '../../../Utils/getUser';
 import Toast from 'react-native-toast-message';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Dropdown } from 'react-native-element-dropdown';
+import { isDisabled } from 'react-native/types_generated/Libraries/LogBox/Data/LogBoxData';
 
 export const AddCommitteeMembers = ({ route }) => {
   //-------------------------------------------
@@ -29,17 +32,17 @@ export const AddCommitteeMembers = ({ route }) => {
   const navigation = useNavigation();
   const [membersList, setMembersList] = useState([]);
 
-  //------------------dropdown 1----------------------
+  //--------------dropdown 1-----------------------------------
 
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([]);
+  const [value1, setValue1] = useState(null);
+  const [items1, setItems1] = useState([]);
+  const [isFocus1, setIsFocus1] = useState(false);
 
-  //--------------dropdown 2-----------------------------------
+  //------------------dropdown 2----------------------
 
-  const [open2, setOpen2] = useState(false);
-  const [value2, setValue2] = useState(null);
   const [items2, setItems2] = useState([]);
+  const [value2, setValue2] = useState(null);
+  const [isFocus2, setIsFocus2] = useState(false);
 
   //---------select members ID dropdown 2------------------------
 
@@ -56,7 +59,7 @@ export const AddCommitteeMembers = ({ route }) => {
         label: `${index + 1}`,
         value: item.committe_member_id,
       }));
-      setItems2(dropdownItems);
+      setItems1(dropdownItems);
     }
   }, []);
   //--------------------members api---------------------------------------
@@ -83,7 +86,6 @@ export const AddCommitteeMembers = ({ route }) => {
         const user = await getStoredUser();
         if (user) {
           setUserData(user);
-
         }
       };
       loadUser();
@@ -95,8 +97,6 @@ export const AddCommitteeMembers = ({ route }) => {
   const userViewUsers = async () => {
     if (!userdata?.user_id) return;
 
-    // console.log(userdata.user_id);
-
     try {
       const response = await api.get(`/user/view-users/${userdata.user_id}`);
       if (Array.isArray(response.data.msg)) {
@@ -104,10 +104,10 @@ export const AddCommitteeMembers = ({ route }) => {
           label: user.name,
           value: user.user_id,
         }));
-        setItems(dropdownItems);
+        setItems2(dropdownItems);
       } else {
         setUserList([]);
-        setItems([]);
+        setItems2([]);
       }
     } catch (error) {
       console.log('error :', error);
@@ -125,13 +125,14 @@ export const AddCommitteeMembers = ({ route }) => {
   const addCommitteeMember = async () => {
     try {
       var formData = new FormData();
-      formData.append('committee_member_id[]', value2);
-      formData.append('user_id[]', value);
+      formData.append('committee_member_id[]', value1);
+      formData.append('user_id[]', value2);
 
       const res = await api.post('/user/update/committee-members', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       const response = res?.data;
+      console.log('response :', response);
       if (response.code === '200' && response.msg[0].response) {
         Toast.show({
           type: 'customToast',
@@ -142,6 +143,7 @@ export const AddCommitteeMembers = ({ route }) => {
             borderColor: 'green',
           },
         });
+        membersApi();
       } else {
         Toast.show({
           type: 'customToast',
@@ -153,7 +155,6 @@ export const AddCommitteeMembers = ({ route }) => {
           },
         });
       }
-      membersApi();
     } catch (error) {
       console.log(error);
       Toast.show({
@@ -167,6 +168,9 @@ export const AddCommitteeMembers = ({ route }) => {
       });
     }
   };
+  console.log('value 1 :', value1);
+  console.log('value 2 :', value2);
+
   //-------------------------delete member api---------------------------
   const deleteCommitteeMember = async committeeMemberID => {
     try {
@@ -211,6 +215,33 @@ export const AddCommitteeMembers = ({ route }) => {
     }
   };
   //----------------------------------------------------------------
+
+  const renderLabel1 = () => {
+    if (value1 || isFocus1) {
+      return (
+        <Text style={[styles.label, isFocus1 && { color: AppColors.primary }]}>
+          Select Committee no
+        </Text>
+      );
+    }
+    return null;
+  };
+  //----------------------------------------------------------------
+
+  const renderLabel2 = () => {
+    if (value2 || isFocus2) {
+      return (
+        <Text style={[styles.label, isFocus2 && { color: AppColors.primary }]}>
+          Select Member
+        </Text>
+      );
+    }
+    return null;
+  };
+  const isDataEmpty = !items2 || items2.length === 0;
+
+  //------------------------------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -245,78 +276,74 @@ export const AddCommitteeMembers = ({ route }) => {
         </View>
         {/* ------------------------------------------------------------------ */}
         <View style={styles.dropdownMain}>
-          <View style={[styles.dropDownView, { zIndex: 2000 }]}>
-            <Text style={styles.label}>Select Committee no</Text>
-            <DropDownPicker
-              open={open2}
-              items={items2}
-              setOpen={setOpen2}
-              value={value2}
-              setValue={setValue2}
-              setItems={setItems2}
-              placeholder="Choose members ID"
-              style={styles.dropDown}
-              dropDownContainerStyle={{
-                borderColor: '#ccc',
-                borderRadius: 10,
-                backgroundColor: '#f7f4f4ff',
-                color: '#000',
+          <View style={styles.DropDowncontainer}>
+            {renderLabel1()}
+            <Dropdown
+              style={[
+                styles.dropdown,
+                isFocus1 && { borderColor: AppColors.primary },
+              ]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={items1}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus1 ? 'Select Committee no' : '...'}
+              value={value1}
+              onFocus={() => setIsFocus1(true)}
+              onBlur={() => setIsFocus1(false)}
+              onChange={item => {
+                setValue1(item.value);
+                setIsFocus1(false);
               }}
-              flatListProps={{
-                nestedScrollEnabled: true,
-                showsVerticalScrollIndicator: true,
-              }}
-              listMode="MODAL"
-              modalTitle="Select Committee No"
-              modalProps={{
-                animationType: 'slide',
-              }}
-              modalContentContainerStyle={{
-                backgroundColor: '#ffffff',
-              }}
-              ArrowDownIconComponent={() => (
-                <Icon name="arrow-drop-down" size={24} color="#666" />
-              )}
-              ArrowUpIconComponent={() => (
-                <Icon name="arrow-drop-up" size={24} color="#666" />
+              renderLeftIcon={() => (
+                <Icon
+                  style={styles.icon}
+                  color={isFocus1 ? AppColors.primary : 'black'}
+                  name="playlist-add"
+                  size={20}
+                />
               )}
             />
           </View>
+
           {/* ------------------------------------------------------------------ */}
-          <View style={[styles.dropDownView, { zIndex: 1000 }]}>
-            <Text style={styles.label}>Select Member</Text>
-            <DropDownPicker
-              open={open}
-              items={items}
-              setOpen={setOpen}
-              value={value}
-              setValue={setValue}
-              setItems={setItems}
-              placeholder="Choose user"
-              style={styles.dropDown}
-              dropDownContainerStyle={{
-                borderColor: '#ccc',
-                borderRadius: 10,
-                backgroundColor: '#f7f4f4ff',
-                color: '#000',
+          <View style={styles.DropDowncontainer}>
+            {renderLabel2()}
+            <Dropdown
+              disable={isDataEmpty}
+              style={[
+                styles.dropdown,
+                isFocus2 && { borderColor: AppColors.primary },
+              ]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={items2}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus2 ? 'Select Member' : '...'}
+              searchPlaceholder="Search..."
+              value={value2}
+              onFocus={() => setIsFocus2(true)}
+              onBlur={() => setIsFocus2(false)}
+              onChange={item => {
+                setValue2(item.value);
+                setIsFocus2(false);
               }}
-              flatListProps={{
-                nestedScrollEnabled: true,
-                showsVerticalScrollIndicator: true,
-              }}
-              listMode="MODAL"
-              modalTitle="Select Committee No"
-              modalProps={{
-                animationType: 'slide',
-              }}
-              modalContentContainerStyle={{
-                backgroundColor: '#fff',
-              }}
-              ArrowDownIconComponent={() => (
-                <Icon name="arrow-drop-down" size={24} color="#666" />
-              )}
-              ArrowUpIconComponent={() => (
-                <Icon name="arrow-drop-up" size={24} color="#666" />
+              renderLeftIcon={() => (
+                <Icon
+                  style={styles.icon}
+                  color={isFocus2 ? AppColors.primary : 'black'}
+                  name="person-add"
+                  size={20}
+                />
               )}
             />
           </View>
@@ -332,20 +359,23 @@ export const AddCommitteeMembers = ({ route }) => {
           </View>
         </View>
         {/* ------------------------------------------------------------------- */}
+
         <View style={styles.tableMainView}>
-          <View style={styles.tableHeader}>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Member # </Text>
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Name </Text>
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Action </Text>
-            </View>
-          </View>
           <FlatList
             data={membersList}
+            ListHeaderComponent={
+              <View style={styles.tableHeader}>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>Member # </Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>Name </Text>
+                </View>
+                <View style={styles.cell}>
+                  <Text style={styles.headerText}>Action </Text>
+                </View>
+              </View>
+            }
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={false}
             renderItem={({ item, index }) => (
@@ -409,7 +439,7 @@ const styles = ScaledSheet.create({
     padding: 10,
   },
   h1: {
-    fontSize: moderateScale(24),
+    fontSize: RFValue(20),
     color: AppColors.title,
     fontWeight: '600',
     marginLeft: 10,
@@ -474,14 +504,14 @@ const styles = ScaledSheet.create({
     backgroundColor: AppColors.background,
     borderRadius: 12,
     overflow: 'hidden',
-    elevation: 3, 
+    elevation: 3,
   },
 
   tableHeader: {
     backgroundColor: AppColors.primary,
     width: '100%',
     flexDirection: 'row',
-   
+
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
@@ -521,5 +551,43 @@ const styles = ScaledSheet.create({
   text: {
     fontSize: moderateScale(15),
     color: AppColors.bodyText,
+  },
+  //---------------------------------
+  DropDowncontainer: {
+    backgroundColor: 'white',
+    padding: 10,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });

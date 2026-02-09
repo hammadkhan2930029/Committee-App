@@ -21,7 +21,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
 import Toast from 'react-native-toast-message';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
@@ -195,18 +194,17 @@ export const Notifications = () => {
                 <View
                   style={{
                     backgroundColor: AppColors.background,
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
+                   
+                    borderRadius: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
-
+                   
                     margin: 5,
                   }}
                 >
                   <Icon
                     name="keyboard-arrow-left"
-                    size={24}
+                    size={28}
                     color={AppColors.link}
                   />
                 </View>

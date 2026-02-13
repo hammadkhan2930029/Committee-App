@@ -329,8 +329,8 @@ const styles = ScaledSheet.create({
     marginBottom: hp('8%'),
   },
   arrowBack: {
-    width: wp('6%'),
-    height: wp('6%'),
+    width: wp('7%'),
+    height: wp('7%'),
   },
   RectangleImg: {
     width: wp('100%'),
@@ -352,9 +352,10 @@ const styles = ScaledSheet.create({
     width: wp('45%'),
   },
   h1: {
-    fontSize: RFValue(24),
+    fontSize: RFValue(22),
     color: AppColors.title,
     fontWeight: '600',
+    paddingLeft:5
   },
   avatar: {
     width: wp('14%'),
@@ -366,7 +367,7 @@ const styles = ScaledSheet.create({
   },
   h4: {
     color: AppColors.title,
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
     opacity: 0.9,
     padding: wp('1%'),
   },

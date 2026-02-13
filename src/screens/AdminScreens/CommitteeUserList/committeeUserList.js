@@ -24,6 +24,8 @@ import {
 } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+
+
 export const CommitteeUserList = () => {
   const [userdata, setUserData] = useState();
   const [userList, setUserList] = useState([]);
@@ -74,12 +76,13 @@ export const CommitteeUserList = () => {
   //---------------------------------------------
   const MySkeleton = () => {
     return (
-      <View>
+      <View >
         {[...Array(6)].map((_, index) => (
           <SkeletonPlaceholder>
             <SkeletonPlaceholder.Item
               justifyContent="center"
               alignItems="center"
+           
             >
               <View
                 style={{
@@ -92,6 +95,7 @@ export const CommitteeUserList = () => {
                   height: 420,
                   width: '95%',
                   height: 120,
+                
                 }}
               >
                 <SkeletonPlaceholder.Item
@@ -190,52 +194,54 @@ export const CommitteeUserList = () => {
         {isLoading ? (
           <MySkeleton />
         ) : (
-          <FlatList
-            data={userList}
-            keyExtractor={(item, index) =>
-              item.id?.toString() || index.toString()
-            }
-            renderItem={({ item }) => (
-              <View style={styles.Committee_View}>
-                <TouchableOpacity
-                  style={[
-                    styles.Dashboardcard,
-                    { display: item.name ? 'flex' : 'none' },
-                  ]}
-                  onPress={() =>
-                    navigation.navigate('MembersDetails', { item: item })
-                  }
-                >
-                  <View style={styles.first_view}>
-                    <View style={styles.userMale_View}>
-                      <Image
-                        source={AppIcons.userMale}
-                        style={styles.userMale}
-                      />
+          <View style={styles.cardlistView}>
+            <FlatList
+              data={userList}
+              keyExtractor={(item, index) =>
+                item.id?.toString() || index.toString()
+              }
+              renderItem={({ item }) => (
+                <View style={styles.Committee_View}>
+                  <TouchableOpacity
+                    style={[
+                      styles.Dashboardcard,
+                      { display: item.name ? 'flex' : 'none' },
+                    ]}
+                    onPress={() =>
+                      navigation.navigate('MembersDetails', { item: item })
+                    }
+                  >
+                    <View style={styles.first_view}>
+                      <View style={styles.userMale_View}>
+                        <Image
+                          source={AppIcons.userMale}
+                          style={styles.userMale}
+                        />
+                      </View>
+                      <View>
+                        <Text style={styles.Name}>{item.name}</Text>
+                      </View>
                     </View>
-                    <View>
-                      <Text style={styles.Name}>{item.name}</Text>
+                    <View style={styles.first_view}>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Phone:</Text>
+                        <Text style={styles.count}>{item.phone}</Text>
+                      </View>
                     </View>
-                  </View>
-                  <View style={styles.first_view}>
-                    <View style={styles.details}>
-                      <Text style={styles.one}>Phone:</Text>
-                      <Text style={styles.count}>{item.phone}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
 
-                <View
-                  style={[
-                    styles.dataEmpty,
-                    { display: item.name ? 'none' : 'flex' },
-                  ]}
-                >
-                  <Text style={styles.emptyText}>Data not available</Text>
+                  <View
+                    style={[
+                      styles.dataEmpty,
+                      { display: item.name ? 'none' : 'flex' },
+                    ]}
+                  >
+                    <Text style={styles.emptyText}>Data not available</Text>
+                  </View>
                 </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          </View>
         )}
       </ScrollView>
     </View>
@@ -248,15 +254,18 @@ const styles = ScaledSheet.create({
   },
   backArrow: {
     backgroundColor: AppColors.background,
-    borderRadius:20
+    borderRadius: 20
   },
   scrollView: {
     marginBottom: 65,
   },
-  
+
   RectangleImg: {
-    width: '100%',
-    height: 200,
+    // width: '100%',
+    // height: 220,
+    // resizeMode: 'contain',
+     width: wp('100%'),
+    height: hp('25%'),
     resizeMode: 'contain',
   },
   TopView: {
@@ -296,10 +305,12 @@ const styles = ScaledSheet.create({
     padding: 3,
   },
   //----------------------------
+ 
   Committee_View: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   Dashboardcard: {
     width: '90%',
@@ -370,7 +381,7 @@ const styles = ScaledSheet.create({
   addView: {
     position: 'absolute',
     // top: hp(75),
-    bottom:70,
+    bottom: 70,
     right: 20,
     width: 60,
     height: 60,

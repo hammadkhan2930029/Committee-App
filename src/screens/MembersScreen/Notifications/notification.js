@@ -191,14 +191,15 @@ export const Notifications = () => {
                   flexDirection: 'row',
                 }}
               >
-                <View
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
                   style={{
                     backgroundColor: AppColors.background,
-                   
+
                     borderRadius: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
-                   
+
                     margin: 5,
                   }}
                 >
@@ -207,7 +208,7 @@ export const Notifications = () => {
                     size={28}
                     color={AppColors.link}
                   />
-                </View>
+                </TouchableOpacity>
                 <Text style={styles.h1}>Notifications</Text>
               </View>
               <TouchableOpacity

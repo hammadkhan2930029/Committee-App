@@ -18,6 +18,11 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
 import { getStoredUser } from '../../../Utils/getUser';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 
 export const Payments = ({ route }) => {
   //----------------------------------------------------
@@ -87,8 +92,8 @@ export const Payments = ({ route }) => {
     selectedStatus === 'All'
       ? validPayments
       : validPayments.filter(
-          item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
-        );
+        item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
+      );
 
   // const hasPayments = paymentList?.length > 0;
 
@@ -113,8 +118,8 @@ export const Payments = ({ route }) => {
   );
   const pendingAmount = hasPayments
     ? pendingList?.reduce((sum, item) => {
-        return sum + Number(item?.paid_amount || 0);
-      }, 0)
+      return sum + Number(item?.paid_amount || 0);
+    }, 0)
     : 0;
 
   //-----------------paid----------------------------------
@@ -124,8 +129,8 @@ export const Payments = ({ route }) => {
   );
   const paidAmount = hasPayments
     ? paidList.reduce((sum, item) => {
-        return sum + Number(item?.paid_amount || 0);
-      }, 0)
+      return sum + Number(item?.paid_amount || 0);
+    }, 0)
     : 0;
 
   //-----------------------------------------------
@@ -149,59 +154,55 @@ export const Payments = ({ route }) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-
-      <View>
-        <ImageBackground
-          source={AppImages.Rectangle2}
-          style={styles.RectangleImg}
-        >
-          <View style={styles.main}>
-            <View style={styles.TopView}>
-              <View style={styles.backAndText}>
-                <TouchableOpacity>
-                  <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
-                </TouchableOpacity>
-                <Text style={styles.h1}>Payments</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('AdminProfile')}
-              >
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.textView}>
-              <Text style={styles.h4}>Monitor all committee payments </Text>
-              <Text style={styles.h4}>and pending amounts.</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-      {!hasPayments ? (
-        <View style={{ alignItems: 'center', marginTop: 40 }}>
-          <Text
-            style={{
-              fontSize: moderateScale(16),
-              color: AppColors.bodyText,
-            }}
-          >
-            No payments available yet
-          </Text>
-        </View>
-      ) : (
+      <ScrollView style={styles.scrollView}>
         <View>
+          <ImageBackground
+            source={AppImages.Rectangle2}
+            style={styles.RectangleImg}
+          >
+            <View style={styles.main}>
+              <View style={styles.TopView}>
+                <View style={styles.backAndText}>
+                  <TouchableOpacity>
+                    <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
+                  </TouchableOpacity>
+                  <Text style={styles.h1}>Payments</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.h4}>Monitor all committee payments </Text>
+                <Text style={styles.h4}>and pending amounts.</Text>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+        {!hasPayments ? (
+          <View style={{ alignItems: 'center', marginTop: 40 }}>
+            <Text
+              style={{
+                fontSize: moderateScale(16),
+                color: AppColors.bodyText,
+              }}
+            >
+              No payments available yet
+            </Text>
+          </View>
+        ) : (
           <View style={styles.cardView}>
             <FlatList
               data={filterData}
               ListHeaderComponent={
                 <>
-                  <View style={styles.horizontalCards}>
-                    <FlatList
-                      data={summaryData}
-                      horizontal
-                      keyExtractor={item => item.id.toString()}
-                      contentContainerStyle={{ paddingHorizontal: 15 }}
-                      renderItem={({ item }) => (
-                        <View style={styles.summaryCard}>
+                  <View style={styles.horizontalCards} >
+                    {summaryData.map((item, index) => {
+                      return (
+
+                        <View style={styles.summaryCard} key={index}>
                           <View style={styles.cardHeader}>
                             <Icon
                               name={
@@ -218,14 +219,16 @@ export const Payments = ({ route }) => {
                             {formatNumber(item.value)}
                           </Text>
 
-                          {/* Subtitle */}
+
                           <Text style={styles.cardSubtitle}>
                             {item.subtitle}
                           </Text>
                         </View>
-                      )}
-                    />
+                      )
+                    })}
                   </View>
+
+
                   {/* ------------------------------------------------------- */}
                   <View style={styles.statuslistView}>
                     <FlatList
@@ -292,12 +295,12 @@ export const Payments = ({ route }) => {
                         item?.status?.toLowerCase() === 'verified'
                           ? styles.paid
                           : item?.status?.toLowerCase() === 'pending'
-                          ? styles.pending
-                          : item?.status?.toLowerCase() === 'Overdue'
-                          ? styles.overDue
-                          : item?.status?.toLowerCase() === 'requested'
-                          ? styles.requested
-                          : null,
+                            ? styles.pending
+                            : item?.status?.toLowerCase() === 'Overdue'
+                              ? styles.overDue
+                              : item?.status?.toLowerCase() === 'requested'
+                                ? styles.requested
+                                : null,
                       ]}
                     >
                       <Text
@@ -327,8 +330,8 @@ export const Payments = ({ route }) => {
               )}
             />
           </View>
-        </View>
-      )}
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -338,15 +341,16 @@ const styles = ScaledSheet.create({
     backgroundColor: AppColors.background,
   },
   scrollView: {
-    marginBottom: 65,
+    marginBottom: 66,
   },
   arrowBack: {
     width: 28,
     height: 28,
   },
   RectangleImg: {
-    width: '100%',
-    height: 200,
+
+    width: wp('100%'),
+    height: hp('25%'),
     resizeMode: 'contain',
   },
   TopView: {
@@ -388,11 +392,18 @@ const styles = ScaledSheet.create({
   },
   //---------------------------------
 
+
+  horizontalCards: {
+    width: wp('100%'),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
   summaryCard: {
-    width: 200,
+    width: wp('48%'),
     height: 130,
     backgroundColor: AppColors.background,
-    padding: 15,
+    padding: 10,
     borderRadius: 15,
     elevation: 5,
     margin: 5,
@@ -418,6 +429,7 @@ const styles = ScaledSheet.create({
     color: AppColors.link,
     fontSize: moderateScale(16),
     fontWeight: '600',
+    paddingLeft: 5
   },
   cardSubtitle: {
     color: AppColors.bodyText,
@@ -429,14 +441,15 @@ const styles = ScaledSheet.create({
   },
   statusList: {
     borderRadius: 20,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: AppColors.background,
     width: 115,
     padding: 6,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,
-    // marginLeft: 5,
     margin: 5,
+    borderWidth: 1,
+    borderColor: AppColors.primary
   },
 
   activeStatusList: {
@@ -454,7 +467,11 @@ const styles = ScaledSheet.create({
   },
   //--------------------------------------
   cardView: {
-    marginTop: 5,
+    // marginTop: 3,
+    // backgroundColor:'green',
+    // height:hp('70%')
+    // marginBottom:hp('20%')
+    // marginBottom:150
   },
   cards: {
     width: '95%',
@@ -463,7 +480,6 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     alignSelf: 'center',
     backgroundColor: AppColors.background,
-    // margin: 10,
     marginTop: 10,
     padding: 15,
     borderRadius: 15,

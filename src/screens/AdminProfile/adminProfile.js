@@ -43,9 +43,7 @@ export const AdminProfile = () => {
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
     navigation.replace('Login');
-    // setTimeout(() => {
-    //   setIsLoading();
-    // }, 2000);
+
   };
 
   if (userdata) {
@@ -140,10 +138,15 @@ const styles = ScaledSheet.create({
   profileView: {
     justifyContent: 'center',
     alignItems: 'center',
+
   },
   profileImage: {
     width: '45%',
     resizeMode: 'contain',
+    
+    elevation: 5,
+    borderRadius: 100
+
   },
   nameView: {
     justifyContent: 'center',

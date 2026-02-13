@@ -192,7 +192,8 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 15,
+    width:'75%',
+    padding: 8,
   },
   wavingHand: {
     width: 28,
@@ -209,11 +210,13 @@ const styles = ScaledSheet.create({
   },
   //-----------------------------
   nameAndNotifiView: {
+    width:'100%',
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 15,
+    
   },
   notificationsView: {
     justifyContent: 'space-around',

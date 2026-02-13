@@ -107,7 +107,7 @@ export const AdminEditProfile = ({ route }) => {
       />
       <ScrollView>
         <View style={styles.arrowBackView}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=> navigation.goBack()}>
             <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
           </TouchableOpacity>
         </View>
@@ -200,6 +200,9 @@ const styles = ScaledSheet.create({
   profileImage: {
     width: '45%',
     resizeMode: 'contain',
+    borderRadius: 100,
+    elevation: 5
+
   },
   nameView: {
     justifyContent: 'center',

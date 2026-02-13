@@ -140,6 +140,7 @@ export const ChooseRole = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor:AppColors.background
   },
   RectangleImg: {
     width: '100%',
@@ -180,11 +181,11 @@ const styles = ScaledSheet.create({
     marginTop: -100,
   },
   profileImage: {
-    width: '50%',
+    width: '45%',
     resizeMode: 'contain',
     borderColor: '#fff',
     borderWidth: 8,
-    borderRadius: 90,
+    borderRadius: 100,
     elevation: 3,
   },
   cardView: {

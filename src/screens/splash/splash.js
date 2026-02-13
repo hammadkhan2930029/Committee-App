@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, StatusBar, Image } from 'react-native';
-import { AppColors } from '../../constant/appColors'; 
+import { AppColors } from '../../constant/appColors';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { useNavigation } from '@react-navigation/native';
 import Animated, {
@@ -15,7 +15,7 @@ import { AppImages } from '../../constant/appImages';
 
 export const Splash = () => {
   const navigation = useNavigation();
-  
+
 
   const logoPosition = useSharedValue(-500);
   const contentOpacity = useSharedValue(0);
@@ -68,12 +68,16 @@ export const Splash = () => {
     <View style={styles.splashMain}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
 
-      <Animated.View style={[styles.splash_logo_view, logoStyle]}>
-        <Image source={AppImages.profileAvatar} style={styles.logoImage} />
+      <Animated.View
+        // style={[styles.splash_logo_view, logoStyle]}
+        style={styles.splash_logo_view}
+
+      >
+        <Animated.Image source={AppImages.logo1} style={[styles.logoImage,logoStyle]} />
       </Animated.View>
 
       <Animated.View style={[styles.headings, textStyle]}>
-        <Text style={styles.h1}>Committee App</Text>
+        <Text style={styles.h1}>Bachat Committee</Text>
         <Text style={styles.h4}>Manage your BC easily and securely</Text>
       </Animated.View>
     </View>
@@ -89,21 +93,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   splash_logo_view: {
-    backgroundColor: '#fff',
-    width: '50%',
-
-    borderRadius: 90,
+   
+    width: '100%',
+    
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
     elevation: 5,
   },
   logoImage: {
-    width: '100%',
+    width: '50%',
+    height: 200,
+
     elevation: 5,
-    borderRadius: 90,
-    borderWidth: 5,
-    borderColor: AppColors.background,
+    borderRadius: 100,
+ 
   },
   headings: {
     justifyContent: 'center',

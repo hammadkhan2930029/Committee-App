@@ -224,6 +224,7 @@ export const Login = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+    backgroundColor:AppColors.background
   },
   RectangleImg: {
     width: '100%',

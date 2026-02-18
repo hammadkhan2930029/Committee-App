@@ -154,12 +154,12 @@ export const ActiveBCs = () => {
           <View style={styles.main}>
             <View style={styles.TopView}>
               <View style={styles.backAndText}>
-                <TouchableOpacity style={styles.arrowIcon}>
-                  <Icon
-                    name="keyboard-arrow-left"
-                    size={26}
-                    color={AppColors.link}
-                  />
+                <TouchableOpacity >
+                 <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
+                    />
                 </TouchableOpacity>
                 <Text style={styles.h1}>My Active BCs </Text>
               </View>
@@ -295,7 +295,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: 6,
   },
 
   textView: {

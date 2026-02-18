@@ -56,14 +56,16 @@ export const AssignRounds = ({ route }) => {
       value: item.committee_round_id,
     })),
   );
+  console.log('round items :',roundItems)
   //-------------user view committee rounds--------------------------
   const viewCommitteeRound = async () => {
     try {
       const response = await api.get(
         `/user/view-committee-rounds/${committeeID}`,
       );
-      const result = await response.data?.msg;
-      setRoundList(result);
+      const result = await response.data?.msg || [];
+      const filtererd = result.filter(item => item.committe_member_name)
+      setRoundList(filtererd);
     } catch (error) {
       console.log(error);
     }
@@ -73,7 +75,7 @@ export const AssignRounds = ({ route }) => {
       viewCommitteeRound();
     }, []),
   );
-  console.log('view committee round:', roundList);
+  // console.log('view committee round:', roundList);
 
   //--------------------assign round api--------------------------
   const roundApi = async () => {
@@ -86,7 +88,7 @@ export const AssignRounds = ({ route }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      console.log('FULL RESPONSE:', res.data);
+      // console.log('FULL RESPONSE:', res.data);
 
       if (res?.data?.code === '200') {
         console.log('SUCCESS MSG:', res.data.msg[0].response);
@@ -138,7 +140,7 @@ export const AssignRounds = ({ route }) => {
       );
       const result = await response.data.msg[0].response;
       viewCommitteeRound();
-      console.log(result);
+      // console.log(result);
     } catch (error) {
       console.log(error);
     }
@@ -152,7 +154,7 @@ export const AssignRounds = ({ route }) => {
       );
       const result = await response.data.msg[0].response;
       setMark(result);
-      console.log('round mark :', result);
+      // console.log('round mark :', result);
       viewCommitteeRound();
     } catch (error) {
       console.log(error);
@@ -160,7 +162,7 @@ export const AssignRounds = ({ route }) => {
       setloading(false);
     }
   };
-  console.log('round mark 2:', mark);
+  // console.log('round mark 2:', mark);
   //----------------------------------------
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
@@ -189,7 +191,7 @@ export const AssignRounds = ({ route }) => {
     }
     return null;
   };
-  
+
 
 
   return (
@@ -205,9 +207,12 @@ export const AssignRounds = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Assign Rounds To Member</Text>
@@ -225,7 +230,7 @@ export const AssignRounds = ({ route }) => {
           <View style={styles.DropDowncontainer}>
             {renderLabel1()}
             <Dropdown
-             
+
               style={[
                 styles.dropdown,
                 isFocus1 && { borderColor: AppColors.primary },
@@ -305,34 +310,30 @@ export const AssignRounds = ({ route }) => {
         </View>
         {/* ------------------------------------------------------------------- */}
         <View style={styles.tableMainView}>
-          <View style={styles.tableHeader}>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Round no </Text>
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Name </Text>
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Mark </Text>
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.headerText}>Action </Text>
-            </View>
-          </View>
+
           <FlatList
             data={roundList}
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={false}
+            ListHeaderComponent={<View style={styles.tableHeader}>
+              <View style={styles.cell}>
+                <Text style={styles.headerText}>Round no </Text>
+              </View>
+              <View style={styles.cell}>
+                <Text style={styles.headerText}>Name </Text>
+              </View>
+              <View style={styles.cell}>
+                <Text style={styles.headerText}>Mark </Text>
+              </View>
+              <View style={styles.cell}>
+                <Text style={styles.headerText}>Action </Text>
+              </View>
+            </View>}
             renderItem={({ item, index }) => {
-              console.log(item.status);
+              console.log('assign data', item);
 
               return (
-                <View
-                  style={[
-                    styles.tableRow,
-                    { display: item.committe_member_name ? 'flex' : 'none' },
-                  ]}
-                >
+                <View style={styles.tableRow}>
                   <View style={styles.Rowcell}>
                     <Text style={styles.text}>{item.round_no}</Text>
                   </View>

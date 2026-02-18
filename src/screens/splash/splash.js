@@ -12,6 +12,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppImages } from '../../constant/appImages';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 export const Splash = () => {
   const navigation = useNavigation();
@@ -73,7 +76,7 @@ export const Splash = () => {
         style={styles.splash_logo_view}
 
       >
-        <Animated.Image source={AppImages.logo1} style={[styles.logoImage,logoStyle]} />
+        <Animated.Image source={AppImages.logo1} style={[styles.logoImage, logoStyle]} />
       </Animated.View>
 
       <Animated.View style={[styles.headings, textStyle]}>
@@ -93,21 +96,28 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   splash_logo_view: {
-   
+
     width: '100%',
-    
+
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
     elevation: 5,
   },
   logoImage: {
-    width: '50%',
-    height: 200,
+    // width: '50%',
+    // height: 200,
 
-    elevation: 5,
-    borderRadius: 100,
- 
+    // elevation: 5,
+    // borderRadius: 100,
+    width: screenWidth * 0.45,
+    height: screenWidth * 0.45,
+    resizeMode: 'contain',
+    borderColor: '#fff',
+    borderWidth: 8,
+    borderRadius: (screenWidth * 0.45) / 2,
+    elevation: 25,
+
   },
   headings: {
     justifyContent: 'center',

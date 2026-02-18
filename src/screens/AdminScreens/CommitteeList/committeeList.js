@@ -25,6 +25,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 export const CommitteeList = () => {
   const [loading, setLoading] = useState(false);
@@ -180,9 +182,11 @@ export const CommitteeList = () => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+            
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Committees</Text>
@@ -349,13 +353,13 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    width: wp('45%'),
+    // width: wp('45%'),
   },
   h1: {
     fontSize: RFValue(22),
     color: AppColors.title,
     fontWeight: '600',
-    paddingLeft:5
+    paddingLeft: 6
   },
   avatar: {
     width: wp('14%'),

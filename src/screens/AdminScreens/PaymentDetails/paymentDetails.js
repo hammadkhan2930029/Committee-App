@@ -16,21 +16,29 @@ import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { navigate } from '../../../navigations/navigationService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 
 export const PaymentDetails = ({ route }) => {
   //-------------------------------------------
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [showImage, setShowImage] = useState(false);
 
   const { item } = route.params;
   console.log('payment details :', item);
   const navigation = useNavigation();
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false)
+
+    }, 1000);
+  }, [item.payment_by])
 
   //-------------------------------------------
   const markPaymentVerified = async () => {
@@ -81,9 +89,10 @@ export const PaymentDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Payment Details</Text>
@@ -166,7 +175,7 @@ export const PaymentDetails = ({ route }) => {
           </View>
         </Modal>
       </ScrollView>
-      <Loader visible={loading}/>
+      <Loader visible={loading} />
     </View>
   );
 };

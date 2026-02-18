@@ -24,14 +24,19 @@ import { useNavigation } from '@react-navigation/native';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import { string } from 'yup';
 
 
 
 export const EditCommittee = ({ route }) => {
 
 
-  const { details } = route.params;
+  const { details, start, due } = route.params;
   console.log('edit :', details);
+  console.log('start :', start);
+  console.log('due :', due);
+
+
   const navigation = useNavigation();
   //------------------------------------
   const [showDue, setShowDue] = useState(false);
@@ -53,7 +58,7 @@ export const EditCommittee = ({ route }) => {
     setShow(false);
     if (selectedDate) {
       setDate(selectedDate);
-      setFieldValue('startDate', dayjs(selectedDate).format('YYYY-MM-DD'));
+      setFieldValue('start', dayjs(selectedDate).format('YYYY-MM-DD'));
     }
   };
 
@@ -76,16 +81,28 @@ export const EditCommittee = ({ route }) => {
   const removeCommas = value => value.replace(/,/g, '');
 
   //-----------------------------------------------------------
-
+  const statusMap = {
+    Active: 1,
+    Inactive: 2,
+    Pending: 0,
+  }
+  //--------------------------------------------------------
+  console.log("committe ID :", details.committee_id)
+  //---------------------------------------------------------
   const editCommittee = async value => {
+    console.log('status :', value)
     try {
       var formData = new FormData();
-      formData.append('committee_id', details.committee_id);
+      
+
+      //=====================================================================
+
+      formData.append('committee_id', String(value.committee_id));
       formData.append('name', value.committeeName || details.name);
 
       formData.append(
         'total_member',
-        value.totalMembers ?? details.total_member,
+        value.totalMembers || details.total_member,
       );
 
       formData.append(
@@ -107,26 +124,28 @@ export const EditCommittee = ({ route }) => {
 
       formData.append('total', value.totalAmount || details.total);
 
-      formData.append('start_date', value.startDate || details.start_date);
+      formData.append('start_date', value.start || start);
 
-      formData.append('due_on', value.due_on || details.due_on);
+      formData.append('due_on', value.due_on || due);
 
-      formData.append('status', value.status ?? details.status);
+      formData.append('status', value.status);
+      console.log('Form data :', formData)
 
-     const response = await api.post(
-        `/user/edit-committee/${details.committee_id}`,
-        formData,
+      const response = await api.post(`/user/edit-committee/${details.committee_id}`, formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
       const data = response?.data?.msg[0];
+      console.log("Data :", response)
 
       if (data.response) {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: data.response,
+          text2: typeof data.response === 'string'
+            ? data.response
+            : "Committee updated successfully!",
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
@@ -146,11 +165,12 @@ export const EditCommittee = ({ route }) => {
       }
       console.log('edit committee response : ', response?.data?.msg[0]);
     } catch (error) {
-      console.log('edit committe try catch error', error);
+
+      console.log('API ERROR MESSAGE:', error);
       Toast.show({
         type: 'customToast',
         text1: 'Error',
-        text2: 'Server error, please try again',
+        text2: 'Server error',
         props: {
           bgColor: AppColors.background,
           borderColor: '#ff5252',
@@ -173,9 +193,12 @@ export const EditCommittee = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Edit Committee</Text>
@@ -192,7 +215,9 @@ export const EditCommittee = ({ route }) => {
         </View>
         <View>
           <Formik
+            enableReinitialize
             initialValues={{
+              committee_id: details.committee_id,
               committeeName: details.name || '',
               totalMembers: details.total_member || '',
               totalRounds: details.total_rounds || '',
@@ -200,9 +225,9 @@ export const EditCommittee = ({ route }) => {
               noOfMonths: details.no_of_month || '',
               amountPerMember: details.amount_per_member || '',
               totalAmount: details.total || '',
-              startDate: details.start_date || '',
-              due_on: details.due_on || '',
-              status: details.status ?? null,
+              start: start || '',
+              due_on: due || '',
+              status: statusMap[details.status] ?? null,
             }}
             onSubmit={values => {
               editCommittee(values);
@@ -306,15 +331,17 @@ export const EditCommittee = ({ route }) => {
                     onblur={handleBlur('totalAmount')}
                     rightIcon={<Icon name="edit" size={20} color="#666" />}
                   />
+                  {/* ---------------------------------------------------------- */}
+
                   <View>
                     <CustomInputWithIcon
                       label="Select Date"
                       type="date"
-                      placeholder={details.start_date}
+                      placeholder={start}
                       value={
                         date
                           ? dayjs(date).format('DD-MM-YYYY')
-                          : details.start_date
+                          : start
                       }
                       rightIcon={
                         <Icon name="calendar-today" size={22} color="#666" />
@@ -330,18 +357,20 @@ export const EditCommittee = ({ route }) => {
                         onChange={(event, selectedDate) =>
                           onChange(event, selectedDate, setFieldValue)
                         }
+
                       />
                     )}
                   </View>
+                  {/* ---------------------------------------------------------- */}
                   <View>
                     <CustomInputWithIcon
                       label="Due on"
                       type="date"
-                      placeholder={details.due_on}
+                      placeholder={due}
                       value={
                         dateDue
                           ? dayjs(dateDue).format('DD-MM-YYYY')
-                          : details.due_on
+                          : due
                       }
                       rightIcon={
                         <Icon name="calendar-today" size={22} color="#666" />
@@ -368,7 +397,12 @@ export const EditCommittee = ({ route }) => {
                       items={items}
                       setOpen={setOpen}
                       value={values.status}
-                      setValue={val => setFieldValue('status', val)}
+                      // setValue={val => setFieldValue('status', val)}
+                      setValue={(callback) => {
+                        const selectedValue = callback(values.status);
+                        setFieldValue('status', selectedValue);
+                      }}
+
                       setItems={setItems}
                       placeholder="Select Status"
                       style={styles.dropDown}
@@ -436,13 +470,13 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 10,
+    // padding: 10,
   },
   h1: {
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    paddingLeft: 10,
+    paddingLeft: 6,
   },
 
   textView: {

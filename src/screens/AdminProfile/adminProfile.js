@@ -16,6 +16,9 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 export const AdminProfile = () => {
   const [userdata, setUserData] = useState(null);
@@ -55,13 +58,13 @@ export const AdminProfile = () => {
         />
         <View style={styles.arrowBackView}>
           <TouchableOpacity
-            style={styles.arrowIcon}
+
             onPress={() => navigation.goBack()}
           >
             <Icon
-              name="keyboard-arrow-left"
-              size={26}
-              color={AppColors.title}
+              name="arrow-circle-left"
+              size={28}
+              color={AppColors.link}
             />
           </TouchableOpacity>
           <TouchableOpacity>
@@ -141,11 +144,14 @@ const styles = ScaledSheet.create({
 
   },
   profileImage: {
-    width: '45%',
+
+    width: screenWidth * 0.45,
+    height: screenWidth * 0.45,
     resizeMode: 'contain',
-    
-    elevation: 5,
-    borderRadius: 100
+    borderColor: '#fff',
+    borderWidth: 8,
+    borderRadius: (screenWidth * 0.45) / 2,
+    elevation: 3,
 
   },
   nameView: {

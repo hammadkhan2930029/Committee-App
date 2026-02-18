@@ -66,9 +66,12 @@ export const MembersDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Member Details</Text>

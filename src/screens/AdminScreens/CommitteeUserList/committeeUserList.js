@@ -82,7 +82,7 @@ export const CommitteeUserList = () => {
             <SkeletonPlaceholder.Item
               justifyContent="center"
               alignItems="center"
-           
+
             >
               <View
                 style={{
@@ -95,7 +95,7 @@ export const CommitteeUserList = () => {
                   height: 420,
                   width: '95%',
                   height: 120,
-                
+
                 }}
               >
                 <SkeletonPlaceholder.Item
@@ -148,9 +148,16 @@ export const CommitteeUserList = () => {
       <View style={styles.addView}>
         <TouchableOpacity
           activeOpacity={0.8}
+          style={styles.add}
+
           onPress={() => navigation.navigate('CreateMembers')}
         >
-          <Image source={AppIcons.Add} style={styles.add} />
+          {/* <Image source={AppIcons.Add} style={styles.add} /> */}
+          <Icon
+            name="add"
+            size={34}
+            color={AppColors.title}
+          />
         </TouchableOpacity>
       </View>
 
@@ -164,11 +171,11 @@ export const CommitteeUserList = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity style={styles.backArrow}>
+                  <TouchableOpacity >
                     <Icon
-                      name="keyboard-arrow-left"
+                      name="arrow-circle-left"
                       size={28}
-                      color={AppColors.link}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Users</Text>
@@ -213,9 +220,10 @@ export const CommitteeUserList = () => {
                   >
                     <View style={styles.first_view}>
                       <View style={styles.userMale_View}>
-                        <Image
-                          source={AppIcons.userMale}
-                          style={styles.userMale}
+                        <Icon
+                          name="person"
+                          size={28}
+                          color={AppColors.title}
                         />
                       </View>
                       <View>
@@ -224,7 +232,7 @@ export const CommitteeUserList = () => {
                     </View>
                     <View style={styles.first_view}>
                       <View style={styles.details}>
-                        <Text style={styles.one}>Phone:</Text>
+                        <Text style={styles.one}>Phone : </Text>
                         <Text style={styles.count}>{item.phone}</Text>
                       </View>
                     </View>
@@ -261,10 +269,8 @@ const styles = ScaledSheet.create({
   },
 
   RectangleImg: {
-    // width: '100%',
-    // height: 220,
-    // resizeMode: 'contain',
-     width: wp('100%'),
+
+    width: wp('100%'),
     height: hp('25%'),
     resizeMode: 'contain',
   },
@@ -282,12 +288,13 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    width: '30%',
+    // width: '30%',
   },
   h1: {
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
+    paddingLeft: 6
   },
   avatar: {
     width: 60,
@@ -295,17 +302,18 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 10,
+    paddingLeft: 5,
+    // backgroundColor:'green'
   },
 
   h4: {
     color: AppColors.title,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(15),
     opacity: 0.9,
-    padding: 3,
+    padding: 5,
   },
   //----------------------------
- 
+
   Committee_View: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -319,12 +327,13 @@ const styles = ScaledSheet.create({
 
     alignItems: 'center',
     flexDirection: 'column',
-    padding: 15,
+    padding: 10,
     elevation: 5,
     borderRadius: 20,
-    margin: 10,
+
     borderColor: AppColors.primary,
     borderWidth: 1,
+    marginTop: 10
   },
   first_view: {
     width: '100%',
@@ -369,19 +378,19 @@ const styles = ScaledSheet.create({
     paddingTop: 10,
   },
   one: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(15),
     color: AppColors.blackText,
+    fontWeight: '600'
   },
   count: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(15),
     color: AppColors.link,
     fontWeight: '600',
   },
   //-----------------------------
   addView: {
     position: 'absolute',
-    // top: hp(75),
-    bottom: 70,
+    bottom: 80,
     right: 20,
     width: 60,
     height: 60,
@@ -392,11 +401,15 @@ const styles = ScaledSheet.create({
   },
 
   add: {
-    width: wp(20),
-    height: hp(20),
-
-    resizeMode: 'contain',
+    width: 60,
+    height:60,
+    backgroundColor: AppColors.primary,
     elevation: 10,
+    justifyContent:'center',
+    alignItems:'center',
+    padding:8,
+    borderRadius:50
+
   },
   userMale_View: {
     backgroundColor: AppColors.primary,

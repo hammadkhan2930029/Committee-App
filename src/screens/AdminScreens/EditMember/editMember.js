@@ -47,13 +47,13 @@ export const EditMember = ({ route }) => {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: result.response ,
+          text2: result.response,
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
           },
         });
-        navigation.goBack();
+        navigation.pop(2);
         setLoading(false);
       } else {
         Toast.show({
@@ -95,9 +95,12 @@ export const EditMember = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Edit Member</Text>
@@ -182,13 +185,13 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 10,
+    // padding: 10,
   },
   h1: {
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: 6,
   },
 
   textView: {

@@ -16,6 +16,8 @@ import { CustomButton } from '../../../components/customButton';
 import { Modal } from 'react-native';
 import { useEffect, useState } from 'react';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 export const UserPaymentDetails = ({ route }) => {
   //------------------------------------
@@ -101,9 +103,10 @@ export const UserPaymentDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Payment Details</Text>

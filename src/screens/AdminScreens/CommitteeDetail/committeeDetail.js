@@ -21,6 +21,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 
 
 export const CommitteeDetails = ({ route }) => {
@@ -59,7 +63,7 @@ export const CommitteeDetails = ({ route }) => {
       committeeDetails();
     }, [id]),
   );
-  console.log('committee details 2:', details.committee_id);
+  console.log('committee details 2:', details);
 
   //----------------delete committee-------------------
 
@@ -124,6 +128,19 @@ export const CommitteeDetails = ({ route }) => {
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
   );
+  //---------------------------------------
+
+
+  const getFormattedDate = (dateStr) => {
+    if (!dateStr) return '';
+    // 'D MMM YYYY' format "18 Feb 2026" ko parse karega
+    const parsed = dayjs(dateStr, ['D MMM YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY'], true);
+    return parsed.isValid() ? parsed.format('YYYY-MM-DD') : dateStr;
+  };
+  const startDate = getFormattedDate(details.start_date)
+  const dueOn = getFormattedDate(details.due_on)
+
+
 
   return (
     <View style={styles.container}>
@@ -138,9 +155,11 @@ export const CommitteeDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Committee Details</Text>
@@ -148,17 +167,17 @@ export const CommitteeDetails = ({ route }) => {
               </View>
               <View style={styles.textView}>
                 <Text style={styles.h4}>{details.name}</Text>
-                
-                 <View style={styles.activeBtn}>
-              <Text style={styles.active}>{details.status}</Text>
-            </View>
+
+                <View style={styles.activeBtn}>
+                  <Text style={styles.active}>{details.status}</Text>
+                </View>
               </View>
             </View>
           </ImageBackground>
         </View>
 
         <View style={styles.BCDetails}>
-          
+
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -187,7 +206,7 @@ export const CommitteeDetails = ({ route }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Date</Text>
-            <Text style={styles.text2}>{details.start_date}</Text>
+            <Text style={styles.text2}>{startDate}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Start Month</Text>
@@ -195,7 +214,7 @@ export const CommitteeDetails = ({ route }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Due On</Text>
-            <Text style={styles.text2}>{details.due_on}</Text>
+            <Text style={styles.text2}>{dueOn}</Text>
           </View>
         </View>
 
@@ -204,7 +223,7 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.btnView}>
             <TouchableOpacity
               style={styles.deleteBTN}
-              onPress={() => navigate('EditCommittee', { details: details })}
+              onPress={() => navigate('EditCommittee', { details: details, start: startDate, due: dueOn })}
             >
               <Text style={styles.text}>Edit</Text>
               <Icon name="edit" size={18} color={AppColors.title} />
@@ -337,7 +356,7 @@ const styles = ScaledSheet.create({
   },
   text2: {
     color: AppColors.bodyText,
-       fontSize: RFValue(14),
+    fontSize: RFValue(14),
 
   },
   buttons: {

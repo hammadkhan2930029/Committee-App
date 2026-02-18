@@ -16,22 +16,20 @@ import { AppImages } from '../../../constant/appImages';
 import { CustomInput } from '../../../components/customTextInput';
 import { CustomButton } from '../../../components/customButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 export const UserEditProfile = () => {
   const navigation = useNavigation();
-   useFocusEffect(
-      React.useCallback(() => {
-        // Jab Profile screen open ho
-        StatusBar.setBackgroundColor('#fff');
-        StatusBar.setBarStyle('dark-content');
-  
-        // return () => {
-        //   // Jab Profile se bahar jao
-        //   StatusBar.setBackgroundColor(AppColors.primary);
-        //   StatusBar.setBarStyle('light-content');
-        // };
-      }, []),
-    );
+  useFocusEffect(
+    React.useCallback(() => {
+
+      StatusBar.setBackgroundColor('#fff');
+      StatusBar.setBarStyle('dark-content');
+
+
+    }, []),
+  );
   return (
     <View style={styles.container}>
       <StatusBar
@@ -40,7 +38,11 @@ export const UserEditProfile = () => {
       />
       <View style={styles.arrowBackView}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
+          <Icon
+            name="arrow-circle-left"
+            size={28}
+            color={AppColors.title}
+          />
         </TouchableOpacity>
       </View>
 
@@ -130,11 +132,11 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
   },
   profileImage: {
-      width: 150,
-    height:150,
-    borderRadius:75,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     resizeMode: 'contain',
-    elevation:5
+    elevation: 5
   },
   nameView: {
     justifyContent: 'center',

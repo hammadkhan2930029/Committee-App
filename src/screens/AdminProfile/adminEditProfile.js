@@ -21,6 +21,12 @@ import { api } from '../../services/api';
 import Toast from 'react-native-toast-message';
 import * as Yup from 'yup';
 import { Loader } from '../Loader/loader';
+import { Dimensions } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const screenWidth = Dimensions.get('window').width;
+
+
 
 export const AdminEditProfile = ({ route }) => {
   const { user } = route.params;
@@ -107,8 +113,12 @@ export const AdminEditProfile = ({ route }) => {
       />
       <ScrollView>
         <View style={styles.arrowBackView}>
-          <TouchableOpacity onPress={()=> navigation.goBack()}>
-            <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-circle-left"
+              size={28}
+              color={AppColors.link}
+            />
           </TouchableOpacity>
         </View>
 
@@ -198,10 +208,13 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
   },
   profileImage: {
-    width: '45%',
+    width: screenWidth * 0.45,
+    height: screenWidth * 0.45,
     resizeMode: 'contain',
-    borderRadius: 100,
-    elevation: 5
+    borderColor: '#fff',
+    borderWidth: 8,
+    borderRadius: (screenWidth * 0.45) / 2,
+    elevation: 3,
 
   },
   nameView: {

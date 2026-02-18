@@ -10,6 +10,9 @@ import { AppIcons } from '../../constant/appIcons';
 import { CustomButton } from '../../components/customButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 export const ChooseRole = () => {
   const navigation = useNavigation();
@@ -39,7 +42,7 @@ export const ChooseRole = () => {
         resizeMode="cover"
       >
         <View style={styles.backgroundInnerView}>
-         
+
           <View style={styles.headingsAlign}>
             <Text style={styles.h1}>Choose Your Role</Text>
             <Text style={styles.h4}>Select how you want to use the app</Text>
@@ -64,8 +67,8 @@ export const ChooseRole = () => {
           onPress={() => setSelected(1)}
         >
           <View style={styles.view1}>
-            
-             <Icon
+
+            <Icon
               name="admin-panel-settings"
               size={28}
               color={selected === 1 ? AppColors.title : AppColors.link}
@@ -103,7 +106,7 @@ export const ChooseRole = () => {
           onPress={() => setSelected(2)}
         >
           <View style={styles.view2}>
-           
+
             <Icon
               name="groups"
               size={28}
@@ -140,7 +143,7 @@ export const ChooseRole = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
-    backgroundColor:AppColors.background
+    backgroundColor: AppColors.background
   },
   RectangleImg: {
     width: '100%',
@@ -181,11 +184,12 @@ const styles = ScaledSheet.create({
     marginTop: -100,
   },
   profileImage: {
-    width: '45%',
+    width: screenWidth * 0.45,
+    height: screenWidth * 0.45,
     resizeMode: 'contain',
     borderColor: '#fff',
     borderWidth: 8,
-    borderRadius: 100,
+    borderRadius: (screenWidth * 0.45) / 2,
     elevation: 3,
   },
   cardView: {
@@ -219,7 +223,7 @@ const styles = ScaledSheet.create({
     color: AppColors.title,
     fontSize: moderateScale(20),
     fontWeight: '700',
-    
+
   },
   card_h4: {
     color: AppColors.subtitle,
@@ -258,7 +262,7 @@ const styles = ScaledSheet.create({
     color: AppColors.primary,
     fontSize: moderateScale(20),
     fontWeight: '700',
-    padding:5
+    padding: 5
   },
   card2_h4: {
     color: AppColors.link,

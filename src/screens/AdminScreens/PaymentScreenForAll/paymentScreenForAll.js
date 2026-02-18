@@ -164,7 +164,11 @@ export const Payments = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity>
-                    <Image source={AppIcons.arrowBack} style={styles.arrowBack} />
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
+                    />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Payments</Text>
                 </View>
@@ -367,13 +371,13 @@ const styles = ScaledSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
-    width: '50%',
+    // width: '50%',
   },
   h1: {
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    paddingLeft: 15,
+    paddingLeft: 6,
   },
   avatar: {
     width: 60,
@@ -381,7 +385,7 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    padding: 10,
+    paddingLeft: 8,
   },
 
   h4: {
@@ -395,25 +399,25 @@ const styles = ScaledSheet.create({
 
   horizontalCards: {
     width: wp('100%'),
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    
   },
   summaryCard: {
     width: wp('48%'),
-    height: 130,
     backgroundColor: AppColors.background,
     padding: 10,
     borderRadius: 15,
     elevation: 5,
-    margin: 5,
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
   cardHeader: {
     justifyContent: 'flex-start',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    padding:5
   },
   cardIcon: {
     width: 28,
@@ -421,9 +425,11 @@ const styles = ScaledSheet.create({
   },
   cardTitle: {
     color: AppColors.blackText,
-    fontSize: moderateScale(18),
+    fontSize: moderateScale(17),
     fontWeight: '600',
-    paddingLeft: 3,
+    // paddingLeft: 3,
+    padding:5
+
   },
   cardValue: {
     color: AppColors.link,
@@ -434,6 +440,8 @@ const styles = ScaledSheet.create({
   cardSubtitle: {
     color: AppColors.bodyText,
     fontSize: moderateScale(14),
+    padding:5
+
   },
   //----------------------------------
   statuslistView: {
@@ -458,7 +466,7 @@ const styles = ScaledSheet.create({
 
   status: {
     color: AppColors.blackText,
-    fontSize: moderateScale(18),
+    fontSize: moderateScale(16),
     fontWeight: '500',
   },
 

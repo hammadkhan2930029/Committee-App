@@ -202,12 +202,12 @@ export const PaymentHistory = () => {
                 <View style={styles.backAndText}>
                   <TouchableOpacity
                     onPress={() => navigation.goBack()}
-                    style={styles.arrowBack}
+
                   >
                     <Icon
-                      name="keyboard-arrow-left"
-                      size={26}
-                      color={AppColors.primary}
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Payment History</Text>
@@ -329,7 +329,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: 6,
   },
 
   textView: {

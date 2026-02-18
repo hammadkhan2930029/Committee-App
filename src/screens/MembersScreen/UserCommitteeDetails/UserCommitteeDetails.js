@@ -18,6 +18,7 @@ import { api } from '../../../services/api';
 import { useEffect, useState } from 'react';
 import { DisabledButton } from '../../../components/disabledButton';
 import { Loader } from '../../Loader/loader';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const UserCommitteeDetails = ({ route }) => {
   //---------------------------------------------
@@ -74,7 +75,7 @@ export const UserCommitteeDetails = ({ route }) => {
   console.log('date :', month);
 
   //------------------------------------------------
-  const memberCountMap  = roundList.reduce((acc, item) => {
+  const memberCountMap = roundList.reduce((acc, item) => {
     const id = item?.committee_member_id;
     if (!id) return acc;
     acc[id] = (acc[id] || 0) + 1;
@@ -97,9 +98,10 @@ export const UserCommitteeDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+                  <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Committee Details</Text>
@@ -249,7 +251,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: 6,
   },
 
   textView: {

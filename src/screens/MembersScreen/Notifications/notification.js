@@ -193,20 +193,20 @@ export const Notifications = () => {
               >
                 <TouchableOpacity
                   onPress={() => navigation.goBack()}
-                  style={{
-                    backgroundColor: AppColors.background,
+                // style={{
+                //   backgroundColor: AppColors.background,
 
-                    borderRadius: 20,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                //   borderRadius: 20,
+                //   justifyContent: 'center',
+                //   alignItems: 'center',
 
-                    margin: 5,
-                  }}
+                //   margin: 5,
+                // }}
                 >
                   <Icon
-                    name="keyboard-arrow-left"
+                    name="arrow-circle-left"
                     size={28}
-                    color={AppColors.link}
+                    color={AppColors.title}
                   />
                 </TouchableOpacity>
                 <Text style={styles.h1}>Notifications</Text>
@@ -269,6 +269,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(24),
     color: AppColors.title,
     fontWeight: '600',
+    paddingLeft: 6
   },
   avatar: {
     width: 60,

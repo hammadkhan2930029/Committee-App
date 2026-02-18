@@ -55,21 +55,28 @@ export const AddCommitteeMembers = ({ route }) => {
   console.log('committee multipleData :', membersID);
   useEffect(() => {
     if (multipleData?.members?.length) {
-      const dropdownItems = multipleData.members.map((item, index) => ({
-        label: `${index + 1}`,
-        value: item.committe_member_id,
-      }));
+
+      //---------------------------------
+      const assignedIds = membersList.map(m => m.committe_member_id)
+      //------------------------------------
+      const dropdownItems = multipleData.members
+        .filter(item => !assignedIds.includes(item.committe_member_id))
+        .map((item, index) => ({
+          label: `Slot : ${item.committe_member_id}`,
+          value: item.committe_member_id,
+        }));
       setItems1(dropdownItems);
     }
-  }, []);
+  }, [multipleData, membersList]);
   //--------------------members api---------------------------------------
   const membersApi = async () => {
     try {
       const response = await api.get(
         `/user/view-committee-members/${committeeID}`,
       );
-      const data = response?.data?.msg;
-      setMembersList(data);
+      const data = response?.data?.msg || [];
+      const filtered = data.filter(item => item.user_name)
+      setMembersList(filtered);
     } catch (error) {
       console.log('members api error:', error);
     }
@@ -132,6 +139,7 @@ export const AddCommitteeMembers = ({ route }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       const response = res?.data;
+      console.log('res :',res)
       console.log('response :', response);
       if (response.code === '200' && response.msg[0].response) {
         Toast.show({
@@ -188,6 +196,7 @@ export const AddCommitteeMembers = ({ route }) => {
             borderColor: 'green',
           },
         });
+
       } else {
         Toast.show({
           type: 'customToast',
@@ -200,6 +209,8 @@ export const AddCommitteeMembers = ({ route }) => {
         });
       }
       membersApi();
+      setValue1(null);
+      setValue2(null);
       console.log('delete Committee Member :', response);
     } catch (error) {
       console.log(error);
@@ -258,9 +269,12 @@ export const AddCommitteeMembers = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.arrowBack}
+
+
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Add Committee Members</Text>
@@ -363,6 +377,7 @@ export const AddCommitteeMembers = ({ route }) => {
         <View style={styles.tableMainView}>
           <FlatList
             data={membersList}
+            extraData={membersList}
             ListHeaderComponent={
               <View style={styles.tableHeader}>
                 <View style={styles.cell}>
@@ -376,32 +391,32 @@ export const AddCommitteeMembers = ({ route }) => {
                 </View>
               </View>
             }
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) => item.committe_member_id.toString()}
             scrollEnabled={false}
-            renderItem={({ item, index }) => (
-              <View
-                style={[
-                  styles.tableRow,
-                  { display: item.user_name ? 'flex' : 'none' },
-                ]}
-              >
-                <View style={styles.Rowcell}>
-                  <Text style={styles.text}>{index + 1}</Text>
+            renderItem={({ item, index }) => {
+              console.log('add memnber :', item)
+              return (
+                <View style={styles.tableRow}>
+                  <View style={styles.Rowcell}>
+                    <Text style={styles.text}>
+                      {item.committe_member_id}
+                    </Text>
+                  </View>
+                  <View style={styles.Rowcell}>
+                    <Text style={styles.text}>{item.user_name}</Text>
+                  </View>
+                  <View style={styles.Rowcell}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        deleteCommitteeMember(item.committe_member_id)
+                      }
+                    >
+                      <Icon name="delete" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View style={styles.Rowcell}>
-                  <Text style={styles.text}>{item.user_name}</Text>
-                </View>
-                <View style={styles.Rowcell}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      deleteCommitteeMember(item.committe_member_id)
-                    }
-                  >
-                    <Icon name="delete" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
+              )
+            }}
           />
         </View>
       </ScrollView>
@@ -442,7 +457,7 @@ const styles = ScaledSheet.create({
     fontSize: RFValue(20),
     color: AppColors.title,
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: 6,
   },
 
   textView: {

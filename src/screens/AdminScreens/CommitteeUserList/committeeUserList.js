@@ -1,0 +1,434 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  StatusBar,
+  ImageBackground,
+  Image,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
+import { moderateScale, ScaledSheet } from 'react-native-size-matters';
+import { AppColors } from '../../../constant/appColors';
+import { AppImages } from '../../../constant/appImages';
+import { AppIcons } from '../../../constant/appIcons';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { api } from '../../../services/api';
+import { getStoredUser } from '../../../Utils/getUser';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { RFValue } from 'react-native-responsive-fontsize';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+
+
+export const CommitteeUserList = () => {
+  const [userdata, setUserData] = useState();
+  const [userList, setUserList] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigation = useNavigation();
+
+  //-----------------get data--------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+          console.log(user.full_name, user.user_id);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+
+  //-----------------user list------------------------
+  const userViewUsers = async () => {
+    if (!userdata?.user_id) return; // safeguard
+    console.log(userdata.user_id);
+    try {
+      const response = await api.get(`/user/view-users/${userdata.user_id}`);
+      console.log('response:', response.data.msg);
+      if (Array.isArray(response.data.msg)) {
+        setUserList(response.data.msg);
+        setIsLoading(false);
+      } else {
+        setUserList([]);
+      }
+    } catch (error) {
+      console.log('error :', error);
+    }
+  };
+
+  console.log(userList);
+  useFocusEffect(
+    useCallback(() => {
+      userViewUsers();
+    }, [userdata?.user_id]),
+  );
+  //---------------------------------------------
+  const MySkeleton = () => {
+    return (
+      <View >
+        {[...Array(6)].map((_, index) => (
+          <SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item
+              justifyContent="center"
+              alignItems="center"
+
+            >
+              <View
+                style={{
+                  backgroundColor: AppColors.background,
+                  padding: 10,
+                  borderRadius: 20,
+                  margin: 10,
+                  borderColor: AppColors.primary,
+                  borderWidth: 1,
+                  height: 420,
+                  width: '95%',
+                  height: 120,
+
+                }}
+              >
+                <SkeletonPlaceholder.Item
+                  width={'100%'}
+                  padding={10}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                >
+                  {/* Text */}
+                  <SkeletonPlaceholder.Item>
+                    <View
+                      style={{
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <SkeletonPlaceholder.Item
+                        width={50}
+                        height={50}
+                        borderRadius={25}
+                      />
+                      <SkeletonPlaceholder.Item
+                        width={60}
+                        height={20}
+                        borderRadius={4}
+                        marginLeft={3}
+                      />
+                    </View>
+
+                    <SkeletonPlaceholder.Item
+                      marginTop={8}
+                      width={150}
+                      height={20}
+                      borderRadius={4}
+                    />
+                  </SkeletonPlaceholder.Item>
+                </SkeletonPlaceholder.Item>
+              </View>
+            </SkeletonPlaceholder.Item>
+          </SkeletonPlaceholder>
+        ))}
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
+      <View style={styles.addView}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.add}
+
+          onPress={() => navigation.navigate('CreateMembers')}
+        >
+          {/* <Image source={AppIcons.Add} style={styles.add} /> */}
+          <Icon
+            name="add"
+            size={34}
+            color={AppColors.title}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.scrollView}>
+        <View>
+          <ImageBackground
+            source={AppImages.Rectangle2}
+            style={styles.RectangleImg}
+            resizeMode="cover"
+          >
+            <View style={styles.main}>
+              <View style={styles.TopView}>
+                <View style={styles.backAndText}>
+                  <TouchableOpacity >
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.h1}>Users</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AdminProfile')}
+                >
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.h4}>Manage all users and view </Text>
+                <Text style={styles.h4}>their joined BCs below.</Text>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+
+        {/* ---------------------------------------------- */}
+        {isLoading ? (
+          <MySkeleton />
+        ) : (
+          <View style={styles.cardlistView}>
+            <FlatList
+              data={userList}
+              keyExtractor={(item, index) =>
+                item.id?.toString() || index.toString()
+              }
+              renderItem={({ item }) => (
+                <View style={styles.Committee_View}>
+                  <TouchableOpacity
+                    style={[
+                      styles.Dashboardcard,
+                      { display: item.name ? 'flex' : 'none' },
+                    ]}
+                    onPress={() =>
+                      navigation.navigate('MembersDetails', { item: item })
+                    }
+                  >
+                    <View style={styles.first_view}>
+                      <View style={styles.userMale_View}>
+                        <Icon
+                          name="person"
+                          size={28}
+                          color={AppColors.title}
+                        />
+                      </View>
+                      <View>
+                        <Text style={styles.Name}>{item.name}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.first_view}>
+                      <View style={styles.details}>
+                        <Text style={styles.one}>Phone : </Text>
+                        <Text style={styles.count}>{item.phone}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+
+                  <View
+                    style={[
+                      styles.dataEmpty,
+                      { display: item.name ? 'none' : 'flex' },
+                    ]}
+                  >
+                    <Text style={styles.emptyText}>Data not available</Text>
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+};
+const styles = ScaledSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: AppColors.background,
+  },
+  backArrow: {
+    backgroundColor: AppColors.background,
+    borderRadius: 20
+  },
+  scrollView: {
+    marginBottom: 65,
+  },
+
+  RectangleImg: {
+
+    width: wp('100%'),
+    height: hp('25%'),
+    resizeMode: 'contain',
+  },
+  TopView: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: 5,
+    alignSelf: 'center',
+    width: '100%',
+    padding: 15,
+    marginTop: 20,
+  },
+  backAndText: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    // width: '30%',
+  },
+  h1: {
+    fontSize: moderateScale(24),
+    color: AppColors.title,
+    fontWeight: '600',
+    paddingLeft: 6
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    elevation: 5,
+  },
+  textView: {
+    paddingLeft: 5,
+    // backgroundColor:'green'
+  },
+
+  h4: {
+    color: AppColors.title,
+    fontSize: moderateScale(15),
+    opacity: 0.9,
+    padding: 5,
+  },
+  //----------------------------
+
+  Committee_View: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+  },
+  Dashboardcard: {
+    width: '90%',
+    backgroundColor: AppColors.cardLight,
+    justifyContent: 'center',
+
+    alignItems: 'center',
+    flexDirection: 'column',
+    padding: 10,
+    elevation: 5,
+    borderRadius: 20,
+
+    borderColor: AppColors.primary,
+    borderWidth: 1,
+    marginTop: 10
+  },
+  first_view: {
+    width: '100%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  Name: {
+    fontSize: moderateScale(16),
+    color: AppColors.blackText,
+    fontWeight: '600',
+    padding: 5,
+  },
+  Btncomplete: {
+    backgroundColor: AppColors.primary,
+    borderRadius: 20,
+    padding: 5,
+  },
+  complete: {
+    fontSize: moderateScale(15),
+    color: AppColors.title,
+    paddingLeft: 7,
+    paddingRight: 7,
+  },
+  BtnActive: {
+    backgroundColor: AppColors.cardLight,
+    borderRadius: 20,
+    padding: 5,
+    borderColor: AppColors.primary,
+    borderWidth: 1,
+  },
+  active: {
+    fontSize: moderateScale(15),
+    color: AppColors.link,
+    paddingLeft: 7,
+    paddingRight: 7,
+  },
+  details: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingTop: 10,
+  },
+  one: {
+    fontSize: moderateScale(15),
+    color: AppColors.blackText,
+    fontWeight: '600'
+  },
+  count: {
+    fontSize: moderateScale(15),
+    color: AppColors.link,
+    fontWeight: '600',
+  },
+  //-----------------------------
+  addView: {
+    position: 'absolute',
+    bottom: 80,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+
+  add: {
+    width: 60,
+    height:60,
+    backgroundColor: AppColors.primary,
+    elevation: 10,
+    justifyContent:'center',
+    alignItems:'center',
+    padding:8,
+    borderRadius:50
+
+  },
+  userMale_View: {
+    backgroundColor: AppColors.primary,
+    borderRadius: 50,
+    padding: 8,
+  },
+  userMale: {
+    width: 25,
+    height: 25,
+    resizeMode: 'contain',
+  },
+  //----------------------------
+  dataEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+  },
+  emptyText: {
+    fontSize: moderateScale(18),
+    color: AppColors.placeholder,
+  },
+});

@@ -43,6 +43,9 @@ export const AddCommitteeMembers = ({ route }) => {
   const [items2, setItems2] = useState([]);
   const [value2, setValue2] = useState(null);
   const [isFocus2, setIsFocus2] = useState(false);
+  //--------------------------------------------------------
+  const [paymentList, setPaymentList] = useState([]);
+  const [isverified, setIsVerified] = useState();
 
   //---------select members ID dropdown 2------------------------
 
@@ -55,16 +58,14 @@ export const AddCommitteeMembers = ({ route }) => {
   console.log('committee multipleData :', membersID);
   useEffect(() => {
     if (multipleData?.members?.length) {
-
       //---------------------------------
-      const assignedIds = membersList.map(m => m.committe_member_id)
+      const assignedIds = membersList.map(m => m.committe_member_id);
       //------------------------------------
-      const dropdownItems = multipleData.members
-        .filter(item => !assignedIds.includes(item.committe_member_id))
-        .map((item, index) => ({
-          label: `Slot : ${item.committe_member_id}`,
-          value: item.committe_member_id,
-        }));
+      // .filter(item => !assignedIds.includes(item.committe_member_id))
+      const dropdownItems = multipleData.members.map((item, index) => ({
+        label: `Slot : ${index + 1}`,
+        value: item.committe_member_id,
+      }));
       setItems1(dropdownItems);
     }
   }, [multipleData, membersList]);
@@ -75,7 +76,7 @@ export const AddCommitteeMembers = ({ route }) => {
         `/user/view-committee-members/${committeeID}`,
       );
       const data = response?.data?.msg || [];
-      const filtered = data.filter(item => item.user_name)
+      const filtered = data.filter(item => item.user_name);
       setMembersList(filtered);
     } catch (error) {
       console.log('members api error:', error);
@@ -139,8 +140,8 @@ export const AddCommitteeMembers = ({ route }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       const response = res?.data;
-      console.log('res :',res)
-      console.log('response :', response);
+      // console.log('res :', res);
+      // console.log('response :', response);
       if (response.code === '200' && response.msg[0].response) {
         Toast.show({
           type: 'customToast',
@@ -196,7 +197,6 @@ export const AddCommitteeMembers = ({ route }) => {
             borderColor: 'green',
           },
         });
-
       } else {
         Toast.show({
           type: 'customToast',
@@ -252,6 +252,46 @@ export const AddCommitteeMembers = ({ route }) => {
   const isDataEmpty = !items2 || items2.length === 0;
 
   //------------------------------------------------------------
+  const committee_id_filter = membersID[0].committee_id;
+
+  const AdminpaymentList = async () => {
+    try {
+      const response = await api.get(
+        `/admin/view-committee-payments/list/${userdata.user_id}`,
+      );
+      const allPayments = response?.data?.msg || [];
+
+      const filteredPayments = allPayments.filter(
+        item => item.committe_id === committee_id_filter,
+      );
+
+      const isVerified = filteredPayments.some(
+        item => item.status.toLowerCase() === 'verified',
+      );
+      const paymentsWithVerification = filteredPayments.map(item => ({
+        ...item,
+        isVerified: item.status.toLowerCase() === 'verified',
+      }));
+      setIsVerified(isVerified);
+
+      console.log('Is Verified:', isVerified);
+      setPaymentList(paymentsWithVerification);
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      if (userdata?.user_id) {
+        AdminpaymentList();
+      }
+    }, [userdata]),
+  );
+  console.log('Is Verified 2:', isverified);
+
+  // console.log('paymentList :', paymentList);
+  //------------------------------------------------------------
 
   return (
     <View style={styles.container}>
@@ -269,8 +309,6 @@ export const AddCommitteeMembers = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-
-
                     <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -394,28 +432,31 @@ export const AddCommitteeMembers = ({ route }) => {
             keyExtractor={(item, index) => item.committe_member_id.toString()}
             scrollEnabled={false}
             renderItem={({ item, index }) => {
-              console.log('add memnber :', item)
+              console.log('add memnber :', item);
               return (
                 <View style={styles.tableRow}>
                   <View style={styles.Rowcell}>
-                    <Text style={styles.text}>
-                      {item.committe_member_id}
-                    </Text>
+                    <Text style={styles.text}>{index + 1}</Text>
                   </View>
                   <View style={styles.Rowcell}>
                     <Text style={styles.text}>{item.user_name}</Text>
                   </View>
                   <View style={styles.Rowcell}>
                     <TouchableOpacity
+                      disabled={isverified}
                       onPress={() =>
                         deleteCommitteeMember(item.committe_member_id)
                       }
                     >
-                      <Icon name="delete" size={24} color="red" />
+                      <Icon
+                        name="delete"
+                        size={24}
+                        color={isverified ? 'gray' : 'red'}
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
-              )
+              );
             }}
           />
         </View>

@@ -7,9 +7,7 @@ import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeLi
 import { CommitteeUserList } from '../screens/AdminScreens/CommitteeUserList/committeeUserList';
 import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 //---------------------members-----------------------------------------
-// import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AppColors } from '../constant/appColors';
 const Tab = createBottomTabNavigator();
@@ -24,9 +22,10 @@ export const BottomTabNavigation = () => {
             icon = focused ? 'home' : 'home-outline';
           } else if (route.name === 'CommitteeList') {
             icon = focused ? 'credit-card' : 'credit-card-outline';
-          } else if (route.name === 'CommitteeUserList') {
-            icon = focused ? 'account-group' : 'account-group-outline';
           }
+          //  else if (route.name === 'CommitteeUserList') {
+          //   icon = focused ? 'account-group' : 'account-group-outline';
+          // }
            else if (route.name === 'Payments') {
             icon = focused ? 'briefcase-variant' : 'briefcase-variant-outline';
           }
@@ -65,22 +64,17 @@ export const BottomTabNavigation = () => {
         options={{ headerShown: false }}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="CommitteeUserList"
         component={CommitteeUserList}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Tab.Screen
         name="Payments"
         component={Payments}
         options={{ headerShown: false }}
       />
-      {/* -----------------Members-------------------- */}
-      {/* <Tab.Screen
-        name="MembersDashboard"
-        component={MembersDashboard}
-        options={{ headerShown: false }}
-      /> */}
+    
     </Tab.Navigator>
   );
 };

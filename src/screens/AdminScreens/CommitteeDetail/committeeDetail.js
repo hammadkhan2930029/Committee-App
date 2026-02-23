@@ -23,29 +23,54 @@ import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { getStoredUser } from '../../../Utils/getUser';
 dayjs.extend(customParseFormat);
 
 
 
+
 export const CommitteeDetails = ({ route }) => {
-  //------------------------------------
+
+  //-----------------------------------------------------------------------
+
   const { id } = route.params;
   console.log('ID :', id);
-  //------------------------------------
+
+    //-----------------------------------------------------------------------
+
+  const [userdata, setUserData] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+        }
+      };
+      loadUser();
+    }, []),
+  );
+   //-----------------------------------------------------------------------
+
 
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [roundList, setRoundList] = useState([]);
   const [multipleData, setMultipleData] = useState([]);
+  const [paymentList, setPaymentList] = useState([]);
+  const [isverified, setIsVerified] = useState();
 
-  //---------------------------------------------------
+  //-----------------------------------------------------------------------
+
   const formatNumber = value => {
     if (!value) return '';
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  //------------------------------------------------
+    //-----------------------------------------------------------------------
+
   const committeeDetails = async () => {
     try {
       const response = await api.get(`/user/view-committee-detail/${id}`);
@@ -65,7 +90,7 @@ export const CommitteeDetails = ({ route }) => {
   );
   console.log('committee details 2:', details);
 
-  //----------------delete committee-------------------
+  //----------------delete committee--------------------------------------
 
   const deleteCommittee = async () => {
     setLoading(true);
@@ -124,22 +149,64 @@ export const CommitteeDetails = ({ route }) => {
     }, [details.committee_id]),
   );
 
-  //----------------------------------------
+    //-----------------------------------------------------------------------
+
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
   );
-  //---------------------------------------
+   //-----------------------------------------------------------------------
 
 
-  const getFormattedDate = (dateStr) => {
+  const getFormattedDate = dateStr => {
     if (!dateStr) return '';
-    // 'D MMM YYYY' format "18 Feb 2026" ko parse karega
-    const parsed = dayjs(dateStr, ['D MMM YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY'], true);
+ 
+    const parsed = dayjs(
+      dateStr,
+      ['D MMM YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY'],
+      true,
+    );
     return parsed.isValid() ? parsed.format('YYYY-MM-DD') : dateStr;
   };
-  const startDate = getFormattedDate(details.start_date)
-  const dueOn = getFormattedDate(details.due_on)
+  const startDate = getFormattedDate(details.start_date);
+  const dueOn = getFormattedDate(details.due_on);
 
+  //-----------------------------------------------------------------------
+
+  const AdminpaymentList = async () => {
+    try {
+      const response = await api.get(
+        `/admin/view-committee-payments/list/${userdata.user_id}`,
+      );
+      const allPayments = response?.data?.msg || [];
+      console.log('All payment :', allPayments);
+
+      const filteredPayments = allPayments.filter(
+        item => item.committe_id === details?.committee_id,
+      );
+
+      const isVerified = filteredPayments.some(
+        item => item.status.toLowerCase() === 'verified',
+      );
+      const paymentsWithVerification = filteredPayments.map(item => ({
+        ...item,
+        isVerified: item.status.toLowerCase() === 'verified',
+      }));
+      setIsVerified(isVerified);
+
+      console.log('Is Verified:', isVerified);
+      setPaymentList(paymentsWithVerification);
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      if (userdata?.user_id) {
+        AdminpaymentList();
+      }
+    }, [userdata]),
+  );
 
 
   return (
@@ -155,7 +222,6 @@ export const CommitteeDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-
                     <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -177,7 +243,6 @@ export const CommitteeDetails = ({ route }) => {
         </View>
 
         <View style={styles.BCDetails}>
-
           <View style={styles.row}>
             <Text style={styles.text1}>Total Members</Text>
             <Text style={styles.text2}>{details.total_member}</Text>
@@ -223,7 +288,13 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.btnView}>
             <TouchableOpacity
               style={styles.deleteBTN}
-              onPress={() => navigate('EditCommittee', { details: details, start: startDate, due: dueOn })}
+              onPress={() =>
+                navigate('EditCommittee', {
+                  details: details,
+                  start: startDate,
+                  due: dueOn,
+                })
+              }
             >
               <Text style={styles.text}>Edit</Text>
               <Icon name="edit" size={18} color={AppColors.title} />
@@ -231,11 +302,11 @@ export const CommitteeDetails = ({ route }) => {
           </View>
           <View style={styles.btnView}>
             <TouchableOpacity
-              disabled={hasAnyPaid}
+              disabled={hasAnyPaid || isverified}
               style={[
                 styles.deleteBTN,
                 {
-                  backgroundColor: hasAnyPaid
+                  backgroundColor: hasAnyPaid || isverified
                     ? AppColors.placeholder
                     : AppColors.primary,
                 },
@@ -348,7 +419,6 @@ const styles = ScaledSheet.create({
     padding: 6,
     borderBottomColor: AppColors.primary,
     borderBottomWidth: 2,
-    // backgroundColor: 'green',
   },
   text1: {
     color: AppColors.blackText,
@@ -357,7 +427,6 @@ const styles = ScaledSheet.create({
   text2: {
     color: AppColors.bodyText,
     fontSize: RFValue(14),
-
   },
   buttons: {
     width: '100%',
@@ -366,7 +435,6 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 15,
-    // backgroundColor:'green'
   },
   btnView: {
     width: '47%',

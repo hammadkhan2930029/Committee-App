@@ -23,6 +23,8 @@ export const MembersDashboard = () => {
   const navigation = useNavigation();
   const [userdata, setUserdata] = useState();
   const [notifyList, setNotifyList] = useState([]);
+  const [committeeList, setCommitteeList] = useState([]);
+
   //-----------get user aysnc Storage------------------
   useFocusEffect(
     useCallback(() => {
@@ -36,6 +38,8 @@ export const MembersDashboard = () => {
       loader();
     }, []),
   );
+  const userID = userdata?.user_id;
+  console.log(userID);
   //--------------------------------------------------------
   const notificationsApi = async () => {
     try {
@@ -57,6 +61,26 @@ export const MembersDashboard = () => {
     }
   }, [userdata]);
   console.log('notify list :', notifyList?.length);
+  //-----------------myCommitteeList---------------------------
+  const myCommitteeList = async () => {
+    try {
+      const response = await api.get(`/user/my-committees/${userID}`);
+      const result = response?.data?.msg;
+      console.log('my committee list :', result);
+      setCommitteeList(result);
+      if (result) {
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log('try catch error :', error);
+    }
+  };
+  useEffect(() => {
+    if (userID) {
+      myCommitteeList();
+    }
+  }, [userID]);
+  console.log('committeeList :', committeeList.length);
   //--------------------------------------------------------
 
   return (
@@ -100,7 +124,9 @@ export const MembersDashboard = () => {
                       color="#FED22D"
                     />
                   </View>
-                  <Text style={styles.counterText}>{notifyList.length > 0 ? notifyList.length : '0'}</Text>
+                  <Text style={styles.counterText}>
+                    {notifyList.length > 0 ? notifyList.length : '0'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -112,7 +138,7 @@ export const MembersDashboard = () => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('CommitteeList')}
+            onPress={() => navigation.navigate('ActiveBCs')}
             style={styles.Dashboardcard}
           >
             <View>
@@ -122,9 +148,9 @@ export const MembersDashboard = () => {
               </View>
             </View>
             <View style={styles.view2}>
-              <Text style={styles.activeBC_details}>2 BCs you’ve joined</Text>
+              <Text style={styles.activeBC_details}>{committeeList.length} BCs you’ve joined</Text>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>08</Text>
+                <Text style={styles.counter_text}>{committeeList.length}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -192,7 +218,7 @@ const styles = ScaledSheet.create({
     elevation: 5,
   },
   textView: {
-    width:'75%',
+    width: '75%',
     padding: 8,
   },
   wavingHand: {
@@ -210,13 +236,12 @@ const styles = ScaledSheet.create({
   },
   //-----------------------------
   nameAndNotifiView: {
-    width:'100%',
+    width: '100%',
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 15,
-    
   },
   notificationsView: {
     justifyContent: 'space-around',

@@ -18,20 +18,20 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 export const UserProfile = () => {
   const navigation = useNavigation();
-  useFocusEffect(
-    React.useCallback(() => {
+  // useFocusEffect(
+  //   React.useCallback(() => {
      
-      StatusBar.setBackgroundColor('#fff');
-      StatusBar.setBarStyle('dark-content');
+  //     StatusBar.setBackgroundColor('#fff');
+  //     StatusBar.setBarStyle('dark-content');
 
-      return () => {
+  //     return () => {
         
-        StatusBar.setBackgroundColor(AppColors.primary);
-        StatusBar.setBarStyle('light-content');
+  //       StatusBar.setBackgroundColor(AppColors.primary);
+  //       StatusBar.setBarStyle('light-content');
         
-      };
-    }, []),
-  );
+  //     };
+  //   }, []),
+  // );
   return (
     <View style={styles.container}>
       <StatusBar

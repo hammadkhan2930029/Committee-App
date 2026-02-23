@@ -92,8 +92,8 @@ export const Payments = ({ route }) => {
     selectedStatus === 'All'
       ? validPayments
       : validPayments.filter(
-        item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
-      );
+          item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
+        );
 
   // const hasPayments = paymentList?.length > 0;
 
@@ -118,8 +118,8 @@ export const Payments = ({ route }) => {
   );
   const pendingAmount = hasPayments
     ? pendingList?.reduce((sum, item) => {
-      return sum + Number(item?.paid_amount || 0);
-    }, 0)
+        return sum + Number(item?.paid_amount || 0);
+      }, 0)
     : 0;
 
   //-----------------paid----------------------------------
@@ -129,8 +129,8 @@ export const Payments = ({ route }) => {
   );
   const paidAmount = hasPayments
     ? paidList.reduce((sum, item) => {
-      return sum + Number(item?.paid_amount || 0);
-    }, 0)
+        return sum + Number(item?.paid_amount || 0);
+      }, 0)
     : 0;
 
   //-----------------------------------------------
@@ -175,7 +175,10 @@ export const Payments = ({ route }) => {
                 <TouchableOpacity
                   onPress={() => navigation.navigate('AdminProfile')}
                 >
-                  <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                  <Image
+                    source={AppImages.profileAvatar}
+                    style={styles.avatar}
+                  />
                 </TouchableOpacity>
               </View>
               <View style={styles.textView}>
@@ -202,10 +205,9 @@ export const Payments = ({ route }) => {
               data={filterData}
               ListHeaderComponent={
                 <>
-                  <View style={styles.horizontalCards} >
+                  <View style={styles.horizontalCards}>
                     {summaryData.map((item, index) => {
                       return (
-
                         <View style={styles.summaryCard} key={index}>
                           <View style={styles.cardHeader}>
                             <Icon
@@ -223,15 +225,13 @@ export const Payments = ({ route }) => {
                             {formatNumber(item.value)}
                           </Text>
 
-
                           <Text style={styles.cardSubtitle}>
                             {item.subtitle}
                           </Text>
                         </View>
-                      )
+                      );
                     })}
                   </View>
-
 
                   {/* ------------------------------------------------------- */}
                   <View style={styles.statuslistView}>
@@ -299,12 +299,12 @@ export const Payments = ({ route }) => {
                         item?.status?.toLowerCase() === 'verified'
                           ? styles.paid
                           : item?.status?.toLowerCase() === 'pending'
-                            ? styles.pending
-                            : item?.status?.toLowerCase() === 'Overdue'
-                              ? styles.overDue
-                              : item?.status?.toLowerCase() === 'requested'
-                                ? styles.requested
-                                : null,
+                          ? styles.pending
+                          : item?.status?.toLowerCase() === 'Overdue'
+                          ? styles.overDue
+                          : item?.status?.toLowerCase() === 'requested'
+                          ? styles.requested
+                          : null,
                       ]}
                     >
                       <Text
@@ -352,7 +352,6 @@ const styles = ScaledSheet.create({
     height: 28,
   },
   RectangleImg: {
-
     width: wp('100%'),
     height: hp('25%'),
     resizeMode: 'contain',
@@ -396,13 +395,11 @@ const styles = ScaledSheet.create({
   },
   //---------------------------------
 
-
   horizontalCards: {
     width: wp('100%'),
     justifyContent: 'space-evenly',
     alignItems: 'center',
     flexDirection: 'row',
-    
   },
   summaryCard: {
     width: wp('48%'),
@@ -417,7 +414,7 @@ const styles = ScaledSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding:5
+    padding: 5,
   },
   cardIcon: {
     width: 28,
@@ -428,20 +425,18 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(17),
     fontWeight: '600',
     // paddingLeft: 3,
-    padding:5
-
+    padding: 5,
   },
   cardValue: {
     color: AppColors.link,
     fontSize: moderateScale(16),
     fontWeight: '600',
-    paddingLeft: 5
+    paddingLeft: 5,
   },
   cardSubtitle: {
     color: AppColors.bodyText,
     fontSize: moderateScale(14),
-    padding:5
-
+    padding: 5,
   },
   //----------------------------------
   statuslistView: {
@@ -457,7 +452,7 @@ const styles = ScaledSheet.create({
     elevation: 3,
     margin: 5,
     borderWidth: 1,
-    borderColor: AppColors.primary
+    borderColor: AppColors.primary,
   },
 
   activeStatusList: {
@@ -482,14 +477,14 @@ const styles = ScaledSheet.create({
     // marginBottom:150
   },
   cards: {
-    width: '95%',
-    justifyContent: 'space-between',
+    width: '98%',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     flexDirection: 'row',
     alignSelf: 'center',
     backgroundColor: AppColors.background,
     marginTop: 10,
-    padding: 15,
+    padding: 8,
     borderRadius: 15,
     elevation: 3,
     borderWidth: 1,
@@ -520,8 +515,11 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
+  left: {
+    // backgroundColor: 'green',
+  },
   right: {
+    //  backgroundColor: 'pink',
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'space-between',

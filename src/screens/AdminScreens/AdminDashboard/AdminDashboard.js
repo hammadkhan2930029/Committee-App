@@ -153,9 +153,9 @@ export const AdminDashboard = () => {
                     <Icon name="group-add" size={34} color={AppColors.link} />
                     <Text style={styles.activeBC}>Active BCs</Text>
                   </View>
-                  <Text style={styles.activeBC_details}>
+                  {/* <Text style={styles.activeBC_details}>
                     2 starting this month
-                  </Text>
+                  </Text> */}
                 </View>
                 <View style={styles.counter}>
                   <Text style={styles.counter_text}>
@@ -165,7 +165,7 @@ export const AdminDashboard = () => {
               </View>
             </TouchableOpacity>
             {/* -------Total Users------- */}
-            <TouchableOpacity activeOpacity={0.7}>
+            {/* <TouchableOpacity activeOpacity={0.7}>
               <View style={styles.Dashboardcard}>
                 <View>
                   <View style={styles.imgText}>
@@ -180,7 +180,7 @@ export const AdminDashboard = () => {
                   <Text style={styles.counter_text}>{counter.total_users}</Text>
                 </View>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {/* -------Pending Payments------- */}
             <TouchableOpacity activeOpacity={0.7}>
               <View style={styles.Dashboardcard}>
@@ -193,9 +193,9 @@ export const AdminDashboard = () => {
                     />
                     <Text style={styles.activeBC}>Pending Payments</Text>
                   </View>
-                  <Text style={styles.activeBC_details}>
+                  {/* <Text style={styles.activeBC_details}>
                     Awaiting approval{' '}
-                  </Text>
+                  </Text> */}
                 </View>
                 <View style={styles.counter}>
                   <Text style={styles.counter_text}>
@@ -211,12 +211,12 @@ export const AdminDashboard = () => {
               style={styles.createCommittee}
               onPress={() => navigate('CreateCommittee')}
             />
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.CreateUser}
               onPress={() => navigation.navigate('CreateMembers')}
             >
               <Text style={styles.CreateUser_text}>Create User</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </ScrollView>

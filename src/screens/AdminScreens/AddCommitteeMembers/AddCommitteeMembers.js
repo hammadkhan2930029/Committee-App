@@ -23,6 +23,10 @@ import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Dropdown } from 'react-native-element-dropdown';
 import { isDisabled } from 'react-native/types_generated/Libraries/LogBox/Data/LogBoxData';
+import { CustomInput } from '../../../components/customTextInput';
+import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
+
+
 
 export const AddCommitteeMembers = ({ route }) => {
   //-------------------------------------------
@@ -31,18 +35,21 @@ export const AddCommitteeMembers = ({ route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const [membersList, setMembersList] = useState([]);
+  const [membersidList, setMembersidList] = useState([]);
+
+  const [selectNumber, setSelectNumber] = useState();
 
   //--------------dropdown 1-----------------------------------
 
-  const [value1, setValue1] = useState(null);
-  const [items1, setItems1] = useState([]);
-  const [isFocus1, setIsFocus1] = useState(false);
+  // const [value1, setValue1] = useState(null);
+  // const [items1, setItems1] = useState([]);
+  // const [isFocus1, setIsFocus1] = useState(false);
 
   //------------------dropdown 2----------------------
 
-  const [items2, setItems2] = useState([]);
-  const [value2, setValue2] = useState(null);
-  const [isFocus2, setIsFocus2] = useState(false);
+  // const [items2, setItems2] = useState([]);
+  // const [value2, setValue2] = useState(null);
+  // const [isFocus2, setIsFocus2] = useState(false);
   //--------------------------------------------------------
   const [paymentList, setPaymentList] = useState([]);
   const [isverified, setIsVerified] = useState();
@@ -54,21 +61,31 @@ export const AddCommitteeMembers = ({ route }) => {
   const committeeID = multipleData?.msg[0]?.committee_id;
 
   const membersID = multipleData.members.map(item => item);
+  //---------------member list ma user_id null ho ----------------------
 
-  console.log('committee multipleData :', membersID);
-  useEffect(() => {
-    if (multipleData?.members?.length) {
-      //---------------------------------
-      const assignedIds = membersList.map(m => m.committe_member_id);
-      //------------------------------------
-      // .filter(item => !assignedIds.includes(item.committe_member_id))
-      const dropdownItems = multipleData.members.map((item, index) => ({
-        label: `Slot : ${index + 1}`,
-        value: item.committe_member_id,
-      }));
-      setItems1(dropdownItems);
-    }
-  }, [multipleData, membersList]);
+  const findMemberID = membersidList?.find(item => item.user_id === null);
+  const filteredMemberID = findMemberID?.committe_member_id;
+  //---------member list ma koi bhi user id khali nh ho usko check karna hy-----------
+
+  const memberIdAndLenght = membersidList?.every(
+    item => item.user_id !== null && item.user_id !== undefined,
+  )
+    ? 1
+    : 0;
+
+ //---------------------------------------------------------------------
+
+  // useEffect(() => {
+  //   if (multipleData?.members?.length) {
+  //     const assignedIds = membersList.map(m => m.committe_member_id)
+  //     .filter(item => !assignedIds.includes(item.committe_member_id))
+  //     const dropdownItems = multipleData.members.map((item, index) => ({
+  //       label: `${index + 1}`,
+  //       value: item.committe_member_id,
+  //     }));
+  //     setItems1(dropdownItems);
+  //   }
+  // }, [multipleData, membersList]);
   //--------------------members api---------------------------------------
   const membersApi = async () => {
     try {
@@ -76,7 +93,9 @@ export const AddCommitteeMembers = ({ route }) => {
         `/user/view-committee-members/${committeeID}`,
       );
       const data = response?.data?.msg || [];
-      const filtered = data.filter(item => item.user_name);
+      
+      setMembersidList(data);
+      const filtered = data?.filter(item => item.user_name);
       setMembersList(filtered);
     } catch (error) {
       console.log('members api error:', error);
@@ -85,7 +104,7 @@ export const AddCommitteeMembers = ({ route }) => {
   useEffect(() => {
     membersApi();
   }, [committeeID]);
-  console.log('member api :', membersList);
+  
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -102,106 +121,67 @@ export const AddCommitteeMembers = ({ route }) => {
 
   //-----------------user list------------------------
 
-  const userViewUsers = async () => {
-    if (!userdata?.user_id) return;
+  // const userViewUsers = async () => {
+  //   if (!userdata?.user_id) return;
 
-    try {
-      const response = await api.get(`/user/view-users/${userdata.user_id}`);
-      if (Array.isArray(response.data.msg)) {
-        const dropdownItems = response.data.msg.map(user => ({
-          label: user.name,
-          value: user.user_id,
-        }));
-        setItems2(dropdownItems);
-      } else {
-        setUserList([]);
-        setItems2([]);
-      }
-    } catch (error) {
-      console.log('error :', error);
-    }
-  };
+  //   try {
+  //     const response = await api.get(`/user/view-users/${userdata.user_id}`);
+  //     if (Array.isArray(response.data.msg)) {
+  //       const dropdownItems = response.data.msg.map(user => ({
+  //         label: user.name,
+  //         value: user.user_id,
+  //       }));
+  //       setItems2(dropdownItems);
+  //     } else {
+  //       setUserList([]);
+  //       setItems2([]);
+  //     }
+  //   } catch (error) {
+  //     console.log('error :', error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (userdata?.user_id) {
-      userViewUsers();
-    }
-  }, [userdata]);
+  // useEffect(() => {
+  //   if (userdata?.user_id) {
+  //     userViewUsers();
+  //   }
+  // }, [userdata]);
 
   //-------------------add members api---------------------------
 
-  const addCommitteeMember = async () => {
+  const addMember = async () => {
     try {
       var formData = new FormData();
-      formData.append('committee_member_id[]', value1);
-      formData.append('user_id[]', value2);
+      formData.append('committee_id', committeeID);
+      formData.append('committee_member_id', filteredMemberID);
+      formData.append('mobile_number', selectNumber);
 
-      const res = await api.post('/user/update/committee-members', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const response = res?.data;
-      // console.log('res :', res);
-      // console.log('response :', response);
-      if (response.code === '200' && response.msg[0].response) {
+      const response = await api.post(
+        `/user/update/committee-members`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
+      const result = response.data.msg[0].response;
+      
+
+      if (response.data.code === '200' && result) {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: response.msg[0].response,
+          text2: result,
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
-          },
-        });
-        membersApi();
-      } else {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Warning',
-          text2: 'something error',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'orange',
           },
         });
       }
-    } catch (error) {
-      console.log(error);
-      Toast.show({
-        type: 'customToast',
-        text1: 'Error',
-        text2: 'Server error, please try again',
-        props: {
-          bgColor: AppColors.background,
-          borderColor: '#ff5252',
-        },
-      });
-    }
-  };
-  console.log('value 1 :', value1);
-  console.log('value 2 :', value2);
-
-  //-------------------------delete member api---------------------------
-  const deleteCommitteeMember = async committeeMemberID => {
-    try {
-      const response = await api.delete(
-        `/user/delete-committee-member/${committeeMemberID}`,
-      );
-      const result = response?.data;
-      if (result.code === '200' && result.msg[0].response) {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Success',
-          text2: result.msg[0].response,
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'green',
-          },
-        });
-      } else {
+      if (response.data.code === '201' && result) {
         Toast.show({
           type: 'customToast',
           text1: 'Warning',
-          text2: 'something error',
+          text2: result,
           props: {
             bgColor: AppColors.background,
             borderColor: 'orange',
@@ -209,9 +189,93 @@ export const AddCommitteeMembers = ({ route }) => {
         });
       }
       membersApi();
-      setValue1(null);
-      setValue2(null);
-      console.log('delete Committee Member :', response);
+      setSelectNumber();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // const addCommitteeMember = async () => {
+  //   try {
+  //     var formData = new FormData();
+  //     formData.append('committee_member_id[]', value1);
+  //     formData.append('user_id[]', value2);
+
+  //     const res = await api.post('/user/update/committee-members', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
+  //     const response = res?.data;
+
+  //     if (response.code === '200' && response.msg[0].response) {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Success',
+  //         text2: response.msg[0].response,
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'green',
+  //         },
+  //       });
+  //       membersApi();
+  //     } else {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Warning',
+  //         text2: 'something error',
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'orange',
+  //         },
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     Toast.show({
+  //       type: 'customToast',
+  //       text1: 'Error',
+  //       text2: 'Server error, please try again',
+  //       props: {
+  //         bgColor: AppColors.background,
+  //         borderColor: '#ff5252',
+  //       },
+  //     });
+  //   }
+  // };
+  // console.log('value 1 :', value1);
+  // console.log('value 2 :', value2);
+
+  //-------------------------delete member api---------------------------
+
+  const deleteCommitteeMember = async committeeMemberID => {
+    try {
+      const response = await api.delete(
+        `/user/delete-committee-member/${committeeMemberID}`,
+      );
+      const result = response?.data?.msg[0].response;
+      
+      if (response.data.code === '200' && result) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Success',
+          text2: result,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'green',
+          },
+        });
+      }
+      if (response.data.code === '201' && result) {
+        Toast.show({
+          type: 'customToast',
+          text1: 'Warning',
+          text2: result,
+          props: {
+            bgColor: AppColors.background,
+            borderColor: 'orange',
+          },
+        });
+      }
+      membersApi();
     } catch (error) {
       console.log(error);
       Toast.show({
@@ -227,29 +291,29 @@ export const AddCommitteeMembers = ({ route }) => {
   };
   //----------------------------------------------------------------
 
-  const renderLabel1 = () => {
-    if (value1 || isFocus1) {
-      return (
-        <Text style={[styles.label, isFocus1 && { color: AppColors.primary }]}>
-          Select Committee no
-        </Text>
-      );
-    }
-    return null;
-  };
+  // const renderLabel1 = () => {
+  //   if (value1 || isFocus1) {
+  //     return (
+  //       <Text style={[styles.label, isFocus1 && { color: AppColors.primary }]}>
+  //         Select Committee no
+  //       </Text>
+  //     );
+  //   }
+  //   return null;
+  // };
   //----------------------------------------------------------------
 
-  const renderLabel2 = () => {
-    if (value2 || isFocus2) {
-      return (
-        <Text style={[styles.label, isFocus2 && { color: AppColors.primary }]}>
-          Select Member
-        </Text>
-      );
-    }
-    return null;
-  };
-  const isDataEmpty = !items2 || items2.length === 0;
+  // const renderLabel2 = () => {
+  //   if (value2 || isFocus2) {
+  //     return (
+  //       <Text style={[styles.label, isFocus2 && { color: AppColors.primary }]}>
+  //         Select Member
+  //       </Text>
+  //     );
+  //   }
+  //   return null;
+  // };
+  // const isDataEmpty = !items2 || items2.length === 0;
 
   //------------------------------------------------------------
   const committee_id_filter = membersID[0].committee_id;
@@ -274,7 +338,6 @@ export const AddCommitteeMembers = ({ route }) => {
       }));
       setIsVerified(isVerified);
 
-      console.log('Is Verified:', isVerified);
       setPaymentList(paymentsWithVerification);
     } catch (error) {
       console.log(error);
@@ -288,9 +351,30 @@ export const AddCommitteeMembers = ({ route }) => {
       }
     }, [userdata]),
   );
-  console.log('Is Verified 2:', isverified);
+  //------------------------------------------------------------
 
-  // console.log('paymentList :', paymentList);
+  const len = membersidList.length;
+  const emptyValue = membersidList.filter(item => item.user_id === null).length;
+
+  console.log(`member id list : ${len - emptyValue}`);
+  //------------------------------------------------------------
+  const [error, setError] = useState('');
+
+ 
+  const pakistanMobileRegex =
+    /^(?:0?3[0-9]{2}-?[0-9]{7}|\+92-?3[0-9]{2}-?[0-9]{7})$/;
+
+  const handleChange = text => {
+    setSelectNumber(text);
+
+    if (text.length === 0) {
+      setError('');
+    } else if (!pakistanMobileRegex.test(text)) {
+      setError('Invalid mobile number');
+    } else {
+      setError('');
+    }
+  };
   //------------------------------------------------------------
 
   return (
@@ -327,8 +411,28 @@ export const AddCommitteeMembers = ({ route }) => {
           </ImageBackground>
         </View>
         {/* ------------------------------------------------------------------ */}
+
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>
+            {len - emptyValue}
+            <Text style={styles.badgeMuted}> / {len} Members</Text>
+          </Text>
+        </View>
+
         <View style={styles.dropdownMain}>
-          <View style={styles.DropDowncontainer}>
+          <View>
+            <CustomInputWithIcon
+              label="Phone Number"
+              placeholder="Enter Phone number"
+              type="numeric"
+              // value={selectNumber}
+              // onChangeText={number => setSelectNumber(number)}
+              value={selectNumber}
+              onChangeText={handleChange}
+            />
+             {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+          </View>
+          {/* <View style={styles.DropDowncontainer}>
             {renderLabel1()}
             <Dropdown
               style={[
@@ -360,10 +464,10 @@ export const AddCommitteeMembers = ({ route }) => {
                 />
               )}
             />
-          </View>
+          </View> */}
 
           {/* ------------------------------------------------------------------ */}
-          <View style={styles.DropDowncontainer}>
+          {/* <View style={styles.DropDowncontainer}>
             {renderLabel2()}
             <Dropdown
               disable={isDataEmpty}
@@ -398,7 +502,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 />
               )}
             />
-          </View>
+          </View> */}
         </View>
         {/* ---------------------------------------------------------------- */}
 
@@ -406,7 +510,8 @@ export const AddCommitteeMembers = ({ route }) => {
           <View style={styles.btnView}>
             <CustomButton
               title="Add Member"
-              onPress={() => addCommitteeMember()}
+              disabled={memberIdAndLenght === 1}
+              onPress={addMember}
             />
           </View>
         </View>
@@ -645,5 +750,29 @@ const styles = ScaledSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+  },
+  //-----------------------------
+  badge: {
+    backgroundColor: AppColors.primary,
+    borderRadius: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    alignSelf: 'flex-end',
+    elevation: 3,
+    margin: 5,
+  },
+  badgeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: AppColors.title,
+  },
+  badgeMuted: {
+    color: AppColors.title,
+    fontSize: 14,
+  },
+   error: {
+    color: "red",
+    marginTop: 5,
+    fontSize: 14,
   },
 });

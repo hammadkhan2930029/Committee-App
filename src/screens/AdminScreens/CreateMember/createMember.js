@@ -75,11 +75,12 @@ export const CreateMembers = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       const msg = response?.data?.msg?.[0];
+      console.log('msg :',msg)
       if (response.status === 200 && typeof msg === 'object' && msg.status) {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: msg.status,
+          text2: msg,
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',

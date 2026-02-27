@@ -98,7 +98,7 @@ export const UserCommitteeDetails = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Icon
+                    <Icon
                       name="arrow-circle-left"
                       size={28}
                       color={AppColors.title}
@@ -176,7 +176,7 @@ export const UserCommitteeDetails = ({ route }) => {
                     <Text style={styles.value}>
                       {data?.committee_member_name
                         ? data?.committee_member_name
-                        : 'null'}
+                        : 'User Not Assigned'}
                     </Text>
                   </View>
                   <View style={styles.paymentCardRow}>
@@ -185,7 +185,8 @@ export const UserCommitteeDetails = ({ route }) => {
                   </View>
 
                   <View style={styles.paymentBTN}>
-                    {month === data.round_month ? (
+                    {month === data.round_month &&
+                    data.status.toLowerCase() !== 'paid' ? (
                       <CustomButton
                         title="Payment Now"
                         onPress={() =>
@@ -220,6 +221,7 @@ export const UserCommitteeDetails = ({ route }) => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
+     backgroundColor: AppColors.background,
   },
 
   arrowBack: {

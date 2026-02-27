@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -41,31 +42,40 @@ export const AdminProfile = () => {
   );
   console.log('user data :', userdata);
   //-----------------logout--------------------------
+  // const logout = async () => {
+  //   setIsLoading(true);
+  //   await AsyncStorage.removeItem('user');
+  //   await AsyncStorage.removeItem('token');
+  //   navigation.replace('Login');
+
+  // };
   const logout = async () => {
     setIsLoading(true);
+
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
-    navigation.replace('Login');
 
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      }),
+    );
+
+    setIsLoading(false);
   };
+  //-------------------------------------
 
   if (userdata) {
     return (
       <View style={styles.container}>
         <StatusBar
-          backgroundColor={AppColors.background}
-          barStyle="dark-content"
+          backgroundColor={AppColors.primary}
+          barStyle="light-content"
         />
         <View style={styles.arrowBackView}>
-          <TouchableOpacity
-
-            onPress={() => navigation.goBack()}
-          >
-            <Icon
-              name="arrow-circle-left"
-              size={28}
-              color={AppColors.link}
-            />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-circle-left" size={28} color={AppColors.link} />
           </TouchableOpacity>
           <TouchableOpacity>
             <Icon name="settings" size={26} color={AppColors.link} />
@@ -128,10 +138,10 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  profileView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // profileView: {
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
   profile: {
     fontSize: moderateScale(24),
     color: AppColors.primary,
@@ -141,18 +151,15 @@ const styles = ScaledSheet.create({
   profileView: {
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   profileImage: {
-
     width: screenWidth * 0.45,
     height: screenWidth * 0.45,
     resizeMode: 'contain',
-    borderColor: '#fff',
+    borderColor: AppColors.background,
     borderWidth: 8,
     borderRadius: (screenWidth * 0.45) / 2,
     elevation: 3,
-
   },
   nameView: {
     justifyContent: 'center',
@@ -163,6 +170,7 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
     fontSize: moderateScale(20),
     color: AppColors.bodyText,
+    padding:5
   },
   admin: {
     textAlign: 'center',

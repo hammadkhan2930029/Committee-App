@@ -26,7 +26,15 @@ import { Loader } from '../../Loader/loader';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import * as Yup from 'yup';
 
+const validationSchema = Yup.object().shape({
+  due_on: Yup.number()
+    .typeError('Only numbers allowed')
+    .required('Due date is required')
+    .min(1, 'Minimum value is 1')
+    .max(31, 'Maximum value is 31'),
+});
 export const CreateCommittee = () => {
   const navigation = useNavigation();
   //------------------------------------
@@ -154,8 +162,6 @@ export const CreateCommittee = () => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-
-
                     <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -313,25 +319,27 @@ export const CreateCommittee = () => {
                   <View>
                     <CustomInputWithIcon
                       label="Due on"
-                      type="date"
-                      placeholder="Pick due date"
-                      value={dateDue ? dayjs(dateDue).format('DD-MM-YYYY') : ''}
-                      rightIcon={
-                        <Icon name="calendar-today" size={22} color="#666" />
-                      }
-                      onRightIconPress={() => setShowDue(true)}
-                    />
+                      type="numeric"
+                      maxLength={2}
+                      placeholder="Enter due date"
+                      value={values.due_on}
+                      onChangeText={text => {
+                        const numericValue = text.replace(/[^0-9]/g, '');
 
-                    {showDue && (
-                      <DateTimePicker
-                        value={dateDue || new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={(event, selectedDate) =>
-                          onChangeDue(event, selectedDate, setFieldValue)
+                        if (numericValue === '') {
+                          setFieldValue('due_on', '');
+                          return;
                         }
-                      />
-                    )}
+
+                        const number = parseInt(numericValue, 10);
+
+                        if (number >= 1 && number <= 31) {
+                          setFieldValue('due_on', numericValue);
+                        }
+                      }}
+                      onblur={handleBlur('due_on')}
+                      error={touched.due_on && errors.due_on}
+                    />
                   </View>
 
                   <View style={{ padding: 20 }}>

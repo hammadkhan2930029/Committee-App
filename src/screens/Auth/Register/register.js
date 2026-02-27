@@ -23,6 +23,7 @@ import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 //-----------------------------------------
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
@@ -48,7 +49,6 @@ const registerSchema = Yup.object().shape({
     .required('Confirm password is required'),
 });
 
-
 //-----------------------------------------
 
 export const Register = () => {
@@ -73,12 +73,13 @@ export const Register = () => {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: res?.data?.msg[0]?.response || 'Login successful',
+          text2: res?.data?.msg[0]?.response || 'Successfully Registered',
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
           },
         });
+        navigation.goBack();
       } else {
         Toast.show({
           type: 'customToast',
@@ -132,12 +133,13 @@ export const Register = () => {
               >
                 <View style={styles.backgroundInnerView}>
                   <TouchableOpacity
-                    style={styles.arrowBTNView}
-                    onPress={() => navigation.navigate('Login')}
+                    onPress={() => navigation.goBack()}
+                    style={styles.backbtn}
                   >
-                    <Image
-                      source={AppIcons.arrowBack}
-                      style={styles.backIcon}
+                    <Icon
+                      name="arrow-circle-left"
+                      size={28}
+                      color={AppColors.title}
                     />
                   </TouchableOpacity>
                   <View style={styles.headingsAlign}>
@@ -254,7 +256,7 @@ export const Register = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
-    backgroundColor:AppColors.background
+    backgroundColor: AppColors.background,
   },
   RectangleImg: {
     width: '100%',
@@ -267,6 +269,9 @@ const styles = ScaledSheet.create({
   },
   backgroundInnerView: {
     height: '150@vs',
+  },
+  backbtn: {
+    marginLeft: 15,
   },
   headingsAlign: {
     justifyContent: 'center',

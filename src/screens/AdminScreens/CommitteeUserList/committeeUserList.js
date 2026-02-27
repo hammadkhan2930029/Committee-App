@@ -171,7 +171,7 @@ export const CommitteeUserList = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity >
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon
                       name="arrow-circle-left"
                       size={28}

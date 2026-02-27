@@ -22,6 +22,8 @@ import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 import { Loader } from '../../Loader/loader';
 import * as Yup from 'yup';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 //-----------------------------------------------------
 
 const resetPasswordSchema = Yup.object().shape({
@@ -69,7 +71,7 @@ export const ResetPassword = () => {
             borderColor: 'green',
           },
         });
-        navigation.goBack()
+        navigation.goBack();
       } else {
         Toast.show({
           type: 'customToast',
@@ -110,10 +112,11 @@ export const ResetPassword = () => {
       <ScrollView>
         <View style={styles.main}>
           <View style={styles.arrowBackView}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Image
-                source={AppIcons.arrowBackColor}
-                style={styles.arrowBack}
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon
+                name="arrow-circle-left"
+                size={28}
+                color={AppColors.primary}
               />
             </TouchableOpacity>
           </View>

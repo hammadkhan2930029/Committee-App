@@ -25,17 +25,20 @@ import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 import { string } from 'yup';
+import * as Yup from 'yup';
 
-
-
+const validationSchema = Yup.object().shape({
+  due_on: Yup.number()
+    .typeError('Only numbers allowed')
+    .required('Due date is required')
+    .min(1, 'Minimum value is 1')
+    .max(31, 'Maximum value is 31'),
+});
 export const EditCommittee = ({ route }) => {
-
-
   const { details, start, due } = route.params;
   console.log('edit :', details);
   console.log('start :', start);
   console.log('due :', due);
-
 
   const navigation = useNavigation();
   //------------------------------------
@@ -85,15 +88,14 @@ export const EditCommittee = ({ route }) => {
     Active: 1,
     Inactive: 2,
     Pending: 0,
-  }
+  };
   //--------------------------------------------------------
-  console.log("committe ID :", details.committee_id)
+  console.log('committe ID :', details.committee_id);
   //---------------------------------------------------------
   const editCommittee = async value => {
-    console.log('status :', value)
+    console.log('status :', value);
     try {
       var formData = new FormData();
-      
 
       //=====================================================================
 
@@ -129,23 +131,26 @@ export const EditCommittee = ({ route }) => {
       formData.append('due_on', value.due_on || due);
 
       formData.append('status', value.status);
-      console.log('Form data :', formData)
+      console.log('Form data :', formData);
 
-      const response = await api.post(`/user/edit-committee/${details.committee_id}`, formData,
+      const response = await api.post(
+        `/user/edit-committee/${details.committee_id}`,
+        formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
       const data = response?.data?.msg[0];
-      console.log("Data :", response)
+      console.log('Data :', response);
 
       if (data.response) {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: typeof data.response === 'string'
-            ? data.response
-            : "Committee updated successfully!",
+          text2:
+            typeof data.response === 'string'
+              ? data.response
+              : 'Committee updated successfully!',
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
@@ -165,7 +170,6 @@ export const EditCommittee = ({ route }) => {
       }
       console.log('edit committee response : ', response?.data?.msg[0]);
     } catch (error) {
-
       console.log('API ERROR MESSAGE:', error);
       Toast.show({
         type: 'customToast',
@@ -193,8 +197,6 @@ export const EditCommittee = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-
-
                     <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -338,11 +340,7 @@ export const EditCommittee = ({ route }) => {
                       label="Select Date"
                       type="date"
                       placeholder={start}
-                      value={
-                        date
-                          ? dayjs(date).format('DD-MM-YYYY')
-                          : start
-                      }
+                      value={date ? dayjs(date).format('DD-MM-YYYY') : start}
                       rightIcon={
                         <Icon name="calendar-today" size={22} color="#666" />
                       }
@@ -357,37 +355,35 @@ export const EditCommittee = ({ route }) => {
                         onChange={(event, selectedDate) =>
                           onChange(event, selectedDate, setFieldValue)
                         }
-
                       />
                     )}
                   </View>
                   {/* ---------------------------------------------------------- */}
                   <View>
+                  
                     <CustomInputWithIcon
                       label="Due on"
-                      type="date"
+                      type="numeric"
+                      maxLength={2}
                       placeholder={due}
-                      value={
-                        dateDue
-                          ? dayjs(dateDue).format('DD-MM-YYYY')
-                          : due
-                      }
-                      rightIcon={
-                        <Icon name="calendar-today" size={22} color="#666" />
-                      }
-                      onRightIconPress={() => setShowDue(true)}
-                    />
+                      value={values.due_on}
+                      onChangeText={text => {
+                        const numericValue = text.replace(/[^0-9]/g, '');
 
-                    {showDue && (
-                      <DateTimePicker
-                        value={dateDue || new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={(event, selectedDate) =>
-                          onChangeDue(event, selectedDate, setFieldValue)
+                        if (numericValue === '') {
+                          setFieldValue('due_on', '');
+                          return;
                         }
-                      />
-                    )}
+
+                        const number = parseInt(numericValue, 10);
+
+                        if (number >= 1 && number <= 31) {
+                          setFieldValue('due_on', numericValue);
+                        }
+                      }}
+                      onblur={handleBlur('due_on')}
+                      error={touched.due_on && errors.due_on}
+                    />
                   </View>
 
                   <View>
@@ -398,11 +394,10 @@ export const EditCommittee = ({ route }) => {
                       setOpen={setOpen}
                       value={values.status}
                       // setValue={val => setFieldValue('status', val)}
-                      setValue={(callback) => {
+                      setValue={callback => {
                         const selectedValue = callback(values.status);
                         setFieldValue('status', selectedValue);
                       }}
-
                       setItems={setItems}
                       placeholder="Select Status"
                       style={styles.dropDown}

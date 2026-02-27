@@ -18,12 +18,23 @@ import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
+import { Loader } from '../../Loader/loader';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSequence,
+  withRepeat,
+} from 'react-native-reanimated';
 
 export const MembersDashboard = () => {
   const navigation = useNavigation();
   const [userdata, setUserdata] = useState();
   const [notifyList, setNotifyList] = useState([]);
   const [committeeList, setCommitteeList] = useState([]);
+  const [upComingList, setUpcomingList] = useState([]);
+
+  const [loading, setLoading] = useState(true);
 
   //-----------get user aysnc Storage------------------
   useFocusEffect(
@@ -39,7 +50,7 @@ export const MembersDashboard = () => {
     }, []),
   );
   const userID = userdata?.user_id;
-  console.log(userID);
+
   //--------------------------------------------------------
   const notificationsApi = async () => {
     try {
@@ -55,18 +66,18 @@ export const MembersDashboard = () => {
       console.log(error);
     }
   };
-  useEffect(() => {
-    if (userdata?.user_id) {
+  useFocusEffect(
+    useCallback(() => {
       notificationsApi();
-    }
-  }, [userdata]);
-  console.log('notify list :', notifyList?.length);
+    }, [userdata]),
+  );
+
   //-----------------myCommitteeList---------------------------
   const myCommitteeList = async () => {
     try {
       const response = await api.get(`/user/my-committees/${userID}`);
       const result = response?.data?.msg;
-      console.log('my committee list :', result);
+
       setCommitteeList(result);
       if (result) {
         setLoading(false);
@@ -75,13 +86,141 @@ export const MembersDashboard = () => {
       console.log('try catch error :', error);
     }
   };
+
+  //--------------------------------------------------------
+  const UserPaymentHistory = async () => {
+    try {
+      const response = await api.get(
+        `/user/view-committee-payments/list/${userID}`,
+      );
+      const result = response?.data?.msg;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     if (userID) {
       myCommitteeList();
+      UserPaymentHistory();
     }
   }, [userID]);
-  console.log('committeeList :', committeeList.length);
-  //--------------------------------------------------------
+
+  //-------------------------------------------------------
+  const upComingPaymentsFun = async () => {
+    try {
+      const response = await api.get(
+        `/user/upcoming-committee-payments/${userID}`,
+      );
+      const result = response?.data?.msg[0];
+      console.log('upcoming  :', result);
+      if (result) {
+        setUpcomingList(result);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (userID) {
+      upComingPaymentsFun();
+    }
+  }, [userID]);
+
+  console.log('upComingList :', upComingList);
+  //------------------------------------------------------
+  const formatNumber = value => {
+    if (value === null || value === undefined) return '';
+
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+  //------------------Animation by notification icon------------------------------------
+
+  const ring = useSharedValue(0);
+
+  const triggerBellRing = () => {
+    ring.value = withSequence(
+      withTiming(-15, { duration: 80 }),
+      withTiming(15, { duration: 80 }),
+      withTiming(-10, { duration: 80 }),
+      withTiming(10, { duration: 80 }),
+      withTiming(-5, { duration: 80 }),
+      withTiming(5, { duration: 80 }),
+      withTiming(0, { duration: 80 }),
+
+      // Repeat sequence 3 times
+      withTiming(-15, { duration: 80 }),
+      withTiming(15, { duration: 80 }),
+      withTiming(-10, { duration: 80 }),
+      withTiming(10, { duration: 80 }),
+      withTiming(-5, { duration: 80 }),
+      withTiming(5, { duration: 80 }),
+      withTiming(0, { duration: 80 }),
+
+      withTiming(-15, { duration: 80 }),
+      withTiming(15, { duration: 80 }),
+      withTiming(-10, { duration: 80 }),
+      withTiming(10, { duration: 80 }),
+      withTiming(-5, { duration: 80 }),
+      withTiming(5, { duration: 80 }),
+      withTiming(0, { duration: 80 }),
+    );
+  };
+  const ringStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${ring.value}deg` }],
+    };
+  });
+
+  useEffect(() => {
+    if (notifyList.length > 0) {
+      triggerBellRing(); 
+    }
+  }, [notifyList]);
+  //------------------------animation by notification waving hand---------------------------------
+  const wave = useSharedValue(0);
+
+  const triggerHandWave = () => {
+    wave.value = withSequence(
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+
+      // 2nd wave
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+
+      // 3rd wave
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+    );
+  };
+  const waveStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${wave.value}deg` }],
+    };
+  });
+  useEffect(() => {
+    triggerHandWave(); 
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -109,7 +248,9 @@ export const MembersDashboard = () => {
                 <View style={styles.textView}>
                   <Text style={styles.h2}>
                     Hello, {userdata?.full_name || 'Member'}{' '}
-                    <Icon name="waving-hand" size={30} color="#FED22D" />
+                    <Animated.View style={[waveStyle, { marginLeft: 5 }]}>
+                      <Icon name="waving-hand" size={30} color="#FED22D" />
+                    </Animated.View>
                   </Text>
                   <Text style={styles.h4}>Here’s your BC overview.</Text>
                 </View>
@@ -117,13 +258,13 @@ export const MembersDashboard = () => {
                   style={styles.notificationsView}
                   onPress={() => navigation.navigate('Notifications')}
                 >
-                  <View>
+                  <Animated.View style={ringStyle}>
                     <Icon
                       name="notifications-active"
                       size={30}
                       color="#FED22D"
                     />
-                  </View>
+                  </Animated.View>
                   <Text style={styles.counterText}>
                     {notifyList.length > 0 ? notifyList.length : '0'}
                   </Text>
@@ -148,14 +289,22 @@ export const MembersDashboard = () => {
               </View>
             </View>
             <View style={styles.view2}>
-              <Text style={styles.activeBC_details}>{committeeList.length} BCs you’ve joined</Text>
+              <Text style={styles.activeBC_details}>
+                {committeeList?.length || 0} BCs you’ve joined
+              </Text>
               <View style={styles.counter}>
-                <Text style={styles.counter_text}>{committeeList.length}</Text>
+                <Text style={styles.counter_text}>
+                  {committeeList?.length || 0}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
           {/* -------Upcoming payments------- */}
-          <TouchableOpacity activeOpacity={0.7} style={styles.Dashboardcard}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.Dashboardcard}
+            onPress={() => navigation.navigate('UpComingPayments')}
+          >
             <View>
               <View style={styles.imgText}>
                 <Icon name="calendar-today" size={34} color={AppColors.link} />
@@ -163,12 +312,20 @@ export const MembersDashboard = () => {
               </View>
             </View>
             <View style={styles.view2}>
-              <Text style={styles.activeBC_details}>Due on 15 Feb 2025 </Text>
-              <Text style={styles.counter_text2}>PKR 5,000</Text>
+              <Text style={styles.activeBC_details}>
+                {`Due on ${upComingList?.due_date || ''}`}{' '}
+              </Text>
+              <Text style={styles.counter_text2}>{`PKR ${formatNumber(
+                upComingList?.committee_amount || '',
+              )}`}</Text>
             </View>
           </TouchableOpacity>
           {/* -------Pending Payments------- */}
-          <TouchableOpacity activeOpacity={0.7} style={styles.Dashboardcard}>
+          {/* <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.Dashboardcard}
+            onPress={() => navigation.navigate('PaymentHistory')}
+          >
             <View>
               <View style={styles.imgText}>
                 <Icon name="cloud-upload" size={34} color={AppColors.link} />
@@ -182,9 +339,10 @@ export const MembersDashboard = () => {
                 <Text style={styles.btn}>Pending</Text>
               </View>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
+      <Loader visible={loading} />
     </View>
   );
 };

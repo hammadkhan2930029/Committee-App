@@ -23,20 +23,17 @@ import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import { getStoredUser } from '../../../Utils/getUser';
 dayjs.extend(customParseFormat);
 
-
-
-
 export const CommitteeDetails = ({ route }) => {
-
   //-----------------------------------------------------------------------
 
   const { id } = route.params;
   console.log('ID :', id);
 
-    //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
 
   const [userdata, setUserData] = useState([]);
 
@@ -51,16 +48,15 @@ export const CommitteeDetails = ({ route }) => {
       loadUser();
     }, []),
   );
-   //-----------------------------------------------------------------------
-
+  //-----------------------------------------------------------------------
 
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [roundList, setRoundList] = useState([]);
   const [multipleData, setMultipleData] = useState([]);
   const [paymentList, setPaymentList] = useState([]);
-  const [isverified, setIsVerified] = useState();
+  const [isverified, setIsVerified] = useState(false);
 
   //-----------------------------------------------------------------------
 
@@ -69,7 +65,7 @@ export const CommitteeDetails = ({ route }) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-    //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
 
   const committeeDetails = async () => {
     try {
@@ -149,17 +145,16 @@ export const CommitteeDetails = ({ route }) => {
     }, [details.committee_id]),
   );
 
-    //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
 
   const hasAnyPaid = roundList.some(
     item => item.status?.toLowerCase() === 'paid',
   );
-   //-----------------------------------------------------------------------
-
+  //-----------------------------------------------------------------------
 
   const getFormattedDate = dateStr => {
     if (!dateStr) return '';
- 
+
     const parsed = dayjs(
       dateStr,
       ['D MMM YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY'],
@@ -205,9 +200,43 @@ export const CommitteeDetails = ({ route }) => {
       if (userdata?.user_id) {
         AdminpaymentList();
       }
-    }, [userdata]),
+    }, [userdata, details]),
   );
+  console.log('user data :', userdata);
+  console.log('Is verified :', isverified);
 
+  //-----------------------------------------------------------
+  const CommitteeDetailsSkeleton = () => {
+    return (
+      <SkeletonPlaceholder borderRadius={8}>
+        {/* Card */}
+        <View style={styles.Skeletoncard}>
+          {Array.from({ length: 9 }).map((_, index) => (
+            <View key={index} style={styles.Skeletonrow}>
+              <View style={styles.Skeletonleft} />
+              <View style={styles.Skeletonright} />
+            </View>
+          ))}
+        </View>
+
+        {/* Buttons */}
+        <View style={styles.Skeletonbuttons}>
+          <View style={styles.Skeletonbtn} />
+          <View style={styles.Skeletonbtn} />
+          <View style={styles.Skeletonbtn} />
+          <View style={styles.Skeletonbtn} />
+        </View>
+      </SkeletonPlaceholder>
+    );
+  };
+  //-----------------------------------------------------------
+  useEffect(() => {
+    if (!details?.committee_id) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, [details]);
 
   return (
     <View style={styles.container}>
@@ -241,101 +270,110 @@ export const CommitteeDetails = ({ route }) => {
             </View>
           </ImageBackground>
         </View>
+        {loading ? (
+          <CommitteeDetailsSkeleton />
+        ) : (
+          <View>
+            <View style={styles.BCDetails}>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Total Members</Text>
+                <Text style={styles.text2}>{details.total_member}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Total Rounds</Text>
+                <Text style={styles.text2}>{details.total_rounds}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Round(s) Per Month</Text>
+                <Text style={styles.text2}>{details.rounds_per_month}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>No. of Months</Text>
+                <Text style={styles.text2}>{details.no_of_month}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Amount Per Member</Text>
+                <Text style={styles.text2}>
+                  PKR {formatNumber(details.amount_per_member)}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Total Amount</Text>
+                <Text style={styles.text2}>
+                  PKR {formatNumber(details.total)}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Start Date</Text>
+                <Text style={styles.text2}>{startDate}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Start Month</Text>
+                <Text style={styles.text2}>{details.start_month}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.text1}>Due On</Text>
+                <Text style={styles.text2}>{dueOn}</Text>
+              </View>
+            </View>
 
-        <View style={styles.BCDetails}>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Total Members</Text>
-            <Text style={styles.text2}>{details.total_member}</Text>
+            <View style={styles.buttons}>
+              <View style={styles.btnView}>
+                <TouchableOpacity
+                  style={styles.deleteBTN}
+                  onPress={() =>
+                    navigate('EditCommittee', {
+                      details: details,
+                      start: startDate,
+                      due: dueOn,
+                    })
+                  }
+                >
+                  <Text style={styles.text}>Edit</Text>
+                  <Icon name="edit" size={18} color={AppColors.title} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.btnView}>
+                <TouchableOpacity
+                  disabled={hasAnyPaid || isverified}
+                  style={[
+                    styles.deleteBTN,
+                    {
+                      backgroundColor:
+                        hasAnyPaid || isverified
+                          ? AppColors.placeholder
+                          : AppColors.primary,
+                    },
+                  ]}
+                  onPress={() => deleteCommittee()}
+                >
+                  <Text style={styles.text}>Delete</Text>
+                  <Icon name="delete" size={18} color={AppColors.title} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.btnView}>
+                <CustomButtonLight
+                  title="Add Members"
+                  onPress={() =>
+                    navigate('AddCommitteeMembers', {
+                      multipleData: multipleData,
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.btnView}>
+                <CustomButtonLight
+                  title="Assign Rounds"
+                  onPress={() =>
+                    navigate('AssignRounds', { multipleData: multipleData })
+                  }
+                />
+              </View>
+            </View>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Total Rounds</Text>
-            <Text style={styles.text2}>{details.total_rounds}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Round(s) Per Month</Text>
-            <Text style={styles.text2}>{details.rounds_per_month}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>No. of Months</Text>
-            <Text style={styles.text2}>{details.no_of_month}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Amount Per Member</Text>
-            <Text style={styles.text2}>
-              PKR {formatNumber(details.amount_per_member)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Total Amount</Text>
-            <Text style={styles.text2}>PKR {formatNumber(details.total)}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Start Date</Text>
-            <Text style={styles.text2}>{startDate}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Start Month</Text>
-            <Text style={styles.text2}>{details.start_month}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text1}>Due On</Text>
-            <Text style={styles.text2}>{dueOn}</Text>
-          </View>
-        </View>
-
-        <View></View>
-        <View style={styles.buttons}>
-          <View style={styles.btnView}>
-            <TouchableOpacity
-              style={styles.deleteBTN}
-              onPress={() =>
-                navigate('EditCommittee', {
-                  details: details,
-                  start: startDate,
-                  due: dueOn,
-                })
-              }
-            >
-              <Text style={styles.text}>Edit</Text>
-              <Icon name="edit" size={18} color={AppColors.title} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.btnView}>
-            <TouchableOpacity
-              disabled={hasAnyPaid || isverified}
-              style={[
-                styles.deleteBTN,
-                {
-                  backgroundColor: hasAnyPaid || isverified
-                    ? AppColors.placeholder
-                    : AppColors.primary,
-                },
-              ]}
-              onPress={() => deleteCommittee()}
-            >
-              <Text style={styles.text}>Delete</Text>
-              <Icon name="delete" size={18} color={AppColors.title} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.btnView}>
-            <CustomButtonLight
-              title="Add Members"
-              onPress={() =>
-                navigate('AddCommitteeMembers', { multipleData: multipleData })
-              }
-            />
-          </View>
-          <View style={styles.btnView}>
-            <CustomButtonLight
-              title="Assign Rounds"
-              onPress={() =>
-                navigate('AssignRounds', { multipleData: multipleData })
-              }
-            />
-          </View>
-        </View>
+        )}
       </ScrollView>
-      <Loader visible={loading} />
+      {/* <Loader visible={loading} /> */}
     </View>
   );
 };
@@ -472,4 +510,54 @@ const styles = ScaledSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  //------skeletone---------------------------
+  Skeletonheader: {
+    height: 180,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  SkeletonbackIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+  },
+  Skeletontitle: {
+    width: 180,
+    height: 25,
+    marginLeft: 15,
+  },
+  Skeletoncard: {
+    marginTop: 50,
+    width: '95%',
+    alignSelf: 'center',
+    padding: 20,
+  },
+  Skeletonrow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  Skeletonleft: {
+    width: '45%',
+    height: 16,
+  },
+  Skeletonright: {
+    width: '35%',
+    height: 16,
+  },
+  Skeletonbuttons: {
+    marginTop: 20,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  Skeletonbtn: {
+    width: '47%',
+    height: 45,
+    borderRadius: 15,
+    marginBottom: 12,
+  },
+  //-----------------------------------------------
 });

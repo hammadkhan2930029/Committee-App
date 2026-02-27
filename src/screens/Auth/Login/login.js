@@ -27,6 +27,8 @@ import * as Yup from 'yup';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //----------------------------------------------
 const loginSchema = Yup.object().shape({
@@ -130,7 +132,9 @@ export const Login = () => {
                 resizeMode="cover"
               >
                 <Text style={styles.h1}>
-                  Welcome Back <Image source={AppIcons.wavingHand} />
+                  Welcome Back
+                  <MaterialIcons name="waving-hand" size={34} color="#FED22D" />
+                
                 </Text>
                 <Text style={styles.h4}>Login to manage your committees</Text>
               </ImageBackground>
@@ -197,9 +201,27 @@ export const Login = () => {
               <Image source={AppImages.VectorLine} />
             </View>
             <View style={styles.socialIocns_View}>
-              <Image source={AppIcons.apple} style={styles.socialIocns} />
-              <Image source={AppIcons.facebook} style={styles.socialIocns} />
-              <Image source={AppIcons.google} style={styles.socialIocns} />
+              <View>
+                <MaterialIcons
+                  name="facebook"
+                  size={34}
+                  color={AppColors.primary}
+                />
+              </View>
+              <View>
+                <Ionicons
+                  name="logo-whatsapp"
+                  size={34}
+                  color={AppColors.primary}
+                />
+              </View>
+              <View>
+                <Ionicons
+                  name="logo-google"
+                  size={34}
+                  color={AppColors.primary}
+                />
+              </View>
             </View>
             <View style={styles.registerView}>
               <Text style={styles.registerText}>
@@ -224,7 +246,7 @@ export const Login = () => {
 const styles = ScaledSheet.create({
   container: {
     flex: 1,
-    backgroundColor:AppColors.background
+    backgroundColor: AppColors.background,
   },
   RectangleImg: {
     width: '100%',

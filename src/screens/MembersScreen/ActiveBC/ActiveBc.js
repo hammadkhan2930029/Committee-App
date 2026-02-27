@@ -15,7 +15,7 @@ import { AppColors } from '../../../constant/appColors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
 import { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getStoredUser } from '../../../Utils/getUser';
 import { navigate } from '../../../navigations/navigationService';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
@@ -24,6 +24,7 @@ export const ActiveBCs = () => {
   const [committeeList, setCommitteeList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState();
+  const navigation = useNavigation()
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -154,7 +155,7 @@ export const ActiveBCs = () => {
           <View style={styles.main}>
             <View style={styles.TopView}>
               <View style={styles.backAndText}>
-                <TouchableOpacity >
+                <TouchableOpacity onPress={()=> navigation.goBack()}>
                  <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -317,7 +318,7 @@ const styles = ScaledSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -40,
+    marginTop: -50,
   },
   Dashboardcard: {
     width: '95%',

@@ -48,7 +48,7 @@ export const PaymentDetails = ({ route }) => {
         `/user/mark-payment/verified/${item.payment_id}`,
       );
       const result = await response?.data?.msg[0]?.response;
-      console.log('paymnet verified mrk :', result);
+      console.log('payment verified mark :', result);
       if (result === 'payment verified') {
         Toast.show({
           type: 'customToast',
@@ -151,6 +151,7 @@ export const PaymentDetails = ({ route }) => {
             <CustomButton
               title="Verify Payment"
               onPress={() => markPaymentVerified()}
+              disabled={item.status === 'verified'}
             />
           </View>
           <View style={styles.btnView}>

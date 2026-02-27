@@ -182,7 +182,7 @@ export const AdminDashboard = () => {
               </View>
             </TouchableOpacity> */}
             {/* -------Pending Payments------- */}
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity activeOpacity={0.7} onPress={()=> navigation.navigate('Payments')}>
               <View style={styles.Dashboardcard}>
                 <View>
                   <View style={styles.imgText}>
@@ -193,9 +193,7 @@ export const AdminDashboard = () => {
                     />
                     <Text style={styles.activeBC}>Pending Payments</Text>
                   </View>
-                  {/* <Text style={styles.activeBC_details}>
-                    Awaiting approval{' '}
-                  </Text> */}
+                
                 </View>
                 <View style={styles.counter}>
                   <Text style={styles.counter_text}>

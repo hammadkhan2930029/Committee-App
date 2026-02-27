@@ -26,8 +26,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Dimensions.get('window').width;
 
-
-
 export const AdminEditProfile = ({ route }) => {
   const { user } = route.params;
   console.log('user :', user.full_name);
@@ -107,18 +105,15 @@ export const AdminEditProfile = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         backgroundColor={AppColors.background}
         barStyle="dark-content"
-      />
+      /> */}
+      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
       <ScrollView>
         <View style={styles.arrowBackView}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon
-              name="arrow-circle-left"
-              size={28}
-              color={AppColors.link}
-            />
+            <Icon name="arrow-circle-left" size={28} color={AppColors.link} />
           </TouchableOpacity>
         </View>
 
@@ -215,7 +210,6 @@ const styles = ScaledSheet.create({
     borderWidth: 8,
     borderRadius: (screenWidth * 0.45) / 2,
     elevation: 3,
-
   },
   nameView: {
     justifyContent: 'center',

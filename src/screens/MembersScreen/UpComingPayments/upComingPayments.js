@@ -25,7 +25,7 @@ import { Loader } from '../../Loader/loader';
 import { CustomButton } from '../../../components/customButton';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
-export const PaymentHistory = () => {
+export const UpComingPayments = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState();
   const [history, setHistory] = useState([]);
@@ -52,13 +52,14 @@ export const PaymentHistory = () => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
   //------------------------------------------------------
-  const UserPaymentHistory = async () => {
+
+  const upComingPaymentsFun = async () => {
     try {
       const response = await api.get(
-        `/user/view-committee-payments/list/${userID}`,
+        `/user/upcoming-committee-payments/${userID}`,
       );
       const result = response?.data?.msg;
-      console.log('payment history :', result);
+      console.log('upcoming  :', result);
       if (result) {
         setHistory(result);
         setLoding(false);
@@ -71,9 +72,10 @@ export const PaymentHistory = () => {
   };
   useEffect(() => {
     if (userID) {
-      UserPaymentHistory();
+      upComingPaymentsFun();
     }
   }, [userID]);
+
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
     return (
@@ -207,11 +209,11 @@ export const PaymentHistory = () => {
                       color={AppColors.title}
                     />
                   </TouchableOpacity>
-                  <Text style={styles.h1}>Payment History</Text>
+                  <Text style={styles.h1}>Upcoming Payments</Text>
                 </View>
               </View>
               <View style={styles.textView}>
-                <Text style={styles.h4}>View all your past payments.</Text>
+                <Text style={styles.h4}>View all your upcoming payments.</Text>
               </View>
             </View>
           </ImageBackground>
@@ -230,7 +232,7 @@ export const PaymentHistory = () => {
                     <Text
                       style={[
                         styles.msg,
-                        { display: items.committe_name ? 'none' : 'flex' },
+                        { display: items.committee_name ? 'none' : 'flex' },
                       ]}
                     >
                       Data not available
@@ -239,45 +241,41 @@ export const PaymentHistory = () => {
                     <View
                       style={[
                         styles.card_view,
-                        { display: items.committe_name ? 'flex' : 'none' },
+                        { display: items.committee_name ? 'flex' : 'none' },
                       ]}
                     >
                       <View style={styles.card}>
                         <View style={styles.header}>
                           <View style={styles.cardHeader}>
                             <Text style={styles.name}>
-                              {items.committe_name}
-                            </Text>
-                            <View style={styles.status_view}>
-                              <Text style={styles.status_text}>
-                                {items.status}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={styles.monthView}>
-                            <Text style={styles.month}>
-                              Round # {items.round_no}
+                              {items.committee_name}
                             </Text>
                             <Text style={styles.month}>
                               {items.round_month}
                             </Text>
                           </View>
+                          <View style={styles.monthView}>
+                            <Text style={styles.month}>
+                              Round# {items.round_no}
+                            </Text>
+                            <Text style={styles.amountPermember}>
+                              Amount : {formatNumber(items.committee_amount)}
+                            </Text>
+
+                            
+                          </View>
                         </View>
-                        <View style={styles.cardMiddle}>
-                          <Text style={styles.amountPermember}>
-                            {formatNumber(items.amount_per_member)}
-                          </Text>
-                          <Text style={styles.amountPermemberText}>
-                            Amount per Member
-                          </Text>
-                        </View>
+                        
 
                         <View style={styles.btnView}>
                           <CustomButton
-                            title="Payment Details"
+                            title="Payment Now"
                             onPress={() =>
-                              navigation.navigate('UserPaymentDetails', {
-                                item: items,
+                              navigation.navigate('UploadSlip', {
+                                singleRoundAmount: items.committee_amount,
+                                amount: items.committee_amount,
+                                memberCount: items.round_no,
+                                data: item.item,
                               })
                             }
                           />
@@ -356,7 +354,6 @@ const styles = ScaledSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    // backgroundColor:'yellow',
     marginBottom: 10,
   },
   card: {
@@ -373,16 +370,13 @@ const styles = ScaledSheet.create({
   },
 
   //---------------------------------
-  header: {
-    borderBottomColor: AppColors.primary,
-    borderBottomWidth: 1,
-  },
+ 
   cardHeader: {
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 10,
+    padding: 5,
   },
   name: {
     color: AppColors.blackText,
@@ -408,10 +402,11 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 5,
+   
   },
   month: {
     fontSize: moderateScale(16),
-    padding: 10,
+    
   },
   amountPermember: {
     textAlign: 'center',
@@ -434,7 +429,5 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(16),
     padding: 15,
   },
-  scroll: {
-    marginBottom: 65,
-  },
+  
 });

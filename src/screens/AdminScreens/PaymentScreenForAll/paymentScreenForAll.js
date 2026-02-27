@@ -81,7 +81,6 @@ export const Payments = ({ route }) => {
   console.log('paymentList :', paymentList[0]?.response);
 
   //---------------------------------------------
-  //---------------------------------------------
   const validPayments = paymentList.filter(
     item => Number(item?.paid_amount) > 0,
   );
@@ -94,16 +93,6 @@ export const Payments = ({ route }) => {
       : validPayments.filter(
           item => item?.status?.toLowerCase() === selectedStatus.toLowerCase(),
         );
-
-  // const hasPayments = paymentList?.length > 0;
-
-  // const filterData = hasPayments
-  //   ? selectedStatus === 'All'
-  //     ? paymentList
-  //     : paymentList.filter(
-  //         item => item?.status?.toLowerCase() === selectedStatus?.toLowerCase(),
-  //       )
-  //   : [];
 
   //----------------------------------------------
 
@@ -163,7 +152,7 @@ export const Payments = ({ route }) => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon
                       name="arrow-circle-left"
                       size={28}
@@ -300,8 +289,7 @@ export const Payments = ({ route }) => {
                           ? styles.paid
                           : item?.status?.toLowerCase() === 'pending'
                           ? styles.pending
-                          : item?.status?.toLowerCase() === 'Overdue'
-                          ? styles.overDue
+                          
                           : item?.status?.toLowerCase() === 'requested'
                           ? styles.requested
                           : null,
@@ -370,7 +358,6 @@ const styles = ScaledSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
-    // width: '50%',
   },
   h1: {
     fontSize: moderateScale(24),
@@ -422,9 +409,8 @@ const styles = ScaledSheet.create({
   },
   cardTitle: {
     color: AppColors.blackText,
-    fontSize: moderateScale(17),
+    fontSize: moderateScale(15),
     fontWeight: '600',
-    // paddingLeft: 3,
     padding: 5,
   },
   cardValue: {
@@ -469,13 +455,7 @@ const styles = ScaledSheet.create({
     color: '#fff',
   },
   //--------------------------------------
-  cardView: {
-    // marginTop: 3,
-    // backgroundColor:'green',
-    // height:hp('70%')
-    // marginBottom:hp('20%')
-    // marginBottom:150
-  },
+
   cards: {
     width: '98%',
     justifyContent: 'space-evenly',
@@ -515,11 +495,8 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  left: {
-    // backgroundColor: 'green',
-  },
+  left: {},
   right: {
-    //  backgroundColor: 'pink',
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'space-between',

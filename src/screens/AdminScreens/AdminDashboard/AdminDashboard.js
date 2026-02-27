@@ -29,12 +29,11 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  withSequence,
   withRepeat,
-  Easing,
 } from 'react-native-reanimated';
 
 export const AdminDashboard = () => {
-
   //--------------------------------------------
   // const AnimatedIcon = Animated.createAnimatedComponent(Icon);
   // const rotation = useSharedValue(0);
@@ -100,6 +99,45 @@ export const AdminDashboard = () => {
   }, [userData]);
   console.log('counter :', counter);
   //----------------------------------------------------------------------------
+  const wave = useSharedValue(0);
+
+  const triggerHandWave = () => {
+    wave.value = withSequence(
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+
+      // 2nd wave
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+
+      // 3rd wave
+      withTiming(-20, { duration: 150 }),
+      withTiming(20, { duration: 150 }),
+      withTiming(-15, { duration: 150 }),
+      withTiming(15, { duration: 150 }),
+      withTiming(-10, { duration: 150 }),
+      withTiming(10, { duration: 150 }),
+      withTiming(0, { duration: 150 }),
+    );
+  };
+  const waveStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${wave.value}deg` }],
+    };
+  });
+  useEffect(() => {
+    triggerHandWave();
+  }, []);
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -126,12 +164,9 @@ export const AdminDashboard = () => {
                 {userData?.full_name && (
                   <Text style={styles.h2}>
                     Hello,{userData.full_name}{' '}
-                    <Icon
-                      name="waving-hand"
-                      size={30}
-                      color="#FED22D"
-                     
-                    />
+                    <Animated.View style={[waveStyle, { marginLeft: 5 }]}>
+                      <Icon name="waving-hand" size={30} color="#FED22D" />
+                    </Animated.View>
                   </Text>
                 )}
                 <Text style={styles.h4}>Here’s your admin overview.</Text>
@@ -182,7 +217,10 @@ export const AdminDashboard = () => {
               </View>
             </TouchableOpacity> */}
             {/* -------Pending Payments------- */}
-            <TouchableOpacity activeOpacity={0.7} onPress={()=> navigation.navigate('Payments')}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Payments')}
+            >
               <View style={styles.Dashboardcard}>
                 <View>
                   <View style={styles.imgText}>
@@ -193,7 +231,6 @@ export const AdminDashboard = () => {
                     />
                     <Text style={styles.activeBC}>Pending Payments</Text>
                   </View>
-                
                 </View>
                 <View style={styles.counter}>
                   <Text style={styles.counter_text}>

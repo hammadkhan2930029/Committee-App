@@ -34,13 +34,13 @@ const resetPasswordSchema = Yup.object().shape({
     )
     .required('Phone number is required'),
 
-  newPassword: Yup.string()
-    .min(6, 'Password kam az kam 6 characters ka ho')
-    .required('Password required hai'),
+  // newPassword: Yup.string()
+  //   .min(6, 'Password kam az kam 6 characters ka ho')
+  //   .required('Password required hai'),
 
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('newPassword')], 'Password match nahi kar raha')
-    .required('Confirm password required hai'),
+  // confirmPassword: Yup.string()
+  //   .oneOf([Yup.ref('newPassword')], 'Password match nahi kar raha')
+  //   .required('Confirm password required hai'),
 });
 
 //----------------------------------------------------
@@ -55,17 +55,18 @@ export const ResetPassword = () => {
     try {
       var formData = new FormData();
       formData.append('phone', value.phone);
-      formData.append('new_password', value.newPassword);
-      formData.append('confirm_password', value.confirmPassword);
+      // formData.append('new_password', value.newPassword);
+      // formData.append('confirm_password', value.confirmPassword);
 
       const res = await api.post('/user/forgot-password', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      if (res?.status === 200) {
+      console.log('response', res.data.msg[0].response)
+      if (res?.data?.code === 200) {
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: res?.data?.message || 'Data successfully reset',
+          text2: res?.data?.msg[0].response,
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
@@ -76,7 +77,7 @@ export const ResetPassword = () => {
         Toast.show({
           type: 'customToast',
           text1: 'Warning',
-          text2: res.data.message || 'Invalid credentials',
+          text2: res?.data?.msg[0].response || 'Invalid credentials',
           props: {
             bgColor: AppColors.background,
             borderColor: 'orange',
@@ -131,8 +132,8 @@ export const ResetPassword = () => {
             <Formik
               initialValues={{
                 phone: '',
-                newPassword: '',
-                confirmPassword: '',
+                // newPassword: '',
+                // confirmPassword: '',
               }}
               onSubmit={(values, { resetForm }) => {
                 resetPassword(values);
@@ -160,7 +161,7 @@ export const ResetPassword = () => {
                       onBlur={handleBlur('phone')}
                       error={touched.phone && errors.phone}
                     />
-                    <CustomInput
+                    {/* <CustomInput
                       label="New Password"
                       type="password"
                       placeholder="Enter your new password"
@@ -177,7 +178,7 @@ export const ResetPassword = () => {
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
                       error={touched.confirmPassword && errors.confirmPassword}
-                    />
+                    /> */}
                   </View>
 
                   <View style={styles.btn}>

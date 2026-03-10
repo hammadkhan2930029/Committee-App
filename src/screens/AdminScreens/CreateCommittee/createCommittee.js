@@ -208,14 +208,14 @@ export const CreateCommittee = () => {
               touched,
             }) => {
               useEffect(() => {
-                if (values.totalMembers && values.amountPerMember) {
+                if (values.totalRounds && values.amountPerMember) {
                   const total =
-                    Number(values.totalMembers) *
+                    Number(values.totalRounds) *
                     Number(values.amountPerMember);
 
                   setFieldValue('totalAmount', total.toString());
                 }
-              }, [values.totalMembers, values.amountPerMember]);
+              }, [values.totalRounds, values.amountPerMember]);
 
               return (
                 <View style={styles.createCommitteForm}>

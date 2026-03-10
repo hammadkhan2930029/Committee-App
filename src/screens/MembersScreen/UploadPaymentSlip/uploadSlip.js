@@ -156,10 +156,11 @@ export const UploadSlip = ({ route }) => {
       formData.append('committee_id', data.committee_id);
       formData.append('committee_member_id', data.committee_member_id);
       if (imageUri) {
+        const extension = getFileExtension(imageUri) || 'jpg';
         formData.append('pay_slip', {
           uri: imageUri,
-          name: 'payment-slip.jpg',
-          type: 'image/jpeg',
+          name: `payment-slip.${extension}`,
+          type: `image/${extension === 'png' ? 'png' : 'jpeg'}`,
         });
       }
 

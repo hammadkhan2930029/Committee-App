@@ -35,23 +35,7 @@ import Animated, {
 
 export const AdminDashboard = () => {
   //--------------------------------------------
-  // const AnimatedIcon = Animated.createAnimatedComponent(Icon);
-  // const rotation = useSharedValue(0);
 
-  // useEffect(() => {
-  //   rotation.value = withRepeat(
-  //     withTiming(20, {
-  //       duration: 400,
-  //       easing: Easing.inOut(Easing.ease),
-  //     }),
-  //     -1,
-  //     true,
-  //   );
-  // }, []);
-
-  // const animatedStyle = useAnimatedStyle(() => ({
-  //   transform: [{ rotate: `${rotation.value}deg` }],
-  // }));
 
   //-------------------------------------------------
   const navigation = useNavigation();

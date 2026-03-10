@@ -128,7 +128,7 @@ export const ResetPassword = () => {
               Enter your phone number to reset your password.
             </Text>
           </View>
-          <View>
+          <View style={styles.formView}>
             <Formik
               initialValues={{
                 phone: '',
@@ -210,6 +210,13 @@ const styles = ScaledSheet.create({
   },
   main: {
     margin: 15,
+  },
+  formView: {
+    height: '80%',
+    marginTop: 25,
+    // backgroundColor: AppColors.primary,
+    // margin: 5,
+    paddingTop: 25
   },
   headingView: {
     justifyContent: 'center',

@@ -28,10 +28,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const resetPasswordSchema = Yup.object().shape({
   phone: Yup.string()
-    .matches(
-      /^03[0-9]{9}$/,
-      'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
-    )
+    // .matches(
+    //   /^03[0-9]{9}$/,
+    //   'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
+    // )
     .required('Phone number is required'),
 
   // newPassword: Yup.string()

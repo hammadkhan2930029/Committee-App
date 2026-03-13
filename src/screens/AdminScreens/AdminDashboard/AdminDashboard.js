@@ -32,6 +32,7 @@ import Animated, {
   withSequence,
   withRepeat,
 } from 'react-native-reanimated';
+import { ShareAppLink } from '../../../components/ShareAppLisk'
 
 export const AdminDashboard = () => {
   //--------------------------------------------
@@ -144,17 +145,24 @@ export const AdminDashboard = () => {
                   />
                 </TouchableOpacity>
               </View>
-              <View style={styles.textView}>
-                {userData?.full_name && (
-                  <Text style={styles.h2}>
-                    Hello,{userData.full_name}{' '}
-                    <Animated.View style={[waveStyle, { marginLeft: 5 }]}>
-                      <Icon name="waving-hand" size={30} color="#FED22D" />
-                    </Animated.View>
-                  </Text>
-                )}
-                <Text style={styles.h4}>Here’s your admin overview.</Text>
+              <View style={styles.textandLink}>
+                <View style={styles.textView}>
+                  {userData?.full_name && (
+                    <Text style={styles.h2}>
+                      Hello,{userData.full_name}{' '}
+                      <Animated.View style={[waveStyle, { marginLeft: 5 }]}>
+                        <Icon name="waving-hand" size={30} color="#FED22D" />
+                      </Animated.View>
+                    </Text>
+                  )}
+                  <Text style={styles.h4}>Here’s your admin overview.</Text>
+                </View>
+                <View style={styles.linkView}>
+
+                  <ShareAppLink />
+                </View>
               </View>
+
             </View>
           </ImageBackground>
         </View>
@@ -277,6 +285,7 @@ const styles = ScaledSheet.create({
   },
   textView: {
     padding: 15,
+    // backgroundColor: 'red'
   },
   wavingHand: {
     width: 28,
@@ -354,5 +363,15 @@ const styles = ScaledSheet.create({
   CreateUser_text: {
     color: AppColors.primary,
     fontWeight: 'bold',
+  },
+  textandLink: {
+    // backgroundColor: 'green',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  linkView:{
+    padding: 15,
+
   },
 });

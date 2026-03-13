@@ -54,6 +54,9 @@ export const AdminProfile = () => {
 
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('ModalClosed');
+
+    
 
     navigation.dispatch(
       CommonActions.reset({

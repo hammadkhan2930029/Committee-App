@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ImageBackground } from 'react-native';
-import { View, TouchableOpacity, Text, Image, StatusBar } from 'react-native';
+import { View, TouchableOpacity, Text, Image, StatusBar, Modal } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../constant/appImages';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { CustomButton } from '../../components/customButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
+import { DisclaimerModal } from '../../components/disclaimerModal'
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -32,6 +33,23 @@ export const ChooseRole = () => {
     };
     data();
   }, []);
+  //----------------------------------------------------------
+  // const [modalVisible, setModalVisible] = useState(false);
+
+  // const checkModal = async () => {
+  //   const value = await AsyncStorage.getItem('ModalClosed')
+  //   console.log('aysnc data :', value)
+  //   if (value === null) {
+  //     setModalVisible(true)
+  //   }
+  // }
+  // useEffect(() => {
+  //   checkModal()
+  // }, [])
+  // const closedModal = async () => {
+  //   await AsyncStorage.setItem('ModalClosed', 'true')
+  //   setModalVisible(false)
+  // }
 
   return (
     <View style={styles.container}>
@@ -136,6 +154,25 @@ export const ChooseRole = () => {
       <View style={styles.btnView}>
         <CustomButton title="Continue" onPress={handleContinue} />
       </View>
+      <DisclaimerModal />
+      {/* <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.innerView}>
+
+              <Text style={styles.modalText1}>Disclaimer</Text>
+              <Text style={styles.modalText2}>This app does not operate as a bank, financial institution, or investment service. <Text style={styles.modalText3}>Read More</Text></Text>
+
+              <CustomButton title='Close' onPress={() => closedModal()} />
+            </View>
+          </View>
+        </View>
+
+      </Modal> */}
     </View>
   );
 };

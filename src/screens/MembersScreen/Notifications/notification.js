@@ -39,7 +39,7 @@ export const Notifications = () => {
         const user = await getStoredUser();
         if (user) {
           setUserdata(user);
-          console.log('user', user);
+          // console.log('user', user);
         }
       };
       loader();
@@ -55,7 +55,7 @@ export const Notifications = () => {
         `/user/view-notifications/${userdata.user_id}`,
       );
       const result = response.data.msg;
-      console.log(response);
+      // console.log(response);
       if (response.data.code === '200') {
         setNotifyList(result);
       }
@@ -75,10 +75,8 @@ export const Notifications = () => {
   //------------------------------------------------------------
 
   const markNotification = async id => {
-    console.log('ID', id);
     try {
       const response = await api.get(`/user/mark-as-read/notifications/${id}`);
-      console.log('mark as read :', response.data.msg[0]);
       const result = response?.data?.msg[0]?.response;
       if (response.data.code === '200') {
         Toast.show({
@@ -98,7 +96,6 @@ export const Notifications = () => {
     }
   };
 
-  console.log(notifyList);
   //------------------------------------------------------------
 
   const renderNotification = ({ item }) => {
@@ -323,12 +320,12 @@ const styles = ScaledSheet.create({
     borderLeftWidth: 5,
   },
   notificationTitle: {
-    fontSize: RFValue(16),
+    fontSize: RFValue(15),
     fontWeight: '600',
     color: '#000',
   },
   notificationMessage: {
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
     color: AppColors.blackText,
     marginTop: hp('0.5%'),
   },

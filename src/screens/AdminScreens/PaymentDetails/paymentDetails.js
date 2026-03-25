@@ -76,6 +76,14 @@ export const PaymentDetails = ({ route }) => {
       console.log(error);
     }
   };
+  //-------------first letter capital-----------------------
+  const capitalizeFirstLetter = (text) => {
+    if (!text) return '';
+    return text.charAt(0).toUpperCase() + text.slice(1)
+  }
+
+  //-----------------------------------------------------
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -109,12 +117,12 @@ export const PaymentDetails = ({ route }) => {
         <View style={styles.BCDetails}>
           <View style={styles.row}>
             <Text style={styles.text1}>User Name</Text>
-            <Text style={styles.text2}>{item.payment_by}</Text>
+            <Text style={styles.text2}>{capitalizeFirstLetter(item.payment_by)}</Text>
           </View>
 
           <View style={styles.row}>
             <Text style={styles.text1}>Committee</Text>
-            <Text style={styles.text2}>{item.committe_name}</Text>
+            <Text style={styles.text2}>{capitalizeFirstLetter(item.committe_name)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Round no</Text>
@@ -130,8 +138,8 @@ export const PaymentDetails = ({ route }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.text1}>Status</Text>
-            <View style={styles.activeBtn}>
-              <Text style={styles.active}>{item.status}</Text>
+            <View style={[styles.activeBtn, { backgroundColor: item.status === 'verified' ? 'green' : AppColors.primary }]}>
+              <Text style={styles.active}>{capitalizeFirstLetter(item.status)}</Text>
             </View>
           </View>
         </View>
@@ -155,7 +163,10 @@ export const PaymentDetails = ({ route }) => {
             />
           </View>
           <View style={styles.btnView}>
-            <CustomButtonLight title="Reject Slip" />
+            <CustomButtonLight
+              title="Reject Slip"
+              disabled={item.status === 'verified'}
+            />
           </View>
         </View>
         <Modal
@@ -235,6 +246,7 @@ const styles = ScaledSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 20,
+    elevation: 5
   },
   active: {
     fontSize: moderateScale(16),

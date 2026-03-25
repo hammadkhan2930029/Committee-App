@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ImageBackground } from 'react-native';
+import { ImageBackground, ScrollView } from 'react-native';
 import { View, TouchableOpacity, Text, Image, StatusBar, Modal } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../constant/appImages';
@@ -34,145 +34,115 @@ export const ChooseRole = () => {
     data();
   }, []);
   //----------------------------------------------------------
-  // const [modalVisible, setModalVisible] = useState(false);
 
-  // const checkModal = async () => {
-  //   const value = await AsyncStorage.getItem('ModalClosed')
-  //   console.log('aysnc data :', value)
-  //   if (value === null) {
-  //     setModalVisible(true)
-  //   }
-  // }
-  // useEffect(() => {
-  //   checkModal()
-  // }, [])
-  // const closedModal = async () => {
-  //   await AsyncStorage.setItem('ModalClosed', 'true')
-  //   setModalVisible(false)
-  // }
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ImageBackground
-        source={AppImages.Rectangle}
-        style={styles.RectangleImg}
-        resizeMode="cover"
-      >
-        <View style={styles.backgroundInnerView}>
-
-          <View style={styles.headingsAlign}>
-            <Text style={styles.h1}>Choose Your Role</Text>
-            <Text style={styles.h4}>Select how you want to use the app</Text>
-          </View>
-        </View>
-      </ImageBackground>
-      <View style={styles.profileView}>
-        <Image source={AppImages.profileAvatar} style={styles.profileImage} />
-      </View>
-
-      <View style={styles.cardView}>
-        {/* ------------------admin---------------------- */}
-        <TouchableOpacity
-          style={[
-            styles.card,
-            {
-              backgroundColor:
-                selected === 1 ? AppColors.primary : AppColors.cardLight,
-            },
-          ]}
-          activeOpacity={0.8}
-          onPress={() => setSelected(1)}
+      <ScrollView>
+        <ImageBackground
+          source={AppImages.Rectangle}
+          style={styles.RectangleImg}
+          resizeMode="cover"
         >
-          <View style={styles.view1}>
+          <View style={styles.backgroundInnerView}>
 
-            <Icon
-              name="admin-panel-settings"
-              size={28}
-              color={selected === 1 ? AppColors.title : AppColors.link}
-            />
+            <View style={styles.headingsAlign}>
+              <Text style={styles.h1}>Choose Your Role</Text>
+              <Text style={styles.h4}>Select how you want to use the app</Text>
+            </View>
+          </View>
+        </ImageBackground>
+        <View style={styles.profileView}>
+          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
+        </View>
+
+        <View style={styles.cardView}>
+          {/* ------------------admin---------------------- */}
+          <TouchableOpacity
+            style={[
+              styles.card,
+              {
+                backgroundColor:
+                  selected === 1 ? AppColors.primary : AppColors.cardLight,
+              },
+            ]}
+            activeOpacity={0.8}
+            onPress={() => setSelected(1)}
+          >
+            <View style={styles.view1}>
+
+              <Icon
+                name="admin-panel-settings"
+                size={28}
+                color={selected === 1 ? AppColors.title : AppColors.link}
+              />
+              <Text
+                style={[
+                  styles.card_h2,
+                  { color: selected === 1 ? AppColors.title : AppColors.primary },
+                ]}
+              >
+                Admin
+              </Text>
+            </View>
+
             <Text
               style={[
-                styles.card_h2,
-                { color: selected === 1 ? AppColors.title : AppColors.primary },
+                styles.card_h4,
+                { color: selected === 1 ? AppColors.title : AppColors.link },
               ]}
             >
-              Admin
+              Manage BCs and members
             </Text>
-          </View>
+          </TouchableOpacity>
+          {/* ------------------member------------------- */}
 
-          <Text
+          <TouchableOpacity
             style={[
-              styles.card_h4,
-              { color: selected === 1 ? AppColors.title : AppColors.link },
+              styles.card2,
+              {
+                backgroundColor:
+                  selected === 2 ? AppColors.primary : AppColors.cardLight,
+              },
             ]}
+            activeOpacity={0.8}
+            onPress={() => setSelected(2)}
           >
-            Manage BCs and members
-          </Text>
-        </TouchableOpacity>
-        {/* ------------------member------------------- */}
+            <View style={styles.view2}>
 
-        <TouchableOpacity
-          style={[
-            styles.card2,
-            {
-              backgroundColor:
-                selected === 2 ? AppColors.primary : AppColors.cardLight,
-            },
-          ]}
-          activeOpacity={0.8}
-          onPress={() => setSelected(2)}
-        >
-          <View style={styles.view2}>
+              <Icon
+                name="groups"
+                size={28}
+                color={selected === 2 ? AppColors.title : AppColors.link}
+              />
 
-            <Icon
-              name="groups"
-              size={28}
-              color={selected === 2 ? AppColors.title : AppColors.link}
-            />
+              <Text
+                style={[
+                  styles.card2_h2,
+                  { color: selected === 2 ? AppColors.title : AppColors.link },
+                ]}
+              >
+                Member
+              </Text>
+            </View>
 
             <Text
               style={[
-                styles.card2_h2,
+                styles.card2_h4,
                 { color: selected === 2 ? AppColors.title : AppColors.link },
               ]}
             >
-              Member
+              Join BCs and pay monthly installments
             </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.card2_h4,
-              { color: selected === 2 ? AppColors.title : AppColors.link },
-            ]}
-          >
-            Join BCs and pay monthly installments
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.btnView}>
-        <CustomButton title="Continue" onPress={handleContinue} />
-      </View>
-      <DisclaimerModal />
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.innerView}>
-
-              <Text style={styles.modalText1}>Disclaimer</Text>
-              <Text style={styles.modalText2}>This app does not operate as a bank, financial institution, or investment service. <Text style={styles.modalText3}>Read More</Text></Text>
-
-              <CustomButton title='Close' onPress={() => closedModal()} />
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
+        <View style={styles.btnView}>
+          <CustomButton title="Continue" onPress={handleContinue} />
+        </View>
+      </ScrollView>
+      <DisclaimerModal />
 
-      </Modal> */}
     </View>
   );
 };

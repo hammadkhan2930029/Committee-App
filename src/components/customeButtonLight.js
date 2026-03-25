@@ -6,13 +6,17 @@ export const CustomButtonLight = ({
   title,
   onPress,
   backgroundColor = AppColors.cardLight,
+  disabled = false,
+
 }) => {
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor }]}
-      onPress={onPress}
+      style={[styles.button, { backgroundColor: disabled ? '#BDBDBD' : backgroundColor },]}
+      onPress={disabled ? null : onPress}
+      disabled={disabled}
+      activeOpacity={disabled ? 1 : 0.7}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text style={[styles.text, { color: disabled ? '#fff' : AppColors.link }]}>{title}</Text>
     </TouchableOpacity>
   );
 };

@@ -411,7 +411,7 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
   },
   family: {
-    fontSize: RFValue(16),
+    fontSize: RFValue(15),
     color: AppColors.blackText,
     fontWeight: '600',
   },
@@ -435,7 +435,7 @@ const styles = ScaledSheet.create({
     borderWidth: 1,
   },
   active: {
-    fontSize: RFValue(15),
+    fontSize: RFValue(14),
     color: AppColors.link,
   },
   details: {
@@ -445,11 +445,11 @@ const styles = ScaledSheet.create({
     paddingTop: hp('1%'),
   },
   one: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     color: AppColors.blackText,
   },
   count: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(13),
     color: AppColors.link,
     fontWeight: '600',
   },

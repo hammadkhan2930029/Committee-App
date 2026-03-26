@@ -20,7 +20,7 @@ import { CustomInput } from '../../../components/customTextInput';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Loader } from '../../Loader/loader';
 import { getStoredUser } from '../../../Utils/getUser';
@@ -35,6 +35,19 @@ const validationSchema = Yup.object().shape({
     .min(1, 'Minimum value is 1')
     .max(31, 'Maximum value is 31'),
 });
+
+const data = [
+  { label: 'Item 1', value: '1' },
+  { label: 'Item 2', value: '2' },
+  { label: 'Item 3', value: '3' },
+  { label: 'Item 4', value: '4' },
+  { label: 'Item 5', value: '5' },
+  { label: 'Item 6', value: '6' },
+  { label: 'Item 7', value: '7' },
+  { label: 'Item 8', value: '8' },
+];
+
+
 export const CreateCommittee = () => {
   const navigation = useNavigation();
   //------------------------------------
@@ -46,6 +59,11 @@ export const CreateCommittee = () => {
   //------------------------------------
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState();
+  //----------------------------------------------
+  const [currencyValue, setCurrencyValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [currency, setCurrency] = useState([]);
+
   //-----------------get data--------------------
 
   useFocusEffect(
@@ -54,7 +72,7 @@ export const CreateCommittee = () => {
         const user = await getStoredUser();
         if (user) {
           setUserData(user);
-          console.log(user.full_name, user.user_id);
+          // console.log(user.full_name, user.user_id);
         }
       };
       loadUser();
@@ -90,6 +108,8 @@ export const CreateCommittee = () => {
 
   //--------------------api--------------------------
   const createCommittee = async value => {
+    console.log(value)
+
     setLoading(true);
     try {
       var formData = new FormData();
@@ -103,6 +123,8 @@ export const CreateCommittee = () => {
       formData.append('total', value.totalAmount);
       formData.append('start_date', value.startDate);
       formData.append('due_on', value.due_on);
+      formData.append('currency_id', currencyValue);
+
 
       const response = await api.post('/user/create-committee', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -147,6 +169,46 @@ export const CreateCommittee = () => {
       setLoading(false);
     }
   };
+  //----------------------------------------------------
+
+
+
+  // const renderLabel = () => {
+  //   if (value || isFocus) {
+  //     return (
+  //       <Text style={[styles.label, isFocus && { color: AppColors.link }]}>
+  //         Dropdown label
+  //       </Text>
+  //     );
+  //   }
+  //   return null;
+  // };
+  //--------------------currency list-------------------------
+
+  const currencyFun = async () => {
+    try {
+      const res = await api.get(`/get/currency-list`)
+      const result = res?.data?.msg
+
+      const formattedData = result.map(item => ({
+        label: item.name,
+        value: item.id,
+      }));
+
+      // console.log("Currency :", formattedData)
+      setCurrency(formattedData)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    currencyFun()
+  }, [])
+  //-------------------------------
+
+
 
   return (
     <View style={styles.container}>
@@ -215,7 +277,16 @@ export const CreateCommittee = () => {
 
                   setFieldValue('totalAmount', total.toString());
                 }
-              }, [values.totalRounds, values.amountPerMember]);
+
+                //-------------------------------------
+                if (values.totalRounds && values.roundsPerMonth) {
+                  const total =
+                    Number(values.totalRounds) /
+                    Number(values.roundsPerMonth);
+
+                  setFieldValue('noOfMonths', total.toString());
+                }
+              }, [values.totalRounds, values.amountPerMember, values.roundsPerMonth]);
 
               return (
                 <View style={styles.createCommitteForm}>
@@ -293,6 +364,34 @@ export const CreateCommittee = () => {
                     onblur={handleBlur('totalAmount')}
                     error={touched.totalAmount && errors.totalAmount}
                   />
+                  {/* ======================================================= */}
+                  <View style={styles.DropDowncontainer}>
+                    {/* {renderLabel()} */}
+                    <Text style={styles.label2}>Select Currency</Text>
+                    <Dropdown
+                      style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      iconStyle={styles.iconStyle}
+                      data={currency}
+                      search
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={!isFocus ? 'Select Currency' : '...'}
+                      searchPlaceholder="Search..."
+                      value={currencyValue}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={item => {
+                        setCurrencyValue(item.value);
+                        setIsFocus(false);
+                      }}
+                 
+                    />
+                  </View>
+                  {/* ======================================================= */}
                   <View>
                     <CustomInputWithIcon
                       label="Select Date"
@@ -318,10 +417,10 @@ export const CreateCommittee = () => {
                   </View>
                   <View>
                     <CustomInputWithIcon
-                      label="Due on"
+                      label="Due On (Date of each  month)"
                       type="numeric"
                       maxLength={2}
-                      placeholder="Enter due date"
+                      placeholder="Enter due date e.g 10"
                       value={values.due_on}
                       onChangeText={text => {
                         const numericValue = text.replace(/[^0-9]/g, '');
@@ -423,5 +522,53 @@ const styles = ScaledSheet.create({
     borderRadius: '10@ms',
     backgroundColor: '#f7f4f4ff',
     paddingHorizontal: '10@ms',
+  },
+  //--------------------------------------------------------------------
+  DropDowncontainer: {
+    // backgroundColor: 'white',
+
+    paddingTop: 10,
+  },
+  dropdown: {
+    backgroundColor: '#f7f4f4ff',
+
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: '#f7f4f4ff',
+    left: 22,
+    top: 3,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+    borderRadius: 10
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: AppColors.placeholder
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  label2: {
+    marginBottom: '5@ms',
+    fontSize: '14@ms',
+    color: '#333',
   },
 });

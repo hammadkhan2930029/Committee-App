@@ -8,7 +8,7 @@ export const ShareAppLink = () => {
         try {
             const result = await Share.share({
                 message:
-                    'Check out this amazing app!\n\nDownload now:\nhttps://play.google.com/store/apps/details?id=com.comitte',
+                    'Digital Bachat Committee Save Together, Grow Together!\n\nDownload now:\nhttps://play.google.com/store/apps/details?id=com.comitte',
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {

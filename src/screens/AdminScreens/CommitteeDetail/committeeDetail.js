@@ -602,6 +602,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
+
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
@@ -720,7 +721,7 @@ export const CommitteeDetails = ({ route }) => {
     }, []),
   );
   //-----------------------------------------------------------------------
-
+  const [expanded, setExpanded] = useState(false);
   const navigation = useNavigation();
   const [details, setDetails] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -728,6 +729,9 @@ export const CommitteeDetails = ({ route }) => {
   const [multipleData, setMultipleData] = useState([]);
   const [paymentList, setPaymentList] = useState([]);
   const [isverified, setIsVerified] = useState(false);
+  const [currentMonthData, setCurrentMonthData] = useState([])
+  const [currMonth, setCurrMOnth] = useState('')
+
 
   //-----------------------------------------------------------------------
 
@@ -760,7 +764,7 @@ export const CommitteeDetails = ({ route }) => {
       committeeDetails();
     }, [id]),
   );
-  console.log('committee details 2:', details);
+
 
   //----------------delete committee--------------------------------------
 
@@ -795,7 +799,7 @@ export const CommitteeDetails = ({ route }) => {
           },
         });
       }
-      console.log('delete :', response);
+      // console.log('delete :', response);
     } catch (error) {
       console.log(error);
     } finally {
@@ -821,6 +825,16 @@ export const CommitteeDetails = ({ route }) => {
     }, [details.committee_id]),
   );
 
+  //--------------------------------------------------------------
+  const paidRounds = roundList?.filter(item => item.status === 'Paid').length
+  const pendingsRounds = roundList?.filter(item => item.status === 'Pending').length
+  const visibleData = expanded ? roundList : roundList.slice(0, 4);
+  // console.log('Round list :', roundList)
+  // console.log('Round list paid:', paidRounds)
+  // console.log('Round list pending:', pendingsRounds.length)
+
+
+
   //-----------------------------------------------------------------------
 
   const hasAnyPaid = roundList.some(
@@ -840,7 +854,22 @@ export const CommitteeDetails = ({ route }) => {
   };
   const startDate = getFormattedDate(details.start_date);
   const dueOn = getFormattedDate(details.due_on);
+  //-----------------------------------------------------------------------
 
+  const getCurrentDateFormatted = () => {
+    const date = new Date();
+
+    const formatted = date.toLocaleString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
+
+    setCurrMOnth(formatted)
+  };
+  useEffect(() => {
+
+    getCurrentDateFormatted()
+  }, [userdata, details])
   //-----------------------------------------------------------------------
 
   const AdminpaymentList = async () => {
@@ -849,11 +878,12 @@ export const CommitteeDetails = ({ route }) => {
         `/admin/view-committee-payments/list/${userdata.user_id}`,
       );
       const allPayments = response?.data?.msg || [];
-      console.log('All payment :', allPayments);
+
 
       const filteredPayments = allPayments.filter(
         item => item.committe_id === details?.committee_id,
       );
+
 
       const isVerified = filteredPayments.some(
         item => item.status.toLowerCase() === 'verified',
@@ -864,7 +894,7 @@ export const CommitteeDetails = ({ route }) => {
       }));
       setIsVerified(isVerified);
 
-      console.log('Is Verified:', isVerified);
+
       setPaymentList(paymentsWithVerification);
     } catch (error) {
       console.log(error);
@@ -878,8 +908,7 @@ export const CommitteeDetails = ({ route }) => {
       }
     }, [userdata, details]),
   );
-  console.log('user data :', userdata);
-  console.log('Is verified :', isverified);
+
 
 
   //-----------------------------------------------------------
@@ -890,16 +919,43 @@ export const CommitteeDetails = ({ route }) => {
       }, 2000);
     }
   }, [details]);
-  //------------------------------------------------------------
-  if (loading) {
-    return <CommitteeDetailsSkeleton />;
-  }
+
   //--------------current month progress-------------------------------
-  const paidAmount = 10000
+  const currentMonthDetails = async () => {
+    try {
+      const res = await api.get(`/user/view-committee-payment/current-month/${details?.committee_id}/${currMonth}`)
+      const result = res.data.msg[0]
+      console.log('result :', result)
+      if (result && res.data.code == 200) {
+        setCurrentMonthData(result)
+
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    if (details) {
+
+      currentMonthDetails()
+    }
+  }, [details])
+
+
+
+  const paidAmount = currentMonthData.round_payment_paid
+
   const total = details.total;
 
   const percentage = (paidAmount / total) * 100;
 
+  const pendingAmount = paidAmount - total
+
+  //------------------------------------------------------------
+  if (loading) {
+    return <CommitteeDetailsSkeleton />;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -934,73 +990,125 @@ export const CommitteeDetails = ({ route }) => {
         {/* Top Progress Section */}
         <Card style={styles.row}>
           <View style={styles.half}>
-            <ProgressCircle value={2} total={details.total_rounds} color='#02af4a' />
+            <ProgressCircle value={paidRounds} total={details.total_rounds} color='#02af4a' />
             <Text style={styles.title}>Rounds Completed</Text>
-            <Text style={styles.bold}>2 / {details.total_rounds}</Text>
+            <Text style={styles.bold}>{paidRounds} / {details.total_rounds}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.half}>
-            <ProgressCircle value={2} total={details.total_rounds} color={AppColors.primary} />
+            <ProgressCircle value={pendingsRounds} total={details.total_rounds} color={AppColors.primary} />
             <Text style={styles.title}>Rounds Remaining</Text>
-            <Text style={styles.bold}>2 / {details.total_rounds}</Text>
+            <Text style={styles.bold}>{pendingsRounds} / {details.total_rounds}</Text>
           </View>
         </Card>
 
 
         {/* Info Cards */}
-        <View style={styles.grid}>
-          <Card style={styles.smallCard}>
-            <Icon name="group" size={28} color={AppColors.primary} />
-            <Text>Total Members</Text>
-            <Text style={styles.bold}>{details.total_member}</Text>
-          </Card>
+        <View style={styles.gridView}>
+          <View style={styles.grid2}>
+            <Card style={styles.smallCard}>
+              <Icon name="group" size={28} color={AppColors.primary} />
+              <Text>Total Members</Text>
+              <Text style={styles.bold}>{details.total_member}</Text>
+            </Card>
 
-          <Card style={styles.smallCard}>
-            <Icon name="calendar-today" size={28} color={AppColors.primary} />
-            <Text>Rounds / Month</Text>
-            <Text style={styles.bold}>{details.total_rounds}</Text>
-          </Card>
+            <Card style={styles.smallCard}>
+              <Icon name="calendar-today" size={28} color={AppColors.primary} />
+              <Text>Rounds / Month</Text>
+              <Text style={styles.bold}>{details.total_rounds}</Text>
+            </Card>
+          </View>
+          <View style={styles.grid2}>
+            <Card style={styles.smallCard}>
+              <Icon name="account-balance-wallet" size={28} color={AppColors.primary} />
+              <Text>Amount / Member</Text>
+              <Text style={styles.bold}>{details.committee_currency} {formatNumber(details.amount_per_member)}</Text>
+            </Card>
 
-          <Card style={styles.smallCard}>
-            <Icon name="account-balance-wallet" size={28} color={AppColors.primary} />
-            <Text>Amount / Member</Text>
-            <Text style={styles.bold}>PKR {formatNumber(details.amount_per_member)}</Text>
-          </Card>
-
-          <Card style={styles.smallCard}>
-            <Icon name="payments" size={28} color={AppColors.primary} />
-            <Text>Total Amount</Text>
-            <Text style={styles.bold}>PKR {formatNumber(details.total)}</Text>
-          </Card>
+            <Card style={styles.smallCard}>
+              <Icon name="payments" size={28} color={AppColors.primary} />
+              <Text>Total Amount</Text>
+              <Text style={styles.bold}>{details.committee_currency} {formatNumber(details.total)}</Text>
+            </Card>
+          </View>
         </View>
 
         {/* Current Month */}
-        <Card>
-          <Text style={styles.sectionTitle}>Current Month Details</Text>
 
-          <View style={styles.rowBetween}>
-            <Text>Round 2 / {details.total_rounds}</Text>
-            <Text>Feb 26, 2026</Text>
-            <Text style={{ color: '#02af4a' }}>PKR {formatNumber(paidAmount)}</Text>
+        <View style={styles.card}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.icon}><Icon name="calendar-month" size={24} color={AppColors.link} /></Text>
+            <Text style={styles.title}>Current Month Details</Text>
           </View>
 
+          {/* Row */}
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Round</Text>
+              <Text style={styles.value}>
+                {currentMonthData.round_pay_by} / {details.total_rounds}
+              </Text>
+            </View>
+
+            <View style={styles.col}>
+              <Text style={styles.label}>Date</Text>
+              <Text style={styles.value}>{currMonth}</Text>
+            </View>
+
+            <View style={styles.col}>
+              <Text style={styles.label}>Pending Amount</Text>
+              <Text style={styles.amount}>
+                {details.committee_currency} {formatNumber(pendingAmount)}
+              </Text>
+            </View>
+          </View>
+
+          {/* Progress */}
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: `${percentage}%` }]} />
           </View>
 
-          <Text>PKR {formatNumber(paidAmount)} of PKR {formatNumber(details.total)}</Text>
-        </Card>
+          <Text style={styles.bottomText}>
+           {details.committee_currency} {formatNumber(paidAmount)} of {details.committee_currency} {formatNumber(details.total)}
+          </Text>
+        </View>
 
         {/* Timeline */}
-        <Card>
-          <Text style={styles.sectionTitle}>Timeline</Text>
 
-          <Text>✔ Feb 24, 2026 - Round 1 Collected</Text>
-          <Text style={{ color: AppColors.link }}>● Feb 26, 2026 - Due Soon</Text>
-          <Text>○ Mar 2026 - Upcoming</Text>
-          <Text>○ Apr 2026 - Upcoming</Text>
+        <Card>
+          <View style={styles.timelineView}>
+            <Text style={styles.sectionTitle}>Timeline</Text>
+            <View>
+              {roundList.length > 4 && (
+                <TouchableOpacity
+                  style={styles.showMoreBtn}
+                  onPress={() => setExpanded(!expanded)}>
+                  <Text style={styles.showMoreText}>
+                    {expanded ? <Icon name="keyboard-arrow-up" size={24} color={AppColors.link} /> : <Icon name="keyboard-arrow-down" size={24} color={AppColors.link} />}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {visibleData.map((item, index) => {
+            return (
+              <View key={index} style={styles.rowItem}>
+                <Text
+                  style={{
+                    color: item.status === 'Paid' ? AppColors.link : '#000',
+                  }}>
+                  {`${item.status === 'Paid' ? '✔' : '○'} ${item.round_month} - ${item.status === 'Paid' ? 'Collected' : 'Upcoming'
+                    }`}
+                </Text>
+              </View>
+            );
+          })}
+
+
         </Card>
         {/* ------------------------------------------ */}
         <View style={styles.buttonRow}>
@@ -1079,7 +1187,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   sub_container: {
-    padding: 10,
+
+
   },
   card: {
     backgroundColor: '#fff',
@@ -1113,13 +1222,16 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
   },
-  grid: {
+  gridView: {
+    width: '100%',
+
+  },
+  grid2: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+
   },
   smallCard: {
-    width: width * 0.45,
+    width: width * 0.43,
     alignItems: 'center',
   },
   sectionTitle: {
@@ -1208,6 +1320,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 10,
     marginBottom: 20,
+    padding: 10
   },
 
   btn: {
@@ -1240,7 +1353,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   //------------------skeleton-----------------------
-  // Skeleton Styles
   skHeader: {
     padding: 15,
   },
@@ -1330,5 +1442,98 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: 10,
   },
+  //------------------------------------
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    margin: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  icon: {
+    fontSize: 18,
+    marginRight: 6,
+  },
+
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+
+  col: {
+    flex: 1,
+  },
+
+  label: {
+    fontSize: 12,
+    color: '#888',
+    marginBottom: 4,
+  },
+
+  value: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#222',
+  },
+
+  amount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#02af4a',
+  },
+
+  progressBar: {
+    height: 8,
+    backgroundColor: '#eee',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#5c9d8b',
+    borderRadius: 10,
+  },
+
+  bottomText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  //-------------------------------------------
+  rowItem: {
+    paddingVertical: 6,
+  },
+
+  showMoreBtn: {
+    alignItems: 'center',
+  },
+
+  showMoreText: {
+    color: AppColors.link,
+    fontWeight: '600',
+  },
+  timelineView: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center'
+  }
 });
 

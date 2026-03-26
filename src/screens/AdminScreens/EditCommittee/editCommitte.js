@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { api } from '../../../services/api';
@@ -47,6 +48,10 @@ export const EditCommittee = ({ route }) => {
   //------------------------------------
   const [show, setShow] = useState(false);
   const [date, setDate] = useState(null);
+  //----------------------------------------
+  const [currencyValue, setCurrencyValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [currency, setCurrency] = useState([]);
 
   //---------------------------------
   const [open, setOpen] = useState(false);
@@ -101,6 +106,8 @@ export const EditCommittee = ({ route }) => {
 
       formData.append('committee_id', String(value.committee_id));
       formData.append('name', value.committeeName || details.name);
+      formData.append('currency_id', currencyValue || details.committee_currency_id);
+
 
       formData.append(
         'total_member',
@@ -182,6 +189,33 @@ export const EditCommittee = ({ route }) => {
       });
     }
   };
+  //--------------------currency list-------------------------
+
+  const currencyFun = async () => {
+    try {
+      const res = await api.get(`/get/currency-list`)
+      const result = res?.data?.msg
+
+      const formattedData = result.map(item => ({
+        label: item.name,
+        value: item.id,
+      }));
+
+      // const filterCurrency = formattedData.filter(item => item.label === details.committee_currency)
+      // console.log('selected currency :', filterCurency[0].label)
+      // setCurrencyValue(filterCurency[0].label)
+      setCurrency(formattedData)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    currencyFun()
+  }, [])
+
+  //----------------------------------------------
 
   return (
     <View style={styles.container}>
@@ -333,9 +367,37 @@ export const EditCommittee = ({ route }) => {
                     onblur={handleBlur('totalAmount')}
                     rightIcon={<Icon name="edit" size={20} color="#666" />}
                   />
+                  {/* ======================================================= */}
+                  <View style={styles.DropDowncontainer}>
+                    <Text style={styles.label2}>Select Currency</Text>
+                    <Dropdown
+                      style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      iconStyle={styles.iconStyle}
+                      data={currency}
+                      search
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={!isFocus ? details.committee_currency : '...'}
+                      searchPlaceholder="Search..."
+                      value={currencyValue}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={item => {
+                        setCurrencyValue(item.value);
+                        setIsFocus(false);
+                      }}
+
+                    />
+                  </View>
+                  {/* ======================================================= */}
                   {/* ---------------------------------------------------------- */}
 
                   <View>
+
                     <CustomInputWithIcon
                       label="Select Date"
                       type="date"
@@ -360,9 +422,9 @@ export const EditCommittee = ({ route }) => {
                   </View>
                   {/* ---------------------------------------------------------- */}
                   <View>
-                  
+
                     <CustomInputWithIcon
-                      label="Due on"
+                      label="Due On (Date of each  month)"
                       type="numeric"
                       maxLength={2}
                       placeholder={due}
@@ -387,7 +449,8 @@ export const EditCommittee = ({ route }) => {
                   </View>
 
                   <View>
-                    <Text style={styles.label}>Status</Text>
+                    <Text style={styles.label2}>Status</Text>
+
                     <DropDownPicker
                       open={open}
                       items={items}
@@ -425,7 +488,7 @@ export const EditCommittee = ({ route }) => {
                     <CustomButton title="Save Changes" onPress={handleSubmit} />
                   </View>
                   <View style={styles.btnView}>
-                    <CustomButtonLight title="Cancel" />
+                    <CustomButtonLight title="Cancel" onPress={() => navigation.goBack()} />
                   </View>
                 </View>
               );
@@ -519,5 +582,53 @@ const styles = ScaledSheet.create({
     width: '80%',
     alignSelf: 'center',
     padding: 10,
+  },
+  //--------------------------------------------------------------------
+  DropDowncontainer: {
+    // backgroundColor: 'white',
+
+    paddingTop: 10,
+  },
+  dropdown: {
+    backgroundColor: '#f7f4f4ff',
+
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: '#f7f4f4ff',
+    left: 22,
+    top: 3,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+    borderRadius: 10
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: AppColors.blackText
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  label2: {
+    marginBottom: '5@ms',
+    fontSize: '14@ms',
+    color: '#333',
   },
 });

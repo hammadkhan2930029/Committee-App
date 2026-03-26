@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 //-----------------------------------------
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
+import PhoneInput from 'react-native-phone-number-input';
 
 const registerSchema = Yup.object().shape({
   name: Yup.string()
@@ -52,16 +53,23 @@ const registerSchema = Yup.object().shape({
 //-----------------------------------------
 
 export const Register = () => {
+
+
+  const phoneInput = useRef(null);
+  const [phoneValue, setPhoneValue] = useState('');
+  //---------------------------------
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
   ///-------------------------------------------
   const register = async value => {
     setLoading(true);
+    const fullNumber =
+      phoneInput.current?.getNumberAfterPossiblyEliminatingZero();
     try {
       var formData = new FormData();
       formData.append('full_name', value.name);
-      formData.append('phone', value.phone);
+      formData.append('phone', fullNumber?.formattedNumber);
       formData.append('password', value.password);
       formData.append('confirm_password', value.confirmPassword);
 
@@ -186,7 +194,7 @@ export const Register = () => {
                         error={touched.name && errors.name}
                       />
 
-                      <CustomInput
+                      {/* <CustomInput
                         label="Phone Number"
                         type="numeric"
                         placeholder="Enter your phone number"
@@ -194,7 +202,34 @@ export const Register = () => {
                         onChangeText={handleChange('phone')}
                         onBlur={handleBlur('phone')}
                         error={touched.phone && errors.phone}
+                      /> */}
+                      {/* --------------------------------------------------- */}
+                      <Text>Phone Number</Text>
+                      <PhoneInput
+                        ref={phoneInput}
+                        defaultValue={phoneValue}
+                        placeholder="3001234567"
+                        defaultCode="PK"
+                        layout="first"
+
+                        // 👇 IMPORTANT
+                        withFlag
+                        withCallingCode
+
+                        onChangeText={text => {
+                          setPhoneValue(text);
+                          handleChange('phone')(text);
+                        }}
+
+                        containerStyle={[
+                          styles.phoneInputContainer,
+                          touched.phone && errors.phone && styles.phoneErrorBorder,
+                        ]}
+                        textContainerStyle={styles.phoneTextContainer}
+                        textInputStyle={styles.phoneTextInput}
+
                       />
+                      {/* --------------------------------------------------- */}
 
                       <CustomInput
                         label="Password"
@@ -356,5 +391,57 @@ const styles = ScaledSheet.create({
   backIcon: {
     width: '20%',
     resizeMode: 'contain',
+  },
+  label: {
+    marginBottom: '5@ms',
+    fontSize: '14@ms',
+    color: '#333',
+  },
+  //---------------------------------
+
+  phoneContainer: {
+    marginBottom: '10@ms',
+  },
+
+  phoneLabel: {
+    marginBottom: '5@ms',
+    color: '#333',
+    fontSize: '14@ms',
+  },
+
+  phoneInputContainer: {
+    width: '100%',
+    height: '50@ms', // flag aur input ke liye enough height
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: '10@ms',
+    backgroundColor: '#f7f4f4ff',
+    paddingHorizontal: 0, // remove extra padding
+  },
+
+  phoneTextContainer: {
+    // backgroundColor: '#a6fd03',
+    borderRadius: '10@ms', // 0 rakhna better hai
+    height: '47@ms', // container ke equal
+    padding: 0,
+    alignItems: 'center', // flag vertically center
+  },
+
+  phoneTextInput: {
+    fontSize: '14@ms',
+    color: '#000',
+    height: '45@ms',
+    // backgroundColor: '#033dfd',
+
+  },
+
+  phoneErrorBorder: {
+    borderColor: 'red',
+  },
+
+  phoneErrorText: {
+    color: 'red',
+    fontSize: '12@ms',
+    marginTop: '5@ms',
   },
 });

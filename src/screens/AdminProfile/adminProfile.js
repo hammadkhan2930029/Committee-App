@@ -61,7 +61,7 @@ export const AdminProfile = () => {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: 'AuthStack' }],
       }),
     );
 

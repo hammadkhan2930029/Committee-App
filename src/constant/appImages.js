@@ -6,6 +6,8 @@ import profileAvatar from '../assets/images/profileAvatar.png';
 import profile from '../assets/images/profile.png';
 import logo from '../assets/images/logo.png';
 import logo1 from '../assets/images/logo1.png';
+import appIconWhite from '../assets/images/appIconWhite.png';
+import appIconOrange from '../assets/images/appIconOrange.png';
 
 
 export const AppImages = {
@@ -16,5 +18,7 @@ export const AppImages = {
   profile: profile,
   logo: logo,
   logo1: logo1,
+  appIconWhite:appIconWhite,
+  appIconOrange:appIconOrange
 
 };

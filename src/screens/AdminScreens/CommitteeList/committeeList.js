@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   StatusBar,
@@ -28,7 +28,7 @@ import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const CommitteeList = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [listView, setListView] = useState([]);
   const navigation = useNavigation();
   const [hasFetched, setHasFetched] = useState(false);
@@ -163,6 +163,45 @@ export const CommitteeList = () => {
       </View>
     );
   };
+  //-------------header---------------
+  const HeaderComponenet = useMemo(() => {
+    return (
+      <View>
+        <ImageBackground
+          source={AppImages.Rectangle2}
+          style={styles.RectangleImg}
+          resizeMode="cover"
+        >
+          <View style={styles.main}>
+            <View style={styles.TopView}>
+              <View style={styles.backAndText}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Icon
+                    name="arrow-circle-left"
+                    size={28}
+                    color={AppColors.title}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.h1}>Committees</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AdminProfile')}
+              >
+                <Image
+                  source={AppImages.profileAvatar}
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.textView}>
+              <Text style={styles.h4}>Manage all your active and</Text>
+              <Text style={styles.h4}>completed BCs below.</Text>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+    )
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -176,52 +215,55 @@ export const CommitteeList = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        <View>
-          <ImageBackground
-            source={AppImages.Rectangle2}
-            style={styles.RectangleImg}
-            resizeMode="cover"
-          >
-            <View style={styles.main}>
-              <View style={styles.TopView}>
-                <View style={styles.backAndText}>
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon
-                      name="arrow-circle-left"
-                      size={28}
-                      color={AppColors.title}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.h1}>Committees</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('AdminProfile')}
-                >
-                  <Image
-                    source={AppImages.profileAvatar}
-                    style={styles.avatar}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.textView}>
-                <Text style={styles.h4}>Manage all your active and</Text>
-                <Text style={styles.h4}>completed BCs below.</Text>
-              </View>
-            </View>
-          </ImageBackground>
-        </View>
+      <View style={styles.scrollView}>
+
 
         {/* ---------------------------------------------- */}
         {loading ? (
           <MySkeleton />
         ) : (
-          <View
-          // style={styles.Committee_View}
-          >
+          <View>
             <FlatList
               data={listView}
               keyExtractor={(item, index) => index.toString()}
+              ListHeaderComponent={HeaderComponenet}
+              // ListHeaderComponent={() => (
+
+              //   <View>
+              //     <ImageBackground
+              //       source={AppImages.Rectangle2}
+              //       style={styles.RectangleImg}
+              //       resizeMode="cover"
+              //     >
+              //       <View style={styles.main}>
+              //         <View style={styles.TopView}>
+              //           <View style={styles.backAndText}>
+              //             <TouchableOpacity onPress={() => navigation.goBack()}>
+              //               <Icon
+              //                 name="arrow-circle-left"
+              //                 size={28}
+              //                 color={AppColors.title}
+              //               />
+              //             </TouchableOpacity>
+              //             <Text style={styles.h1}>Committees</Text>
+              //           </View>
+              //           <TouchableOpacity
+              //             onPress={() => navigation.navigate('AdminProfile')}
+              //           >
+              //             <Image
+              //               source={AppImages.profileAvatar}
+              //               style={styles.avatar}
+              //             />
+              //           </TouchableOpacity>
+              //         </View>
+              //         <View style={styles.textView}>
+              //           <Text style={styles.h4}>Manage all your active and</Text>
+              //           <Text style={styles.h4}>completed BCs below.</Text>
+              //         </View>
+              //       </View>
+              //     </ImageBackground>
+              //   </View>
+              // )}
               renderItem={item => {
                 const datalist = item.item;
                 console.log('data list:', datalist);
@@ -314,16 +356,18 @@ export const CommitteeList = () => {
                 );
               }}
               ListEmptyComponent={() => (
-                <View style={styles.dataEmpty}>
-                  <Text style={styles.emptyText}>Data not available</Text>
-                </View>
+                !loading ? (
+                  <View style={styles.dataEmpty}>
+                    <Text style={styles.emptyText}>Data not available</Text>
+                  </View>
+                ) : null
               )}
             />
           </View>
         )}
 
         {/* ------------------------------------------------------------------------- */}
-      </ScrollView>
+      </View>
     </View>
   );
 };

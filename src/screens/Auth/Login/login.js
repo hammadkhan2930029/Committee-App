@@ -31,12 +31,13 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //----------------------------------------------
+const phoneRegExp = /^\+\d{1,4}[1-9]\d{8,14}$/;
 const loginSchema = Yup.object().shape({
   phone: Yup.string()
-    // .matches(
-    //   /^03[0-9]{9}$/,
-    //   'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
-    // )
+    .matches(
+      phoneRegExp,
+      'Phone number must start with country code (e.g., +92) and cannot start with 0'
+    )
     .required('Phone number is required'),
 
   password: Yup.string()
@@ -134,7 +135,7 @@ export const Login = () => {
                 <Text style={styles.h1}>
                   Welcome Back
                   <MaterialIcons name="waving-hand" size={34} color="#FED22D" />
-                
+
                 </Text>
                 <Text style={styles.h4}>Login to manage your committees</Text>
               </ImageBackground>
@@ -161,8 +162,9 @@ export const Login = () => {
                     <View>
                       <CustomInput
                         label="Phone"
-                        type="numeric"
-                        placeholder="Enter your phone number"
+                        type="text"
+
+                        placeholder="+92 300 1234567"
                         value={values.phone}
                         onChangeText={handleChange('phone')}
                         onBlur={handleBlur('phone')}

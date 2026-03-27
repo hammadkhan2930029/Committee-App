@@ -28,6 +28,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
 import PhoneInput from 'react-native-phone-number-input';
+import { CustomPhoneInput } from '../../../components/CustomePhoneInput'
 
 const registerSchema = Yup.object().shape({
   name: Yup.string()
@@ -62,14 +63,16 @@ export const Register = () => {
   const [loading, setLoading] = useState(false);
 
   ///-------------------------------------------
+  const [selectedCallingCode, setSelectedCallingCode] = useState('92');
+  //--------------------------------------------
   const register = async value => {
     setLoading(true);
-    const fullNumber =
-      phoneInput.current?.getNumberAfterPossiblyEliminatingZero();
+    const fullNumber = `+${selectedCallingCode}${value.phone}`;
+    console.log("Sending Phone:", fullNumber);
     try {
       var formData = new FormData();
       formData.append('full_name', value.name);
-      formData.append('phone', fullNumber?.formattedNumber);
+      formData.append('phone', fullNumber);
       formData.append('password', value.password);
       formData.append('confirm_password', value.confirmPassword);
 
@@ -203,32 +206,14 @@ export const Register = () => {
                         onBlur={handleBlur('phone')}
                         error={touched.phone && errors.phone}
                       /> */}
-                      {/* --------------------------------------------------- */}
-                      <Text>Phone Number</Text>
-                      <PhoneInput
-                        ref={phoneInput}
-                        defaultValue={phoneValue}
-                        placeholder="3001234567"
-                        defaultCode="PK"
-                        layout="first"
-
-                        // 👇 IMPORTANT
-                        withFlag
-                        withCallingCode
-
-                        onChangeText={text => {
-                          setPhoneValue(text);
-                          handleChange('phone')(text);
-                        }}
-
-                        containerStyle={[
-                          styles.phoneInputContainer,
-                          touched.phone && errors.phone && styles.phoneErrorBorder,
-                        ]}
-                        textContainerStyle={styles.phoneTextContainer}
-                        textInputStyle={styles.phoneTextInput}
-
+                      <CustomPhoneInput
+                        label="Phone Number"
+                        value={values.phone}
+                        onChangeText={handleChange('phone')}
+                        error={touched.phone && errors.phone}
+                        onCodeChange={(code) => setSelectedCallingCode(code)}
                       />
+                      
                       {/* --------------------------------------------------- */}
 
                       <CustomInput
@@ -399,49 +384,4 @@ const styles = ScaledSheet.create({
   },
   //---------------------------------
 
-  phoneContainer: {
-    marginBottom: '10@ms',
-  },
-
-  phoneLabel: {
-    marginBottom: '5@ms',
-    color: '#333',
-    fontSize: '14@ms',
-  },
-
-  phoneInputContainer: {
-    width: '100%',
-    height: '50@ms', // flag aur input ke liye enough height
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: '10@ms',
-    backgroundColor: '#f7f4f4ff',
-    paddingHorizontal: 0, // remove extra padding
-  },
-
-  phoneTextContainer: {
-    // backgroundColor: '#a6fd03',
-    borderRadius: '10@ms', // 0 rakhna better hai
-    height: '47@ms', // container ke equal
-    padding: 0,
-    alignItems: 'center', // flag vertically center
-  },
-
-  phoneTextInput: {
-    fontSize: '14@ms',
-    color: '#000',
-    height: '45@ms',
-    // backgroundColor: '#033dfd',
-
-  },
-
-  phoneErrorBorder: {
-    borderColor: 'red',
-  },
-
-  phoneErrorText: {
-    color: 'red',
-    fontSize: '12@ms',
-    marginTop: '5@ms',
-  },
 });

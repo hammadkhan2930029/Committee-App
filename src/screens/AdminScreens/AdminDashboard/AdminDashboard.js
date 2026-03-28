@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Image,
   Text,
+  Share,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -17,6 +18,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
@@ -32,10 +34,10 @@ import Animated, {
   withSequence,
   withRepeat,
 } from 'react-native-reanimated';
-import { ShareAppLink } from '../../../components/ShareAppLisk'
-
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 export const AdminDashboard = () => {
   //--------------------------------------------
+  const [visible, setVisible] = useState(false);
 
 
   //-------------------------------------------------
@@ -83,7 +85,7 @@ export const AdminDashboard = () => {
     }
   }, [userData]);
   console.log('counter :', counter);
-  
+
   //----------------------------------------------------------------------------
   const wave = useSharedValue(0);
 
@@ -124,6 +126,41 @@ export const AdminDashboard = () => {
   useEffect(() => {
     triggerHandWave();
   }, []);
+  //--------------------------------------------------------------
+
+  const toggleMenu = () => {
+    setVisible(!visible);
+  };
+
+  const handleOption = (type) => {
+    setVisible(false);
+
+    if (type === 'share') {
+      onShare()
+    } else if (type === 'suggestion') {
+      navigation.navigate('SuggestionScreen')
+    } else if (type === 'support') {
+      navigation.navigate('SuggestionScreen')
+    }
+  };
+  //---------------------------Share App------------------------------------
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          'Digital Bachat Committee Save Together, Grow Together!\n\nDownload now:\nhttps://play.google.com/store/apps/details?id=com.comitte',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        } else {
+        }
+      } else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+  //-----------------------------------------------------------------
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -158,10 +195,41 @@ export const AdminDashboard = () => {
                   )}
                   <Text style={styles.h4}>Here’s your admin overview.</Text>
                 </View>
-                <View style={styles.linkView}>
+                {/* <View style={styles.linkView}>
 
                   <ShareAppLink />
+                </View> */}
+                <View style={styles.container3}>
+
+                  {/* 3 DOT ICON */}
+                  <TouchableOpacity onPress={toggleMenu}>
+                    <MaterialCommunityIcons name="dots-horizontal" size={35} color="#fff" />
+                  </TouchableOpacity>
+
+                  {/* DROPDOWN */}
+                  {visible && (
+                    <View style={styles.dropdown}>
+                      <TouchableOpacity onPress={() => handleOption('share')} style={styles.item}>
+                        <Icon name="share" size={24} color={AppColors.link} />
+                        <Text style={styles.text}>Share App</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity onPress={() => handleOption('suggestion')} style={styles.item}>
+                        <MaterialCommunityIcons name="lightbulb-outline" size={24} color={AppColors.link} />
+
+                        <Text style={styles.text}>Suggestion</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity onPress={() => handleOption('support')} style={styles.item}>
+                        <MaterialCommunityIcons name="comment-text-outline" size={24} color={AppColors.link} />
+
+                        <Text style={styles.text}>Support</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
+
+
               </View>
 
             </View>
@@ -371,8 +439,37 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  linkView:{
+  linkView: {
     padding: 15,
 
+  },
+  //-------------------------------------
+  container3: {
+
+    // backgroundColor:'green',
+    position: 'relative',
+    paddingRight: 15
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 35,
+    right: 0,
+    width: 180,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 8,
+    elevation: 5,
+    zIndex: 100
+  },
+  item: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  text: {
+    fontSize: 14,
+    color: '#333',
+    paddingLeft: 4
   },
 });

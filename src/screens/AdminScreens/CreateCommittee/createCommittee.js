@@ -334,6 +334,8 @@ export const CreateCommittee = () => {
                     placeholder="Enter number of months"
                     type="numeric"
                     value={values.noOfMonths}
+                    editable={false}
+
                     onChangeText={handleChange('noOfMonths')}
                     onblur={handleBlur('noOfMonths')}
                     error={touched.noOfMonths && errors.noOfMonths}

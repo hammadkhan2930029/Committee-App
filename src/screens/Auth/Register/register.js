@@ -27,7 +27,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 //-----------------------------------------
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
-import PhoneInput from 'react-native-phone-number-input';
 import { CustomPhoneInput } from '../../../components/CustomePhoneInput'
 
 const registerSchema = Yup.object().shape({
@@ -213,7 +212,7 @@ export const Register = () => {
                         error={touched.phone && errors.phone}
                         onCodeChange={(code) => setSelectedCallingCode(code)}
                       />
-                      
+
                       {/* --------------------------------------------------- */}
 
                       <CustomInput
@@ -307,7 +306,7 @@ const styles = ScaledSheet.create({
   h4: {
     fontSize: moderateScale(18),
     color: AppColors.title,
-    opacity: 0.7,
+    opacity: 0.8,
   },
 
   registerCard: {

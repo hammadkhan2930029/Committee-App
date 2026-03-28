@@ -265,7 +265,7 @@ const styles = ScaledSheet.create({
   h4: {
     fontSize: moderateScale(18),
     color: AppColors.title,
-    opacity: 0.7,
+    opacity: 0.8,
   },
   loginCard: {
     backgroundColor: '#fff',

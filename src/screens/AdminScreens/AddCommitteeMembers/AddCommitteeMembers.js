@@ -39,17 +39,7 @@ export const AddCommitteeMembers = ({ route }) => {
 
   const [selectNumber, setSelectNumber] = useState();
 
-  //--------------dropdown 1-----------------------------------
 
-  // const [value1, setValue1] = useState(null);
-  // const [items1, setItems1] = useState([]);
-  // const [isFocus1, setIsFocus1] = useState(false);
-
-  //------------------dropdown 2----------------------
-
-  // const [items2, setItems2] = useState([]);
-  // const [value2, setValue2] = useState(null);
-  // const [isFocus2, setIsFocus2] = useState(false);
   //--------------------------------------------------------
   const [paymentList, setPaymentList] = useState([]);
   const [isverified, setIsVerified] = useState();
@@ -73,19 +63,6 @@ export const AddCommitteeMembers = ({ route }) => {
     ? 1
     : 0;
 
- //---------------------------------------------------------------------
-
-  // useEffect(() => {
-  //   if (multipleData?.members?.length) {
-  //     const assignedIds = membersList.map(m => m.committe_member_id)
-  //     .filter(item => !assignedIds.includes(item.committe_member_id))
-  //     const dropdownItems = multipleData.members.map((item, index) => ({
-  //       label: `${index + 1}`,
-  //       value: item.committe_member_id,
-  //     }));
-  //     setItems1(dropdownItems);
-  //   }
-  // }, [multipleData, membersList]);
   //--------------------members api---------------------------------------
   const membersApi = async () => {
     try {
@@ -93,7 +70,7 @@ export const AddCommitteeMembers = ({ route }) => {
         `/user/view-committee-members/${committeeID}`,
       );
       const data = response?.data?.msg || [];
-      
+
       setMembersidList(data);
       const filtered = data?.filter(item => item.user_name);
       setMembersList(filtered);
@@ -104,7 +81,7 @@ export const AddCommitteeMembers = ({ route }) => {
   useEffect(() => {
     membersApi();
   }, [committeeID]);
-  
+
   //-----------------get user data --------------------
 
   useFocusEffect(
@@ -119,33 +96,7 @@ export const AddCommitteeMembers = ({ route }) => {
     }, []),
   );
 
-  //-----------------user list------------------------
 
-  // const userViewUsers = async () => {
-  //   if (!userdata?.user_id) return;
-
-  //   try {
-  //     const response = await api.get(`/user/view-users/${userdata.user_id}`);
-  //     if (Array.isArray(response.data.msg)) {
-  //       const dropdownItems = response.data.msg.map(user => ({
-  //         label: user.name,
-  //         value: user.user_id,
-  //       }));
-  //       setItems2(dropdownItems);
-  //     } else {
-  //       setUserList([]);
-  //       setItems2([]);
-  //     }
-  //   } catch (error) {
-  //     console.log('error :', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (userdata?.user_id) {
-  //     userViewUsers();
-  //   }
-  // }, [userdata]);
 
   //-------------------add members api---------------------------
 
@@ -164,7 +115,7 @@ export const AddCommitteeMembers = ({ route }) => {
         },
       );
       const result = response.data.msg[0].response;
-      
+
 
       if (response.data.code === '200' && result) {
         Toast.show({
@@ -195,54 +146,6 @@ export const AddCommitteeMembers = ({ route }) => {
     }
   };
 
-  // const addCommitteeMember = async () => {
-  //   try {
-  //     var formData = new FormData();
-  //     formData.append('committee_member_id[]', value1);
-  //     formData.append('user_id[]', value2);
-
-  //     const res = await api.post('/user/update/committee-members', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     });
-  //     const response = res?.data;
-
-  //     if (response.code === '200' && response.msg[0].response) {
-  //       Toast.show({
-  //         type: 'customToast',
-  //         text1: 'Success',
-  //         text2: response.msg[0].response,
-  //         props: {
-  //           bgColor: AppColors.background,
-  //           borderColor: 'green',
-  //         },
-  //       });
-  //       membersApi();
-  //     } else {
-  //       Toast.show({
-  //         type: 'customToast',
-  //         text1: 'Warning',
-  //         text2: 'something error',
-  //         props: {
-  //           bgColor: AppColors.background,
-  //           borderColor: 'orange',
-  //         },
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     Toast.show({
-  //       type: 'customToast',
-  //       text1: 'Error',
-  //       text2: 'Server error, please try again',
-  //       props: {
-  //         bgColor: AppColors.background,
-  //         borderColor: '#ff5252',
-  //       },
-  //     });
-  //   }
-  // };
-  // console.log('value 1 :', value1);
-  // console.log('value 2 :', value2);
 
   //-------------------------delete member api---------------------------
 
@@ -252,7 +155,7 @@ export const AddCommitteeMembers = ({ route }) => {
         `/user/delete-committee-member/${committeeMemberID}`,
       );
       const result = response?.data?.msg[0].response;
-      
+
       if (response.data.code === '200' && result) {
         Toast.show({
           type: 'customToast',
@@ -289,31 +192,7 @@ export const AddCommitteeMembers = ({ route }) => {
       });
     }
   };
-  //----------------------------------------------------------------
 
-  // const renderLabel1 = () => {
-  //   if (value1 || isFocus1) {
-  //     return (
-  //       <Text style={[styles.label, isFocus1 && { color: AppColors.primary }]}>
-  //         Select Committee no
-  //       </Text>
-  //     );
-  //   }
-  //   return null;
-  // };
-  //----------------------------------------------------------------
-
-  // const renderLabel2 = () => {
-  //   if (value2 || isFocus2) {
-  //     return (
-  //       <Text style={[styles.label, isFocus2 && { color: AppColors.primary }]}>
-  //         Select Member
-  //       </Text>
-  //     );
-  //   }
-  //   return null;
-  // };
-  // const isDataEmpty = !items2 || items2.length === 0;
 
   //------------------------------------------------------------
   const committee_id_filter = membersID[0].committee_id;
@@ -351,7 +230,7 @@ export const AddCommitteeMembers = ({ route }) => {
       }
     }, [userdata]),
   );
-  console.log('Is veified :',isverified)
+  console.log('Is veified :', isverified)
   //------------------------------------------------------------
 
   const len = membersidList.length;
@@ -361,17 +240,15 @@ export const AddCommitteeMembers = ({ route }) => {
   //------------------------------------------------------------
   const [error, setError] = useState('');
 
- 
-  const pakistanMobileRegex =
-    /^(?:0?3[0-9]{2}-?[0-9]{7}|\+92-?3[0-9]{2}-?[0-9]{7})$/;
+  const internationalMobileRegex = /^\+[1-9]\d{1,3}-?\d{6,14}$/;
 
   const handleChange = text => {
     setSelectNumber(text);
 
     if (text.length === 0) {
       setError('');
-    } else if (!pakistanMobileRegex.test(text)) {
-      setError('Invalid mobile number');
+    } else if (!internationalMobileRegex.test(text)) {
+      setError('Number must start with country code (e.g. +92...)');
     } else {
       setError('');
     }
@@ -424,86 +301,14 @@ export const AddCommitteeMembers = ({ route }) => {
           <View>
             <CustomInputWithIcon
               label="Phone Number"
-              placeholder="Enter Phone number"
-              type="numeric"
-              // value={selectNumber}
-              // onChangeText={number => setSelectNumber(number)}
+              type="text"
+              placeholder="+92 300 1234567"
               value={selectNumber}
               onChangeText={handleChange}
             />
-             {error.length > 0 && <Text style={styles.error}>{error}</Text>}
+            {error.length > 0 && <Text style={styles.error}>{error}</Text>}
           </View>
-          {/* <View style={styles.DropDowncontainer}>
-            {renderLabel1()}
-            <Dropdown
-              style={[
-                styles.dropdown,
-                isFocus1 && { borderColor: AppColors.primary },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={items1}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={!isFocus1 ? 'Select Committee no' : '...'}
-              value={value1}
-              onFocus={() => setIsFocus1(true)}
-              onBlur={() => setIsFocus1(false)}
-              onChange={item => {
-                setValue1(item.value);
-                setIsFocus1(false);
-              }}
-              renderLeftIcon={() => (
-                <Icon
-                  style={styles.icon}
-                  color={isFocus1 ? AppColors.primary : 'black'}
-                  name="playlist-add"
-                  size={20}
-                />
-              )}
-            />
-          </View> */}
 
-          {/* ------------------------------------------------------------------ */}
-          {/* <View style={styles.DropDowncontainer}>
-            {renderLabel2()}
-            <Dropdown
-              disable={isDataEmpty}
-              style={[
-                styles.dropdown,
-                isFocus2 && { borderColor: AppColors.primary },
-              ]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={items2}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={!isFocus2 ? 'Select Member' : '...'}
-              searchPlaceholder="Search..."
-              value={value2}
-              onFocus={() => setIsFocus2(true)}
-              onBlur={() => setIsFocus2(false)}
-              onChange={item => {
-                setValue2(item.value);
-                setIsFocus2(false);
-              }}
-              renderLeftIcon={() => (
-                <Icon
-                  style={styles.icon}
-                  color={isFocus2 ? AppColors.primary : 'black'}
-                  name="person-add"
-                  size={20}
-                />
-              )}
-            />
-          </View> */}
         </View>
         {/* ---------------------------------------------------------------- */}
 
@@ -771,7 +576,7 @@ const styles = ScaledSheet.create({
     color: AppColors.title,
     fontSize: 14,
   },
-   error: {
+  error: {
     color: "red",
     marginTop: 5,
     fontSize: 14,

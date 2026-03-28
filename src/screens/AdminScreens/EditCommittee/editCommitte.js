@@ -278,6 +278,24 @@ export const EditCommittee = ({ route }) => {
               handleChange,
               setFieldValue,
             }) => {
+              useEffect(() => {
+                if (values.totalRounds && values.amountPerMember) {
+                  const total =
+                    Number(values.totalRounds) *
+                    Number(values.amountPerMember);
+
+                  setFieldValue('totalAmount', total.toString());
+                }
+
+                //-------------------------------------
+                if (values.totalRounds && values.roundsPerMonth) {
+                  const total =
+                    Number(values.totalRounds) /
+                    Number(values.roundsPerMonth);
+
+                  setFieldValue('noOfMonths', total.toString());
+                }
+              }, [values.totalRounds, values.amountPerMember, values.roundsPerMonth]);
               return (
                 <View style={styles.createCommitteForm}>
                   <CustomInputWithIcon
@@ -330,6 +348,8 @@ export const EditCommittee = ({ route }) => {
                     label="No. Of Months"
                     placeholder={details.no_of_month}
                     type="numeric"
+                    editable={false}
+
                     value={values.noOfMonths}
                     onChangeText={handleChange('noOfMonths')}
                     onblur={handleBlur('noOfMonths')}
@@ -362,6 +382,7 @@ export const EditCommittee = ({ route }) => {
                     placeholder={formatNumber(details.total)}
                     type="numeric"
                     editable={false}
+
                     value={formatNumber(values.totalAmount)}
                     onChangeText={handleChange('totalAmount')}
                     onblur={handleBlur('totalAmount')}

@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Image,
   Text,
+  Share,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -16,6 +17,8 @@ import { CustomButton } from '../../../components/customButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
@@ -26,13 +29,17 @@ import Animated, {
   withSequence,
   withRepeat,
 } from 'react-native-reanimated';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 export const MembersDashboard = () => {
+
   const navigation = useNavigation();
   const [userdata, setUserdata] = useState();
   const [notifyList, setNotifyList] = useState([]);
   const [committeeList, setCommitteeList] = useState([]);
   const [upComingList, setUpcomingList] = useState([]);
+  const [visible, setVisible] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -178,7 +185,7 @@ export const MembersDashboard = () => {
 
   useEffect(() => {
     if (notifyList.length > 0) {
-      triggerBellRing(); 
+      triggerBellRing();
     }
   }, [notifyList]);
   //------------------------animation by notification waving hand---------------------------------
@@ -219,8 +226,44 @@ export const MembersDashboard = () => {
     };
   });
   useEffect(() => {
-    triggerHandWave(); 
+    triggerHandWave();
   }, []);
+
+  //--------------------------------------------------------------
+
+  const toggleMenu = () => {
+    setVisible(!visible);
+  };
+
+  const handleOption = (type) => {
+    setVisible(false);
+
+    if (type === 'share') {
+      onShare()
+    } else if (type === 'suggestion') {
+      navigation.navigate('SuggestionScreen')
+    } else if (type === 'support') {
+      navigation.navigate('SuggestionScreen')
+    }
+  };
+  //---------------------------Share App------------------------------------
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          'Digital Bachat Committee Save Together, Grow Together!\n\nDownload now:\nhttps://play.google.com/store/apps/details?id=com.comitte',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        } else {
+        }
+      } else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+  //-----------------------------------------------------------------
 
   return (
     <View style={styles.container}>
@@ -254,21 +297,54 @@ export const MembersDashboard = () => {
                   </Text>
                   <Text style={styles.h4}>Here’s your BC overview.</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.notificationsView}
-                  onPress={() => navigation.navigate('Notifications')}
-                >
-                  <Animated.View style={ringStyle}>
-                    <Icon
-                      name="notifications-active"
-                      size={30}
-                      color="#FED22D"
-                    />
-                  </Animated.View>
-                  <Text style={styles.counterText}>
-                    {notifyList.length > 0 ? notifyList.length : '0'}
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.iconsView}>
+                  <TouchableOpacity
+                    style={styles.notificationsView}
+                    onPress={() => navigation.navigate('Notifications')}
+                  >
+                    <Animated.View style={ringStyle}>
+                      <Icon
+                        name="notifications-active"
+                        size={30}
+                        color="#FED22D"
+                      />
+                    </Animated.View>
+                    <Text style={styles.counterText}>
+                      {notifyList.length > 0 ? notifyList.length : '0'}
+                    </Text>
+                  </TouchableOpacity>
+                  {/* //////////////////////////////////// */}
+                  <View style={styles.container3}>
+
+                    {/* 3 DOT ICON */}
+                    <TouchableOpacity onPress={toggleMenu}>
+                      <MaterialCommunityIcons name="dots-horizontal" size={40} color="#fff" />
+                    </TouchableOpacity>
+
+                    {/* DROPDOWN */}
+                    {visible && (
+                      <View style={styles.dropdown}>
+                        <TouchableOpacity onPress={() => handleOption('share')} style={styles.item}>
+                          <Icon name="share" size={24} color={AppColors.link} />
+                          <Text style={styles.text}>Share App</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => handleOption('suggestion')} style={styles.item}>
+                          <MaterialCommunityIcons name="lightbulb-outline" size={24} color={AppColors.link} />
+
+                          <Text style={styles.text}>Suggestion</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => handleOption('support')} style={styles.item}>
+                          <MaterialCommunityIcons name="comment-text-outline" size={24} color={AppColors.link} />
+
+                          <Text style={styles.text}>Support</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                {/* ///////////////////////////////////////// */}
               </View>
             </View>
           </ImageBackground>
@@ -504,5 +580,41 @@ const styles = ScaledSheet.create({
     color: AppColors.title,
     fontSize: moderateScale(16),
     padding: 3,
+  },
+
+  //-------------------------------------
+  container3: {
+
+    // backgroundColor:'green',
+    position: 'relative',
+    paddingRight: 15
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 35,
+    right: 0,
+    width: 180,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 8,
+    elevation: 5,
+    zIndex: 100
+  },
+  item: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  text: {
+    fontSize: 14,
+    color: '#333',
+    paddingLeft: 4
+  },
+  //---------------------------
+  iconsView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10
   },
 });

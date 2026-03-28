@@ -78,11 +78,20 @@ export const CommitteeList = () => {
     }
   };
 
-  useEffect(() => {
-    if (userData?.user_id && !hasFetched) {
-      committeeList();
-    }
-  }, [userData?.user_id]);
+  // useEffect(() => {
+  //   if (userData?.user_id && !hasFetched) {
+  //     committeeList();
+  //   }
+  // }, [userData?.user_id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userData?.user_id && !hasFetched) {
+        committeeList();
+      }
+
+    }, [userData?.user_id])
+  )
 
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {

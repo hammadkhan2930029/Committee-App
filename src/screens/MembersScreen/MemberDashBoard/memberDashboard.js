@@ -18,7 +18,6 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
@@ -243,7 +242,7 @@ export const MembersDashboard = () => {
     } else if (type === 'suggestion') {
       navigation.navigate('SuggestionScreen')
     } else if (type === 'support') {
-      navigation.navigate('SuggestionScreen')
+      navigation.navigate('SupportTeam')
     }
   };
   //---------------------------Share App------------------------------------

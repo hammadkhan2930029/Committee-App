@@ -232,7 +232,7 @@ export const EditCommittee = ({ route }) => {
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon
-                      name="arrow-circle-left"
+                      name="arrow-back"
                       size={28}
                       color={AppColors.title}
                     />

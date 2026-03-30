@@ -182,7 +182,7 @@ export const Notifications = () => {
               >
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                   <Icon
-                    name="arrow-circle-left"
+                    name="arrow-back"
                     size={28}
                     color={AppColors.title}
                   />

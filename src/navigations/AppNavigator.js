@@ -19,7 +19,6 @@ import { PaymentDetails } from '../screens/AdminScreens/PaymentDetails/paymentDe
 import { BottomTabNavigationUser } from '../navigations/bottomTabsUser';
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 import { UserEditProfile } from '../screens/MembersScreen/UserEditProfile/userEditProfile';
-import { UserProfile } from '../screens/MembersScreen/Profile/userProfile';
 import { UploadSlip } from '../screens/MembersScreen/UploadPaymentSlip/uploadSlip';
 import { PaymentHistory } from '../screens/MembersScreen/PaymentHistory/paymentHistory';
 import { UserCommitteeDetails } from '../screens/MembersScreen/UserCommitteeDetails/UserCommitteeDetails';
@@ -31,6 +30,8 @@ import { Notifications } from '../screens/MembersScreen/Notifications/notificati
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { UpComingPayments } from '../screens/MembersScreen/UpComingPayments/upComingPayments'
 import { SuggestionScreen } from '../screens/SuggestionsAndSupport/Suggestion'
+import { SupportTeam } from '../screens/SuggestionsAndSupport/Support'
+
 
 const Stack = createNativeStackNavigator();
 
@@ -65,7 +66,6 @@ export const AppNavigator = () => {
       />
       <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
       <Stack.Screen name="UserEditProfile" component={UserEditProfile} />
-      <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="UploadSlip" component={UploadSlip} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
       <Stack.Screen
@@ -80,6 +80,8 @@ export const AppNavigator = () => {
       <Stack.Screen name="CommitteeList" component={CommitteeList} />
       <Stack.Screen name="UpComingPayments" component={UpComingPayments} />
       <Stack.Screen name="SuggestionScreen" component={SuggestionScreen} />
+      <Stack.Screen name="SupportTeam" component={SupportTeam} />
+
 
 
 

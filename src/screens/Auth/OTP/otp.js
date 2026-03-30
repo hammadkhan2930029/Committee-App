@@ -29,7 +29,7 @@ export const OtpVerification = () => {
       <View style={styles.main}>
         <View style={styles.arrowBackView}>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Image source={AppIcons.arrowBackColor} style={styles.arrowBack} />
+           <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
 

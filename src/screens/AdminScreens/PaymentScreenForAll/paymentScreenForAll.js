@@ -632,7 +632,7 @@ export const Payments = () => {
           <View style={styles.TopView}>
             <View style={styles.backAndText}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon name="arrow-circle-left" size={moderateScale(30)} color={AppColors.title} />
+                <Icon name="arrow-back" size={28} color={AppColors.title} />
               </TouchableOpacity>
               <Text style={styles.h1}>Payments</Text>
             </View>

@@ -18,6 +18,7 @@ import { CustomButton } from '../../../components/customButton';
 import { CustomInput } from '../../../components/customTextInput';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const ChangePassword = () => {
   const navigation = useNavigation();
@@ -33,10 +34,7 @@ export const ChangePassword = () => {
         <View style={styles.main}>
           <View style={styles.arrowBackView}>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Image
-                source={AppIcons.arrowBackColor}
-                style={styles.arrowBack}
-              />
+              <Icon name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
 

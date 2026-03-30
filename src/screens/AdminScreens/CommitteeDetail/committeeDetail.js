@@ -967,11 +967,12 @@ export const CommitteeDetails = ({ route }) => {
           <View style={styles.TopView}>
             <View style={styles.backAndText}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon
+                {/* <Icon
                   name="arrow-circle-left"
                   size={28}
                   color={AppColors.title}
-                />
+                /> */}
+                <Icon name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.h1}>Committee Details</Text>
             </View>
@@ -1072,7 +1073,7 @@ export const CommitteeDetails = ({ route }) => {
           </View>
 
           <Text style={styles.bottomText}>
-           {details.committee_currency} {formatNumber(paidAmount)} of {details.committee_currency} {formatNumber(details.total)}
+            {details.committee_currency} {formatNumber(paidAmount)} of {details.committee_currency} {formatNumber(details.total)}
           </Text>
         </View>
 

@@ -271,11 +271,7 @@ export const AddCommitteeMembers = ({ route }) => {
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon
-                      name="arrow-circle-left"
-                      size={28}
-                      color={AppColors.title}
-                    />
+                    <Icon name="arrow-back" size={24} color="#fff" />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Add Committee Members</Text>
                 </View>

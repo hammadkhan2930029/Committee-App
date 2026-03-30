@@ -56,7 +56,7 @@ export const AssignRounds = ({ route }) => {
       value: item.committee_round_id,
     })),
   );
-  console.log('round items :',roundItems)
+  console.log('round items :', roundItems)
   //-------------user view committee rounds--------------------------
   const viewCommitteeRound = async () => {
     try {
@@ -208,12 +208,7 @@ export const AssignRounds = ({ route }) => {
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
 
-
-                    <Icon
-                      name="arrow-circle-left"
-                      size={28}
-                      color={AppColors.title}
-                    />
+                    <Icon name="arrow-back" size={24} color="#fff" />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Assign Rounds To Member</Text>
                 </View>

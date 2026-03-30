@@ -140,7 +140,7 @@ export const AdminDashboard = () => {
     } else if (type === 'suggestion') {
       navigation.navigate('SuggestionScreen')
     } else if (type === 'support') {
-      navigation.navigate('SuggestionScreen')
+      navigation.navigate('SupportTeam')
     }
   };
   //---------------------------Share App------------------------------------

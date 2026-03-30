@@ -98,7 +98,7 @@ export const EditMember = ({ route }) => {
 
 
                     <Icon
-                      name="arrow-circle-left"
+                      name="arrow-back"
                       size={28}
                       color={AppColors.title}
                     />

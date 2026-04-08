@@ -21,6 +21,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
+import { RFValue } from 'react-native-responsive-fontsize';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -49,7 +54,7 @@ export const MembersDashboard = () => {
         const user = await getStoredUser();
         if (user) {
           setUserdata(user);
-          console.log('user', user);
+          // console.log('user', user);
         }
       };
       loader();
@@ -84,7 +89,13 @@ export const MembersDashboard = () => {
       const response = await api.get(`/user/my-committees/${userID}`);
       const result = response?.data?.msg;
 
-      setCommitteeList(result);
+      console.log('result :', result)
+      if (result[0].response == 'no data yet') {
+
+        setCommitteeList(0);
+      } else {
+        setCommitteeList(result)
+      }
       if (result) {
         setLoading(false);
       }
@@ -92,6 +103,7 @@ export const MembersDashboard = () => {
       console.log('try catch error :', error);
     }
   };
+
 
   //--------------------------------------------------------
   const UserPaymentHistory = async () => {
@@ -120,7 +132,7 @@ export const MembersDashboard = () => {
         `/user/upcoming-committee-payments/${userID}`,
       );
       const result = response?.data?.msg[0];
-      console.log('upcoming  :', result);
+      // console.log('upcoming  :', result);
       if (result) {
         setUpcomingList(result);
         setLoading(false);
@@ -137,7 +149,7 @@ export const MembersDashboard = () => {
     }
   }, [userID]);
 
-  console.log('upComingList :', upComingList);
+  // console.log('upComingList :', upComingList);
   //------------------------------------------------------
   const formatNumber = value => {
     if (value === null || value === undefined) return '';
@@ -281,7 +293,11 @@ export const MembersDashboard = () => {
                   onPress={() => navigation.navigate('AdminProfile')}
                 >
                   <Image
-                    source={AppImages.profileAvatar}
+                    source={
+                      userdata?.image
+                        ? { uri: userdata.image }
+                        : AppImages.profileAvatar
+                    }
                     style={styles.avatar}
                   />
                 </TouchableOpacity>
@@ -390,31 +406,14 @@ export const MembersDashboard = () => {
               <Text style={styles.activeBC_details}>
                 {`Due on ${upComingList?.due_date || ''}`}{' '}
               </Text>
-              <Text style={styles.counter_text2}>{`PKR ${formatNumber(
-                upComingList?.committee_amount || '',
-              )}`}</Text>
+              {upComingList?.committee_amount && (
+                <Text style={styles.counter_text2}>{`PKR ${formatNumber(
+                  upComingList?.committee_amount || '',
+                )}`}</Text>
+              )}
             </View>
           </TouchableOpacity>
-          {/* -------Pending Payments------- */}
-          {/* <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.Dashboardcard}
-            onPress={() => navigation.navigate('PaymentHistory')}
-          >
-            <View>
-              <View style={styles.imgText}>
-                <Icon name="cloud-upload" size={34} color={AppColors.link} />
-
-                <Text style={styles.activeBC}>Slip Status</Text>
-              </View>
-            </View>
-            <View style={styles.view2}>
-              <Text style={styles.activeBC_details}>Verification pending</Text>
-              <View style={styles.btnView}>
-                <Text style={styles.btn}>Pending</Text>
-              </View>
-            </View>
-          </TouchableOpacity> */}
+         
         </View>
       </ScrollView>
       <Loader visible={loading} />
@@ -449,6 +448,7 @@ const styles = ScaledSheet.create({
     width: 60,
     height: 60,
     elevation: 5,
+    borderRadius: 50
   },
   textView: {
     width: '75%',
@@ -492,20 +492,21 @@ const styles = ScaledSheet.create({
   //----------------------------
   Dashboardcard_View: {
     width: '100%',
-
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -50,
   },
   Dashboardcard: {
-    width: '85%',
+    width: wp(90),
     backgroundColor: AppColors.background,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     flexDirection: 'column',
-    padding: 15,
+    padding: 20,
     elevation: 5,
-    borderRadius: 20,
+    borderRadius: wp('5%'),
+    borderWidth: 1,
+    borderColor: AppColors.primary,
     margin: 10,
   },
   view2: {
@@ -536,14 +537,15 @@ const styles = ScaledSheet.create({
     opacity: 0.7,
   },
   counter: {
-    backgroundColor: AppColors.background,
+    backgroundColor: AppColors.primary,
     borderRadius: 10,
     elevation: 5,
+
   },
   counter_text: {
     fontSize: moderateScale(20),
     padding: 10,
-    color: AppColors.link,
+    color: "#fff",
     fontWeight: '600',
   },
   counter_text2: {

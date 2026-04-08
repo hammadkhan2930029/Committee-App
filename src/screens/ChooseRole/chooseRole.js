@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ImageBackground, ScrollView } from 'react-native';
 import { View, TouchableOpacity, Text, Image, StatusBar, Modal } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../constant/appImages';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
 import { AppIcons } from '../../constant/appIcons';
@@ -12,12 +12,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
 import { DisclaimerModal } from '../../components/disclaimerModal'
+import { getStoredUser } from '../../Utils/getUser';
 
 const screenWidth = Dimensions.get('window').width;
 
 export const ChooseRole = () => {
   const navigation = useNavigation();
   const [selected, setSelected] = useState(1);
+  const [userData, setUserData] = useState()
 
   const handleContinue = () => {
     if (selected === 1) {
@@ -26,20 +28,25 @@ export const ChooseRole = () => {
       navigation.navigate('BottomTabNavigationUser');
     }
   };
-  useEffect(() => {
-    const data = async () => {
-      const savedUser = await AsyncStorage.getItem('user');
-      console.log('Saved user:', savedUser);
-    };
-    data();
-  }, []);
+  //----------------------------------------------
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserData(user);
+        }
+      };
+      loadUser();
+    }, []),
+  );
   //----------------------------------------------------------
 
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView>
+      <ScrollView style={styles.scroll_view}>
         <ImageBackground
           source={AppImages.Rectangle}
           style={styles.RectangleImg}
@@ -54,7 +61,13 @@ export const ChooseRole = () => {
           </View>
         </ImageBackground>
         <View style={styles.profileView}>
-          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
+          <Image 
+          source={
+            userData?.image
+              ? { uri: userData.image }
+              : AppImages.profileAvatar
+          }
+            style={styles.profileImage} />
         </View>
 
         <View style={styles.cardView}>
@@ -282,5 +295,7 @@ const styles = ScaledSheet.create({
     width: '80%',
     alignSelf: 'center',
     marginTop: 20,
+    marginBottom: 50
   },
+
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
+import { AppColors } from '../constant/appColors';
 
 export const CustomInput = ({
   label,
@@ -10,10 +11,10 @@ export const CustomInput = ({
   type,
   error,
   style,
-  ...rest 
+  ...rest
 }) => {
-  
-  
+
+
   const getSettingsByType = () => {
     switch (type) {
       case 'email':
@@ -42,7 +43,7 @@ export const CustomInput = ({
         autoCapitalize={rest.autoCapitalize || settings.autoCapitalize}
         style={[styles.input, style, error && styles.errorInput]}
         placeholderTextColor="#999"
-        {...rest} 
+        {...rest}
       />
 
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -53,21 +54,23 @@ export const CustomInput = ({
 const styles = ScaledSheet.create({
   container: {
     marginVertical: '8@ms',
+
   },
   label: {
     marginBottom: '5@ms',
     fontSize: '14@ms',
-    color: '#333',
+    color: AppColors.primary,
   },
   input: {
     height: '48@ms',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 0.5,
+    borderColor: AppColors.primary,
     borderRadius: '10@ms',
     paddingHorizontal: '12@ms',
     fontSize: '15@ms',
-    backgroundColor: '#f7f4f4ff',
+    backgroundColor: AppColors.background,
     color: '#000',
+    elevation: 3
   },
   errorInput: {
     borderColor: 'red',

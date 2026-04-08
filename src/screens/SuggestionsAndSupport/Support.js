@@ -19,6 +19,7 @@ import { getStoredUser } from '../../Utils/getUser';
 import { api } from '../../services/api'
 import Toast from 'react-native-toast-message';
 import { Loader } from '../Loader/loader';
+import { CustomInput } from '../../components/customTextInput';
 
 //----------------------------------------------------------------------
 
@@ -168,13 +169,12 @@ export const SupportTeam = () => {
 
                                 {/* Subject */}
                                 <View style={styles.inputBox}>
-                                    <Text style={styles.label}>Subject</Text>
-                                    <TextInput
+                                    <CustomInput
+                                        label='Subject'
                                         value={values.subject}
                                         onChangeText={handleChange('subject')}
                                         onBlur={handleBlur('subject')}
                                         placeholder="Enter subject"
-                                        style={styles.input}
                                         placeholderTextColor="#999"
                                     />
                                     {touched.subject && errors.subject && (
@@ -184,13 +184,13 @@ export const SupportTeam = () => {
 
                                 {/* Message */}
                                 <View style={styles.inputBox}>
-                                    <Text style={styles.label}>Message</Text>
-                                    <TextInput
+                                    <CustomInput
+                                        label='Message'
                                         value={values.message}
                                         onChangeText={handleChange('message')}
                                         onBlur={handleBlur('message')}
                                         placeholder="Describe your issue..."
-                                        style={[styles.input, styles.textArea]}
+                                        style={styles.textArea}
                                         multiline
                                         numberOfLines={5}
                                         placeholderTextColor="#999"
@@ -223,7 +223,6 @@ const styles = ScaledSheet.create({
 
     header: {
         height: '200@vs',
-        // justifyContent: 'flex-end',
         paddingHorizontal: 20,
         paddingBottom: 20,
     },
@@ -233,7 +232,7 @@ const styles = ScaledSheet.create({
         alignItems: 'start',
         justifyContent: 'flex-start',
         gap: 10,
-        paddingTop: 20
+        paddingTop: 30
     },
     headingAndArrow: {
         flexDirection: 'row',

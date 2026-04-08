@@ -13,12 +13,10 @@ import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
 import { AppIcons } from '../../../constant/appIcons';
-import { CustomButton } from '../../../components/customButton';
 import { navigate } from '../../../navigations/navigationService';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
-import { Loader } from '../../Loader/loader';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {
   widthPercentageToDP as wp,
@@ -193,7 +191,11 @@ export const CommitteeList = () => {
                 onPress={() => navigation.navigate('AdminProfile')}
               >
                 <Image
-                  source={AppImages.profileAvatar}
+                  source={
+                    userData?.image
+                      ? { uri: userData.image }
+                      : AppImages.profileAvatar
+                  }
                   style={styles.avatar}
                 />
               </TouchableOpacity>
@@ -232,43 +234,7 @@ export const CommitteeList = () => {
               data={listView}
               keyExtractor={(item, index) => index.toString()}
               ListHeaderComponent={HeaderComponenet}
-              // ListHeaderComponent={() => (
 
-              //   <View>
-              //     <ImageBackground
-              //       source={AppImages.Rectangle2}
-              //       style={styles.RectangleImg}
-              //       resizeMode="cover"
-              //     >
-              //       <View style={styles.main}>
-              //         <View style={styles.TopView}>
-              //           <View style={styles.backAndText}>
-              //             <TouchableOpacity onPress={() => navigation.goBack()}>
-              //               <Icon
-              //                 name="arrow-circle-left"
-              //                 size={28}
-              //                 color={AppColors.title}
-              //               />
-              //             </TouchableOpacity>
-              //             <Text style={styles.h1}>Committees</Text>
-              //           </View>
-              //           <TouchableOpacity
-              //             onPress={() => navigation.navigate('AdminProfile')}
-              //           >
-              //             <Image
-              //               source={AppImages.profileAvatar}
-              //               style={styles.avatar}
-              //             />
-              //           </TouchableOpacity>
-              //         </View>
-              //         <View style={styles.textView}>
-              //           <Text style={styles.h4}>Manage all your active and</Text>
-              //           <Text style={styles.h4}>completed BCs below.</Text>
-              //         </View>
-              //       </View>
-              //     </ImageBackground>
-              //   </View>
-              // )}
               renderItem={item => {
                 const datalist = item.item;
                 console.log('data list:', datalist);
@@ -287,8 +253,8 @@ export const CommitteeList = () => {
                         ]}
                       >
                         <View style={styles.first_view}>
-                          <View>
-                            <Text style={styles.family}>{datalist.name}</Text>
+                          <View style={styles.committeeName_View}>
+                            <Text style={styles.committeeName}>{datalist.name}</Text>
                           </View>
                           <TouchableOpacity
                             style={
@@ -390,8 +356,8 @@ const styles = ScaledSheet.create({
     height: wp('7%'),
   },
   RectangleImg: {
-    width: wp('100%'),
-    height: hp('25%'),
+    width: '100%',
+    height: 200,
     resizeMode: 'contain',
   },
   TopView: {
@@ -406,7 +372,6 @@ const styles = ScaledSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    // width: wp('45%'),
   },
   h1: {
     fontSize: RFValue(22),
@@ -418,6 +383,7 @@ const styles = ScaledSheet.create({
     width: wp('14%'),
     height: wp('14%'),
     elevation: 5,
+    borderRadius: 50
   },
   textView: {
     padding: wp('2%'),
@@ -459,10 +425,20 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  family: {
+  committeeName_View: {
+    backgroundColor: AppColors.background,
+    borderWidth: 1,
+    borderColor: AppColors.primary,
+    borderRadius: 50,
+    elevation: 3
+  },
+  committeeName: {
     fontSize: RFValue(15),
     color: AppColors.blackText,
     fontWeight: '600',
+    paddingHorizontal: 15,
+    paddingVertical: 5
+
   },
   Btncomplete: {
     backgroundColor: 'green',
@@ -482,6 +458,8 @@ const styles = ScaledSheet.create({
     paddingHorizontal: wp('2%'),
     borderColor: AppColors.primary,
     borderWidth: 1,
+    elevation: 5
+
   },
   active: {
     fontSize: RFValue(14),

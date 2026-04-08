@@ -1,220 +1,239 @@
-import React, { useCallback, useEffect, useState } from 'react';
+
+import React, { useCallback, useState } from 'react';
 import {
-  Button,
-  Image,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
+    Dimensions,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
-import { AppIcons } from '../../constant/appIcons';
 import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
+import { CustomButtonLight } from '../../components/customeButtonLight';
 
-const screenWidth = Dimensions.get('window').width;
+const { width } = Dimensions.get('window');
 
 export const AdminProfile = () => {
-  const [userdata, setUserData] = useState(null);
-  const [isLodaing, setIsLoading] = useState(false);
-  const navigation = useNavigation();
-  //-----------------get data--------------------
-  const getData = async () => {
-    const user = await AsyncStorage.getItem('user');
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      setUserData(parsedUser);
-    } else {
-      setUserData(null);
-    }
-  };
-  useFocusEffect(
-    useCallback(() => {
-      getData();
-    }, []),
-  );
-  console.log('user data :', userdata);
-  //-----------------logout--------------------------
-  // const logout = async () => {
-  //   setIsLoading(true);
-  //   await AsyncStorage.removeItem('user');
-  //   await AsyncStorage.removeItem('token');
-  //   navigation.replace('Login');
+    const [userdata, setUserData] = useState(null);
+    const [isLodaing, setIsLoading] = useState(false);
+    const navigation = useNavigation();
 
-  // };
-  const logout = async () => {
-    setIsLoading(true);
+    const getData = async () => {
+        const user = await AsyncStorage.getItem('user');
+        if (user) setUserData(JSON.parse(user));
+    };
 
-    await AsyncStorage.removeItem('user');
-    await AsyncStorage.removeItem('token');
-    await AsyncStorage.removeItem('ModalClosed');
-
-    
-
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'AuthStack' }],
-      }),
+    useFocusEffect(
+        useCallback(() => {
+            getData();
+        }, []),
     );
+    console.log("profile user", userdata)
+    const logout = async () => {
+        setIsLoading(true);
+        await AsyncStorage.multiRemove(['user', 'token', 'ModalClosed']);
 
-    setIsLoading(false);
-  };
-  //-------------------------------------
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'AuthStack' }],
+            }),
+        );
 
-  if (userdata) {
+        setIsLoading(false);
+    };
+
+    console.log('user data async :', userdata)
+    if (!userdata) return <Loader visible />;
+
     return (
-      <View style={styles.container}>
-        <StatusBar
-          backgroundColor={AppColors.primary}
-          barStyle="light-content"
-        />
-        <View style={styles.arrowBackView}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-circle-left" size={28} color={AppColors.link} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon name="settings" size={26} color={AppColors.link} />
-          </TouchableOpacity>
-        </View>
+        <View style={styles.container}>
+            <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
 
-        <View style={styles.profileView}>
-          <Text style={styles.profile}>Profile</Text>
+            <ScrollView contentContainerStyle={styles.scroll}>
+
+                {/* HEADER */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Icon name="arrow-back" size={26} color="#fff" />
+                    </TouchableOpacity>
+
+                    <Text style={styles.headerTitle}>My Profile</Text>
+
+                    <Icon name="settings" size={24} color="#fff" />
+                </View>
+
+                {/* PROFILE CARD */}
+                <View style={styles.card}>
+                    <Image
+                        source={
+                            userdata?.image
+                                ? { uri: userdata.image }
+                                : AppImages.profileAvatar
+                        }
+                        style={styles.image}
+                    />
+
+                    <Text style={styles.name}>{userdata?.full_name}</Text>
+                    <Text style={styles.role}>Administrator</Text>
+                </View>
+
+                {/* INFO CARD */}
+                <View style={styles.infoCard}>
+                    {renderRow('Full Name', userdata?.full_name)}
+                    {renderRow('Phone', userdata?.phone)}
+                    {renderRow('Code', userdata?.reg_code)}
+                </View>
+
+                {/* BUTTONS */}
+                <View style={styles.btnWrap}>
+                    <CustomButton
+                        title="Edit Profile"
+                        onPress={() =>
+                            navigation.navigate('AdminEditProfile', { user: userdata })
+                        }
+                    />
+                    <View style={styles.btnView}>
+
+                        <CustomButtonLight
+                            title='Log Out'
+                            onPress={logout}
+                        />
+                    </View>
+
+
+                </View>
+            </ScrollView>
+
+            <Loader visible={isLodaing} />
         </View>
-        <View style={styles.profileView}>
-          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
-        </View>
-        <View style={styles.nameView}>
-          <Text style={styles.name}>{userdata?.full_name}</Text>
-          <Text style={styles.admin}>Admin</Text>
-        </View>
-        <View style={styles.detailView}>
-          <View style={styles.detail}>
-            <Text style={styles.text1}>Full Name : </Text>
-            <Text style={styles.text2}> {userdata?.full_name}</Text>
-          </View>
-          <View style={styles.detail}>
-            <Text style={styles.text1}>Phone Number : </Text>
-            <Text style={styles.text2}> {userdata?.phone}</Text>
-          </View>
-        </View>
-        <View style={styles.BtnView}>
-          <CustomButton
-            title="Edit Profile"
-            onPress={() =>
-              navigation.navigate('AdminEditProfile', { user: userdata })
-            }
-          />
-          <TouchableOpacity style={styles.button} onPress={() => logout()}>
-            <Text style={styles.text}>Log Out</Text>
-          </TouchableOpacity>
-        </View>
-        <Loader visible={isLodaing} />
-      </View>
     );
-  }
 };
+
+const renderRow = (label, value) => (
+    <View style={styles.row}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value}>{value}</Text>
+    </View>
+);
+
 const styles = ScaledSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.background,
-  },
-  arrowBackView: {
-    marginTop: 20,
-    padding: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  arrowIcon: {
-    backgroundColor: AppColors.primary,
-    borderRadius: 20,
-    width: 25,
-    height: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  // profileView: {
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
-  profile: {
-    fontSize: moderateScale(24),
-    color: AppColors.primary,
-    fontWeight: '700',
-    padding: 5,
-  },
-  profileView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: screenWidth * 0.45,
-    height: screenWidth * 0.45,
-    resizeMode: 'contain',
-    borderColor: AppColors.background,
-    borderWidth: 8,
-    borderRadius: (screenWidth * 0.45) / 2,
-    elevation: 3,
-  },
-  nameView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-  name: {
-    textAlign: 'center',
-    fontSize: moderateScale(20),
-    color: AppColors.bodyText,
-    padding:5
-  },
-  admin: {
-    textAlign: 'center',
-    fontSize: moderateScale(16),
-    color: AppColors.link,
-  },
-  detailView: {
-    padding: 25,
-  },
-  detail: {
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    padding: 8,
-  },
-  text1: {
-    fontSize: moderateScale(18),
-    color: AppColors.focusText,
-    fontWeight: '600',
-  },
-  text2: {
-    fontSize: moderateScale(18),
-    color: AppColors.bodyText,
-  },
-  BtnView: {
-    width: '70%',
-    alignSelf: 'center',
-  },
-  button: {
-    padding: 12,
-    borderRadius: 15,
-    alignItems: 'center',
-    elevation: 5,
-    backgroundColor: AppColors.background,
-    marginTop: 10,
-    borderColor: AppColors.primary,
-    borderWidth: 1,
-  },
-  text: {
-    color: AppColors.link,
-    fontWeight: 'bold',
-    fontSize: moderateScale(14),
-  },
+    container: {
+        flex: 1,
+        backgroundColor: AppColors.background,
+
+    },
+
+    scroll: {
+        paddingBottom: '30@ms',
+    },
+
+    header: {
+        backgroundColor: AppColors.primary,
+        padding: '25@ms',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomLeftRadius: '45@ms',
+        borderBottomRightRadius: '45@ms',
+        elevation: 8,
+    },
+
+    headerTitle: {
+        color: '#fff',
+        fontSize: '18@ms',
+        fontWeight: '600',
+    },
+
+    card: {
+        alignItems: 'center',
+        marginTop: '20@ms',
+        backgroundColor: AppColors.primary,
+        marginHorizontal: '20@ms',
+        padding: '20@ms',
+        borderRadius: '20@ms',
+        elevation: 6,
+    },
+
+    image: {
+        width: width * 0.28,
+        height: width * 0.28,
+        borderRadius: (width * 0.28) / 2,
+        marginBottom: '10@ms',
+        elevation: 5
+    },
+
+    name: {
+        fontSize: '20@ms',
+        fontWeight: '700',
+        color: '#fff'
+    },
+
+    role: {
+        fontSize: '14@ms',
+        color: AppColors.cardLight,
+        marginTop: '4@ms',
+    },
+
+    infoCard: {
+        backgroundColor: AppColors.cardLight,
+        margin: '20@ms',
+        padding: '15@ms',
+        borderRadius: '15@ms',
+        elevation: 4,
+
+    },
+
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: '10@ms',
+        borderBottomWidth: 0.5,
+        borderColor: '#dfc2b6',
+    },
+
+    label: {
+        fontSize: '15@ms',
+        fontWeight: '600',
+
+        color: AppColors.primary
+
+    },
+
+    value: {
+        fontSize: '15@ms',
+        fontWeight: '400',
+        color: AppColors.primary
+
+    },
+
+    btnWrap: {
+        marginHorizontal: '20@ms',
+    },
+    btnView: {
+        marginTop: 8
+    },
+
+    logoutBtn: {
+        marginTop: '10@ms',
+        padding: '12@ms',
+        borderRadius: '12@ms',
+        borderWidth: 1,
+        borderColor: 'red',
+        alignItems: 'center',
+    },
+
+    logoutText: {
+        color: 'red',
+        fontWeight: '600',
+    },
 });

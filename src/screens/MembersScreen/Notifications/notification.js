@@ -39,7 +39,6 @@ export const Notifications = () => {
         const user = await getStoredUser();
         if (user) {
           setUserdata(user);
-          // console.log('user', user);
         }
       };
       loader();
@@ -70,7 +69,7 @@ export const Notifications = () => {
       notificationsApi();
     }
   }, [userdata]);
-  console.log('notify list :', notifyList);
+  console.log('notify list :', notifyList.length);
 
   //------------------------------------------------------------
 
@@ -192,7 +191,11 @@ export const Notifications = () => {
               <TouchableOpacity
                 onPress={() => navigation.navigate('AdminProfile')}
               >
-                <Image source={AppImages.profileAvatar} style={styles.avatar} />
+                <Image source={
+                  userdata?.image
+                    ? { uri: userdata.image }
+                    : AppImages.profileAvatar
+                } style={styles.avatar} />
               </TouchableOpacity>
             </View>
           </View>
@@ -222,7 +225,7 @@ export const Notifications = () => {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        {notifyList && (
+        {notifyList.length > 0 && (
           <View style={styles.btnView}>
             <CustomButton
               title="Mark All as Read"
@@ -264,6 +267,7 @@ const styles = ScaledSheet.create({
     width: 60,
     height: 60,
     elevation: 5,
+    borderRadius:50
   },
   textView: {
     padding: 15,

@@ -1,269 +1,320 @@
-import React, { useEffect, useState } from 'react';
+
+
+
+import React, { useCallback, useState } from 'react';
 import {
-  Button,
-  Image,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
+    Dimensions,
+    Alert,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
-import { AppIcons } from '../../constant/appIcons';
 import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
 import { CustomInput } from '../../components/customTextInput';
 import { Formik } from 'formik';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../../services/api';
 import Toast from 'react-native-toast-message';
-import * as Yup from 'yup';
 import { Loader } from '../Loader/loader';
-import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { getStoredUser } from '../../Utils/getUser';
 
-const screenWidth = Dimensions.get('window').width;
+const { width } = Dimensions.get('window');
 
 export const AdminEditProfile = ({ route }) => {
-  const { user } = route.params;
-  console.log('user :', user.full_name);
-  const [userdata, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+    const { user } = route.params;
+    const [isLoading, setIsLoading] = useState(false);
+    const [image, setImage] = useState(null);
+    const [userData, setUserData] = useState()
 
-  const navigation = useNavigation();
-  //------------------local storage update data-----------------
-  const updateUserInStorage = async updatedUser => {
-    try {
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-      console.log('User updated in AsyncStorage');
-    } catch (e) {
-      console.log('Storage update error:', e);
-    }
-  };
+    const navigation = useNavigation();
+    //----------------------------------------------
+    useFocusEffect(
+        useCallback(() => {
+            const loadUser = async () => {
+                const user = await getStoredUser();
+                if (user) {
+                    setUserData(user);
+                    // console.log(user.full_name, user.user_id);
+                }
+            };
+            loadUser();
+        }, []),
+    );
+    console.log('userData', userData);
 
-  //----------------------------------------------------------
-  const editProfile = async value => {
-    setIsLoading(true);
-    try {
-      var formData = new FormData();
-      formData.append('full_name', value.fullName || user.full_name);
-      formData.append('phone', value.phoneNumber || user.phone);
-      formData.append('user_id', user.user_id);
-      const res = await api.post('/user/edit-profile', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      if (res?.data?.code === '200') {
-        const updatedUser = {
-          ...user,
-          full_name: value.fullName || user.full_name,
-          phone: value.phoneNumber || user.phone,
-        };
-
-        await updateUserInStorage(updatedUser);
-        Toast.show({
-          type: 'customToast',
-          text1: 'Success',
-          text2: res?.data?.msg?.[0].response || 'Profile updated',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'green',
-          },
+    //------------------ Image Picker ------------------
+    const pickImage = () => {
+        launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
+            if (!response.didCancel && !response.errorCode) {
+                setImage(response.assets[0]);
+            }
         });
-      } else {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Warning',
-          text2: res?.data?.msg?.[0].response || 'Something went wrong',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'orange',
-          },
+    };
+
+
+    const openCamera = () => {
+        launchCamera({ mediaType: 'photo', quality: 0.7 }, response => {
+            if (!response.didCancel && !response.errorCode) {
+                setImage(response.assets[0]);
+            }
         });
-      }
-      navigation.goBack();
-      console.log('edit profile response', res.data.code);
-    } catch (error) {
-      console.log(error);
-      Toast.show({
-        type: 'customToast',
-        text1: 'Error',
-        text2:
-          error?.response?.data?.msg?.[0]?.response ||
-          'Server error, please try again',
-        props: {
-          bgColor: AppColors.background,
-          borderColor: '#ff5252',
-        },
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  //----------------------------------------------------------
+    };
 
-  return (
-    <View style={styles.container}>
-      {/* <StatusBar
-        backgroundColor={AppColors.background}
-        barStyle="dark-content"
-      /> */}
-      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <ScrollView>
-        <View style={styles.arrowBackView}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-circle-left" size={28} color={AppColors.link} />
-          </TouchableOpacity>
-        </View>
+    const chooseImage = () => {
+        Alert.alert('Select Image', 'Choose option', [
+            { text: 'Camera', onPress: openCamera },
+            { text: 'Gallery', onPress: pickImage },
+            { text: 'Cancel', style: 'cancel' },
+        ]);
+    };
 
-        <View style={styles.profileView}>
-          <Text style={styles.profile}>Edit Profile</Text>
-        </View>
-        <View style={styles.profileView}>
-          <Image source={AppImages.profileAvatar} style={styles.profileImage} />
-        </View>
-        <View style={styles.nameView}>
-          <Text style={styles.name}>{userdata?.full_name}</Text>
-          <Text style={styles.admin}>Admin</Text>
-        </View>
-        <View style={styles.detailView}>
-          <Formik
-            initialValues={{
-              fullName: user.full_name || '',
-              phoneNumber: user.phone || '',
-            }}
-            onSubmit={(values, { resetForm }) => {
-              editProfile(values);
-              resetForm();
-            }}
-          >
-            {({
-              values,
-              handleBlur,
-              handleChange,
-              handleSubmit,
-              handleReset,
-              errors,
-            }) => (
-              <View>
-                <View>
-                  <CustomInput
-                    label="Full Name"
-                    type="text"
-                    placeholder={user.full_name}
-                    value={values.fullName}
-                    onChangeText={handleChange('fullName')}
-                    onBlur={handleBlur('fullName')}
-                  />
-                  <CustomInput
-                    label="Phone Number"
-                    type="numeric"
-                    placeholder={user.phone}
-                    value={values.phoneNumber}
-                    onChangeText={handleChange('phoneNumber')}
-                    onBlur={handleBlur('phoneNumber')}
-                  />
+    //------------------ Storage Update ------------------
+    const updateUserInStorage = async updatedUser => {
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+    };
+
+    //------------------ API Call ------------------
+    const editProfile = async value => {
+
+        setIsLoading(true);
+        try {
+            let formData = new FormData();
+
+
+            formData.append('full_name', value.fullName);
+            formData.append('phone', value.phoneNumber);
+            formData.append('user_id', user.user_id);
+
+            // IMAGE UPLOAD
+            if (image) {
+                formData.append('image', {
+                    uri: image.uri,
+                    type: image.type || 'image/jpeg',
+                    name: image.fileName || 'profile.jpg',
+                });
+            }
+            const res = await api.post('/user/edit-profile', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            console.log("response :", res)
+
+            if (res?.data?.code === '200') {
+                const updatedUser = {
+                    ...user,
+                    full_name: value.fullName || user.full_name,
+                    phone: value.phoneNumber || user.phone,
+                    image: image?.uri || user.image, // ✅ ADD THIS
+                };
+
+                await updateUserInStorage(updatedUser);
+
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Success',
+                    text2: res?.data?.msg?.[0].response || 'Profile updated',
+                    props: {
+                        bgColor: AppColors.background,
+                        borderColor: 'green',
+                    },
+                });
+
+                navigation.goBack();
+            } else {
+                Toast.show({
+                    type: 'customToast',
+                    text1: 'Warning',
+                    text2: res?.data?.msg?.[0].response || 'Something went wrong',
+                    props: {
+                        bgColor: AppColors.background,
+                        borderColor: 'orange',
+                    },
+                });
+            }
+        } catch (error) {
+            console.log(error)
+            Toast.show({
+                type: 'customToast',
+                text1: 'Error',
+                text2:
+                    error?.response?.data?.msg?.[0]?.response ||
+                    'Server error, please try again',
+                props: {
+                    bgColor: AppColors.background,
+                    borderColor: '#ff5252',
+                },
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <View style={styles.container}>
+            <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
+
+            <ScrollView contentContainerStyle={styles.scroll}>
+
+                {/* HEADER */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Icon name="arrow-back" size={26} color="#fff" />
+                    </TouchableOpacity>
+
+                    <Text style={styles.headerTitle}>Edit Profile</Text>
+
+                    <View style={{ width: 24 }} />
                 </View>
 
-                <View style={styles.btn}>
-                  <CustomButton title="Submit" onPress={handleSubmit} />
+                {/* PROFILE CARD */}
+                <View style={styles.card}>
+                    <View style={styles.imageWrapper}>
+                        <Image
+                            source={
+                                image ? { uri: image.uri } : userData?.image ? { uri: userData.image } : AppImages.profileAvatar
+                            }
+                            style={styles.image}
+                        />
+
+                        {/* Edit Icon */}
+                        <TouchableOpacity style={styles.editIcon} onPress={chooseImage}>
+                            <Icon name="edit" size={18} color={AppColors.primary} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.name}>{user.full_name}</Text>
+                    <Text style={styles.role}>Administrator</Text>
                 </View>
-              </View>
-            )}
-          </Formik>
+
+                {/* FORM CARD */}
+                <View style={styles.formCard}>
+                    <Formik
+                        initialValues={{
+                            fullName: user.full_name || '',
+                            phoneNumber: user.phone || '',
+                        }}
+                        onSubmit={values => editProfile(values)}
+                    >
+                        {({ values, handleChange, handleBlur, handleSubmit }) => (
+                            <View>
+
+                                <CustomInput
+                                    label="Full Name"
+                                    placeholder="Enter full name"
+                                    value={values.fullName}
+                                    onChangeText={handleChange('fullName')}
+                                    onBlur={handleBlur('fullName')}
+                                />
+
+                                <CustomInput
+                                    label="Phone Number"
+                                    placeholder="Enter phone number"
+                                    value={values.phoneNumber}
+                                    onChangeText={handleChange('phoneNumber')}
+                                    onBlur={handleBlur('phoneNumber')}
+                                />
+
+                                <View style={styles.btn}>
+                                    <CustomButton title="Update Profile" onPress={handleSubmit} />
+                                </View>
+
+                            </View>
+                        )}
+                    </Formik>
+                </View>
+            </ScrollView>
+
+            <Loader visible={isLoading} />
         </View>
-      </ScrollView>
-      <Loader visible={isLoading} />
-    </View>
-  );
+    );
 };
-const styles = ScaledSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.background,
-  },
-  arrowBackView: {
-    marginTop: 20,
-    padding: 20,
-  },
 
-  profileView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profile: {
-    fontSize: moderateScale(24),
-    color: AppColors.primary,
-    fontWeight: '700',
-    padding: 5,
-  },
-  profileView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: screenWidth * 0.45,
-    height: screenWidth * 0.45,
-    resizeMode: 'contain',
-    borderColor: '#fff',
-    borderWidth: 8,
-    borderRadius: (screenWidth * 0.45) / 2,
-    elevation: 3,
-  },
-  nameView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-  name: {
-    textAlign: 'center',
-    fontSize: moderateScale(20),
-    color: AppColors.bodyText,
-  },
-  admin: {
-    textAlign: 'center',
-    fontSize: moderateScale(16),
-    color: AppColors.link,
-  },
-  detailView: {
-    padding: 25,
-  },
-  detail: {
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    padding: 8,
-  },
-  text1: {
-    fontSize: moderateScale(18),
-    color: AppColors.focusText,
-    fontWeight: '600',
-  },
-  text2: {
-    fontSize: moderateScale(18),
-    color: AppColors.bodyText,
-  },
-  BtnView: {
-    width: '70%',
-    alignSelf: 'center',
-  },
-  button: {
-    padding: 12,
-    borderRadius: 15,
-    alignItems: 'center',
-    elevation: 5,
-    backgroundColor: AppColors.background,
-    marginTop: 10,
-    borderColor: AppColors.primary,
-    borderWidth: 1,
-  },
-  text: {
-    color: AppColors.link,
-    fontWeight: 'bold',
-    fontSize: moderateScale(14),
-  },
-  btn: {
-    marginTop: 15,
-  },
+const styles = ScaledSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: AppColors.background,
+    },
+
+    scroll: {
+        paddingBottom: '30@ms',
+    },
+
+    header: {
+        backgroundColor: AppColors.primary,
+        padding: '25@ms',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomLeftRadius: '45@ms',
+        borderBottomRightRadius: '45@ms',
+        elevation: 8,
+    },
+
+    headerTitle: {
+        color: '#fff',
+        fontSize: '18@ms',
+        fontWeight: '600',
+    },
+
+    card: {
+        alignItems: 'center',
+        marginTop: '20@ms',
+        backgroundColor: AppColors.primary,
+        marginHorizontal: '20@ms',
+        padding: '20@ms',
+        borderRadius: '20@ms',
+        elevation: 6,
+    },
+
+    imageWrapper: {
+        position: 'relative',
+    },
+
+    image: {
+        width: width * 0.28,
+        height: width * 0.28,
+        borderRadius: (width * 0.28) / 2,
+    },
+
+    editIcon: {
+        position: 'absolute',
+        bottom: 5,
+        right: 5,
+        backgroundColor: AppColors.background,
+        padding: 6,
+        borderRadius: 20,
+        elevation: 5,
+    },
+
+    name: {
+        fontSize: '20@ms',
+        fontWeight: '700',
+        color: '#fff',
+        marginTop: '10@ms',
+    },
+
+    role: {
+        fontSize: '14@ms',
+        color: AppColors.cardLight,
+    },
+
+    formCard: {
+        backgroundColor: AppColors.cardLight,
+        margin: '20@ms',
+        padding: '15@ms',
+        borderRadius: '15@ms',
+        elevation: 4,
+    },
+
+    btn: {
+        marginTop: '15@ms',
+    },
 });

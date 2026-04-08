@@ -3,14 +3,11 @@ import {
   View,
   Text,
   StatusBar,
-  Image,
-  TextBase,
-  TextInput,
+  ImageBackground,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { AppColors } from '../../../constant/appColors';
-import { AppIcons } from '../../../constant/appIcons';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { ScaledSheet } from 'react-native-size-matters';
 import { OtpInput } from 'react-native-otp-entry';
@@ -23,6 +20,7 @@ import Toast from 'react-native-toast-message';
 import { Loader } from '../../Loader/loader';
 import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AppImages } from '../../../constant/appImages';
 
 //-----------------------------------------------------
 
@@ -107,17 +105,18 @@ export const ResetPassword = () => {
   return (
     <View style={styles.Container}>
       <StatusBar
-        backgroundColor={AppColors.background}
-        barStyle="dark-content"
+        backgroundColor={AppColors.primary}
+        barStyle="light-content"
       />
       <ScrollView>
-        <View style={styles.main}>
+        {/* <View style={styles.header}>
+
           <View style={styles.arrowBackView}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon
                 name="arrow-back"
                 size={28}
-                color={AppColors.primary}
+                color="#fff"
               />
             </TouchableOpacity>
           </View>
@@ -128,12 +127,43 @@ export const ResetPassword = () => {
               Enter your phone number to reset your password.
             </Text>
           </View>
+        </View> */}
+        <View>
+          <ImageBackground
+            source={AppImages.Rectangle}
+            style={styles.RectangleImg}
+            resizeMode="cover"
+          >
+            <View style={styles.backgroundInnerView}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.backbtn}
+              >
+                <Icon
+                  name="arrow-back"
+                  size={28}
+                  color={AppColors.title}
+                />
+              </TouchableOpacity>
+              <View style={styles.headingsAlign}>
+                <Text style={styles.h1}>Reset Password</Text>
+                <Text style={styles.h4}>
+                  Enter your phone number to reset your password.
+                </Text>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+
+
+
+        <View style={styles.main}>
+
           <View style={styles.formView}>
             <Formik
               initialValues={{
                 phone: '',
-                // newPassword: '',
-                // confirmPassword: '',
+
               }}
               onSubmit={(values, { resetForm }) => {
                 resetPassword(values);
@@ -208,15 +238,53 @@ const styles = ScaledSheet.create({
     flex: 1,
     backgroundColor: AppColors.background,
   },
+  RectangleImg: {
+    width: '100%',
+    height: '250@vs',
+
+    justifyContent: 'center',
+  },
   main: {
-    margin: 15,
+    marginBottom: 20,
+  },
+  backgroundInnerView: {
+    height: '150@vs',
+  },
+  backbtn: {
+    marginLeft: 15,
+  },
+  headingsAlign: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  h1: {
+    fontSize: moderateScale(24),
+    color: AppColors.title,
+    padding: 5,
+    fontWeight: '700',
+  },
+  h4: {
+    fontSize: moderateScale(18),
+    color: AppColors.title,
+    opacity: 0.8,
   },
   formView: {
-    height: '80%',
+    borderRadius: 20,
     marginTop: 25,
-    // backgroundColor: AppColors.primary,
+    backgroundColor: "#fff",
     // margin: 5,
-    paddingTop: 25
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+
+    elevation: 5,
+    width: '95%',
+    alignSelf: 'center',
+    // padding: 20,
+    borderRadius: 10,
+    marginTop: -35,
+
+    elevation: 5
   },
   headingView: {
     justifyContent: 'center',
@@ -225,15 +293,15 @@ const styles = ScaledSheet.create({
   },
   h1: {
     fontSize: moderateScale(24),
-    color: AppColors.primary,
+    color: '#fff',
     fontWeight: '700',
     padding: 5,
   },
   h4: {
     fontSize: moderateScale(16),
-    color: AppColors.primary,
+    color: '#fff',
     opacity: 0.7,
-    padding: 5,
+    padding: 15,
     textAlign: 'center',
   },
   arrowBackView: {
@@ -259,4 +327,9 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     padding: 15,
   },
+  header: {
+    backgroundColor: AppColors.primary,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50
+  }
 });

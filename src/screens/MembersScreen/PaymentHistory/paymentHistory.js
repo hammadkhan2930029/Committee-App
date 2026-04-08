@@ -275,6 +275,7 @@ export const PaymentHistory = () => {
                         <View style={styles.btnView}>
                           <CustomButton
                             title="Payment Details"
+                            disabled={item.status == 'verified'}
                             onPress={() =>
                               navigation.navigate('UserPaymentDetails', {
                                 item: items,
@@ -433,6 +434,8 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
     fontSize: moderateScale(16),
     padding: 15,
+    color: AppColors.placeholder,
+    marginTop: 50
   },
   scroll: {
     marginBottom: 65,

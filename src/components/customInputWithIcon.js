@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
+import { AppColors } from '../constant/appColors';
 
 export const CustomInputWithIcon = ({
   label,
@@ -72,7 +73,7 @@ export const CustomInputWithIcon = ({
         onPress={type === 'date' ? onRightIconPress : undefined}
       >
         <View style={[styles.inputWrapper, error && styles.errorInput]}>
-          
+
           {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
 
           <TextInput
@@ -113,16 +114,27 @@ const styles = ScaledSheet.create({
   label: {
     marginBottom: '5@ms',
     fontSize: '14@ms',
-    color: '#333',
+    color: AppColors.link,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    height: '48@ms',
+    borderWidth: 0.5,
+    borderColor: AppColors.primary,
     borderRadius: '10@ms',
-    backgroundColor: '#f7f4f4ff',
-    paddingHorizontal: '10@ms',
+    paddingHorizontal: '12@ms',
+    fontSize: '15@ms',
+    backgroundColor: AppColors.background,
+    color: '#000',
+    elevation: 3
+    // height: '48@ms',
+    // borderWidth: 0.5,
+    // borderColor: AppColors.primary,
+    // borderRadius: '10@ms',
+    // borderRadius: '10@ms',
+    // backgroundColor: '#fff',
+    // paddingHorizontal: '10@ms',
   },
   input: {
     flex: 1,
@@ -135,6 +147,7 @@ const styles = ScaledSheet.create({
   },
   iconRight: {
     marginLeft: '8@ms',
+   
   },
   errorInput: {
     borderColor: 'red',

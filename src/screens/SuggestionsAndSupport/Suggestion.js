@@ -19,6 +19,7 @@ import { getStoredUser } from '../../Utils/getUser';
 import { api } from '../../services/api'
 import Toast from 'react-native-toast-message';
 import { Loader } from '../Loader/loader';
+import { CustomInput } from '../../components/customTextInput';
 
 
 export const SuggestionScreen = () => {
@@ -31,11 +32,11 @@ export const SuggestionScreen = () => {
 
   const validationSchema = Yup.object().shape({
     subject: Yup.string()
-      .min(3, 'Subject bohat chhota hai')
-      .required('Subject required hai'),
+      .min(3, 'Subject is too short')
+      .required('Subject is required'),
     message: Yup.string()
-      .min(10, 'Detail me likho')
-      .required('Message required hai'),
+      .min(10, 'Please write in detail')
+      .required('Message is required'),
   });
 
 
@@ -167,13 +168,12 @@ export const SuggestionScreen = () => {
 
                 {/* Subject */}
                 <View style={styles.inputBox}>
-                  <Text style={styles.label}>Subject</Text>
-                  <TextInput
+                  <CustomInput
+                    label='Subject'
                     value={values.subject}
                     onChangeText={handleChange('subject')}
                     onBlur={handleBlur('subject')}
                     placeholder="Enter subject"
-                    style={styles.input}
                     placeholderTextColor="#999"
                   />
                   {touched.subject && errors.subject && (
@@ -185,13 +185,13 @@ export const SuggestionScreen = () => {
 
                 {/* Message */}
                 <View style={styles.inputBox}>
-                  <Text style={styles.label}>Message</Text>
-                  <TextInput
+                  <CustomInput
+                    label='Message'
                     value={values.message}
                     onChangeText={handleChange('message')}
                     onBlur={handleBlur('message')}
                     placeholder="Write your suggestion..."
-                    style={[styles.input, styles.textArea]}
+                    style={styles.textArea}
                     multiline
                     numberOfLines={5}
                     placeholderTextColor="#999"
@@ -236,7 +236,7 @@ const styles = ScaledSheet.create({
     alignItems: 'start',
     justifyContent: 'flex-start',
     gap: 10,
-    paddingTop: 20
+    paddingTop: 30
   },
   headingAndArrow: {
     flexDirection: 'row',

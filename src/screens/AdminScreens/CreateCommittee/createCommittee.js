@@ -390,7 +390,7 @@ export const CreateCommittee = () => {
                         setCurrencyValue(item.value);
                         setIsFocus(false);
                       }}
-                 
+
                     />
                   </View>
                   {/* ======================================================= */}
@@ -511,48 +511,42 @@ const styles = ScaledSheet.create({
     padding: 15,
     marginTop: -30,
   },
-  label: {
-    marginBottom: '5@ms',
-    fontSize: '14@ms',
-    color: '#333',
-  },
-  dropDown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: '10@ms',
-    backgroundColor: '#f7f4f4ff',
-    paddingHorizontal: '10@ms',
-  },
+
+
   //--------------------------------------------------------------------
   DropDowncontainer: {
-    // backgroundColor: 'white',
 
     paddingTop: 10,
   },
+  label2: {
+    marginBottom: '5@ms',
+    fontSize: '14@ms',
+    color: AppColors.primary,
+  },
   dropdown: {
-    backgroundColor: '#f7f4f4ff',
-
-    height: 50,
-    borderColor: 'gray',
+    height: '48@ms',
     borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
+    borderColor: AppColors.primary,
+    borderRadius: '10@ms',
+    paddingHorizontal: '12@ms',
+    fontSize: '15@ms',
+    backgroundColor: AppColors.background,
+    color: '#000',
+    elevation: 3
   },
   icon: {
     marginRight: 5,
   },
-  label: {
-    position: 'absolute',
-    backgroundColor: '#f7f4f4ff',
-    left: 22,
-    top: 3,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-    borderRadius: 10
-  },
+  // label: {
+  //   position: 'absolute',
+  //   backgroundColor: '#f7f4f4ff',
+  //   left: 22,
+  //   top: 3,
+  //   zIndex: 999,
+  //   paddingHorizontal: 8,
+  //   fontSize: 14,
+  //   borderRadius: 10
+  // },
   placeholderStyle: {
     fontSize: 16,
     color: AppColors.placeholder
@@ -568,9 +562,5 @@ const styles = ScaledSheet.create({
     height: 40,
     fontSize: 16,
   },
-  label2: {
-    marginBottom: '5@ms',
-    fontSize: '14@ms',
-    color: '#333',
-  },
+
 });

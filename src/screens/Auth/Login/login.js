@@ -41,7 +41,7 @@ const loginSchema = Yup.object().shape({
     .required('Phone number is required'),
 
   password: Yup.string()
-    .min(6, 'Password kam az kam 6 characters ka ho')
+    .min(6, 'Password must be at least 6 characters long')
     .required('Password is required'),
 });
 //----------------------------------------------
@@ -79,7 +79,7 @@ export const Login = () => {
           },
         });
         navigation.replace('ChooseRole');
-        console.log('userData :', userData);
+        console.log('login userData :', userData);
       } else {
         Toast.show({
           type: 'customToast',

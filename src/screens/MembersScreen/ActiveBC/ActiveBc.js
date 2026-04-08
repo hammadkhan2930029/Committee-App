@@ -19,6 +19,11 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getStoredUser } from '../../../Utils/getUser';
 import { navigate } from '../../../navigations/navigationService';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { RFValue } from 'react-native-responsive-fontsize';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 export const ActiveBCs = () => {
   const [committeeList, setCommitteeList] = useState([]);
@@ -146,102 +151,103 @@ export const ActiveBCs = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-
-      <View>
-        <ImageBackground
-          source={AppImages.Rectangle}
-          style={styles.RectangleImg}
-        >
-          <View style={styles.main}>
-            <View style={styles.TopView}>
-              <View style={styles.backAndText}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Icon name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.h1}>My Active BCs </Text>
+      <ScrollView style={styles.scroll_View}>
+        <View>
+          <ImageBackground
+            source={AppImages.Rectangle}
+            style={styles.RectangleImg}
+          >
+            <View style={styles.main}>
+              <View style={styles.TopView}>
+                <View style={styles.backAndText}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Icon name="arrow-back" size={24} color="#fff" />
+                  </TouchableOpacity>
+                  <Text style={styles.h1}>My Active BCs </Text>
+                </View>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.h4}>View all BCs you’ve joined.</Text>
               </View>
             </View>
-            <View style={styles.textView}>
-              <Text style={styles.h4}>View all BCs you’ve joined.</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-      {loading ? (
-        <MySkeleton />
-      ) : (
-        <View style={styles.Committee_View}>
-          <FlatList
-            data={committeeList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={item => {
-              console.log('item :', item.item);
-              const data = item.item;
-              return (
-                <View>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigate('UserCommitteeDetails', { data: data })
-                    }
-                  >
+          </ImageBackground>
+        </View>
+        {loading ? (
+          <MySkeleton />
+        ) : (
+          <View style={styles.Committee_View}>
+            <FlatList
+              data={committeeList}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={item => {
+                console.log('item :', item.item);
+                const data = item.item;
+                return (
+                  <View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigate('UserCommitteeDetails', { data: data })
+                      }
+                    >
+                      <View
+                        style={[
+                          styles.Dashboardcard,
+                          { display: data.name ? 'flex' : 'none' },
+                        ]}
+                      >
+                        <View style={styles.first_view}>
+                          <View style={styles.committeeName_View}>
+                            <Text style={styles.committeeName}>{data.name}</Text>
+                          </View>
+                          <TouchableOpacity style={styles.BtnActive}>
+                            <Text style={styles.active}>{data.status}</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.first_view}>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Members : </Text>
+                            <Text style={styles.count}> {data.total_member}</Text>
+                          </View>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Amount per Member :</Text>
+                            <Text style={styles.count}>
+                              {' '}
+                              {formatNumber(data.amount_per_member)}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.first_view}>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Round : </Text>
+                            <Text style={styles.count}> {data.total_rounds}</Text>
+                          </View>
+                          <View style={styles.details}>
+                            <Text style={styles.one}>Start Date :</Text>
+                            <Text style={styles.count}> {data.start_date}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
                     <View
                       style={[
-                        styles.Dashboardcard,
-                        { display: data.name ? 'flex' : 'none' },
+                        styles.dataEmpty,
+                        { display: data.name ? 'none' : 'flex' },
                       ]}
                     >
-                      <View style={styles.first_view}>
-                        <View>
-                          <Text style={styles.family}>{data.name}</Text>
-                        </View>
-                        <TouchableOpacity style={styles.BtnActive}>
-                          <Text style={styles.active}>{data.status}</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.first_view}>
-                        <View style={styles.details}>
-                          <Text style={styles.one}>Members : </Text>
-                          <Text style={styles.count}> {data.total_member}</Text>
-                        </View>
-                        <View style={styles.details}>
-                          <Text style={styles.one}>Amount per Member :</Text>
-                          <Text style={styles.count}>
-                            {' '}
-                            {formatNumber(data.amount_per_member)}
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={styles.first_view}>
-                        <View style={styles.details}>
-                          <Text style={styles.one}>Round : </Text>
-                          <Text style={styles.count}> {data.total_rounds}</Text>
-                        </View>
-                        <View style={styles.details}>
-                          <Text style={styles.one}>Start Date :</Text>
-                          <Text style={styles.count}> {data.start_date}</Text>
-                        </View>
-                      </View>
+                      <Text style={styles.emptyText}>Data not available</Text>
                     </View>
-                  </TouchableOpacity>
-                  <View
-                    style={[
-                      styles.dataEmpty,
-                      { display: data.name ? 'none' : 'flex' },
-                    ]}
-                  >
-                    <Text style={styles.emptyText}>Data not available</Text>
                   </View>
+                );
+              }}
+              ListEmptyComponent={() => (
+                <View style={styles.dataEmpty}>
+                  <Text style={styles.emptyText}>Data not available</Text>
                 </View>
-              );
-            }}
-            ListEmptyComponent={() => (
-              <View style={styles.dataEmpty}>
-                <Text style={styles.emptyText}>Data not available</Text>
-              </View>
-            )}
-          />
-        </View>
-      )}
+              )}
+            />
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -336,10 +342,20 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  family: {
-    fontSize: moderateScale(16),
+  committeeName_View: {
+    backgroundColor: AppColors.background,
+    borderWidth: 1,
+    borderColor: AppColors.primary,
+    borderRadius: 50,
+    elevation: 3
+  },
+  committeeName: {
+    fontSize: RFValue(15),
     color: AppColors.blackText,
     fontWeight: '600',
+    paddingHorizontal: 15,
+    paddingVertical: 5
+
   },
   Btncomplete: {
     backgroundColor: AppColors.primary,
@@ -355,19 +371,21 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
   },
   BtnActive: {
-    backgroundColor: AppColors.cardLight,
+    backgroundColor: AppColors.primary,
     borderRadius: 20,
     padding: 5,
     borderColor: AppColors.primary,
     borderWidth: 1,
     width: 100,
+    elevation: 3
   },
   active: {
     fontSize: moderateScale(15),
-    color: AppColors.link,
+    color: '#fff',
     paddingLeft: 7,
     paddingRight: 7,
     textAlign: 'center',
+    fontWeight: 600
   },
   details: {
     justifyContent: 'center',

@@ -25,6 +25,8 @@ import { useNavigation } from '@react-navigation/native';
 import { CustomButtonLight } from '../../../components/customeButtonLight';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
+import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
+
 import { string } from 'yup';
 import * as Yup from 'yup';
 
@@ -305,7 +307,7 @@ export const EditCommittee = ({ route }) => {
                     value={values.committeeName}
                     onChangeText={handleChange('committeeName')}
                     onblur={handleBlur('committeeName')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
                   <CustomInputWithIcon
                     label="Total Members"
@@ -321,7 +323,7 @@ export const EditCommittee = ({ route }) => {
                       setFieldValue('totalAmount', total.toString());
                     }}
                     onblur={handleBlur('totalMembers')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
 
                   <CustomInputWithIcon
@@ -331,7 +333,7 @@ export const EditCommittee = ({ route }) => {
                     value={values.totalRounds}
                     onChangeText={handleChange('totalRounds')}
                     onblur={handleBlur('totalRounds')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
 
                   <CustomInputWithIcon
@@ -341,7 +343,7 @@ export const EditCommittee = ({ route }) => {
                     value={values.roundsPerMonth}
                     onChangeText={handleChange('roundsPerMonth')}
                     onblur={handleBlur('roundsPerMonth')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
 
                   <CustomInputWithIcon
@@ -353,7 +355,7 @@ export const EditCommittee = ({ route }) => {
                     value={values.noOfMonths}
                     onChangeText={handleChange('noOfMonths')}
                     onblur={handleBlur('noOfMonths')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
 
                   <CustomInputWithIcon
@@ -374,7 +376,7 @@ export const EditCommittee = ({ route }) => {
                       }
                     }}
                     onblur={handleBlur('amountPerMember')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
 
                   <CustomInputWithIcon
@@ -386,17 +388,16 @@ export const EditCommittee = ({ route }) => {
                     value={formatNumber(values.totalAmount)}
                     onChangeText={handleChange('totalAmount')}
                     onblur={handleBlur('totalAmount')}
-                    rightIcon={<Icon name="edit" size={20} color="#666" />}
+                    rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
                   />
                   {/* ======================================================= */}
                   <View style={styles.DropDowncontainer}>
                     <Text style={styles.label2}>Select Currency</Text>
                     <Dropdown
-                      style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                      style={[styles.dropdown, isFocus && { borderColor: AppColors.primary }]}
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
                       inputSearchStyle={styles.inputSearchStyle}
-                      iconStyle={styles.iconStyle}
                       data={currency}
                       search
                       maxHeight={300}
@@ -404,6 +405,13 @@ export const EditCommittee = ({ route }) => {
                       valueField="value"
                       placeholder={!isFocus ? details.committee_currency : '...'}
                       searchPlaceholder="Search..."
+                      renderRightIcon={() => (
+                        <Icon
+                          name="arrow-drop-down"
+                          size={26}
+                          color={AppColors.primary}
+                        />
+                      )}
                       value={currencyValue}
                       onFocus={() => setIsFocus(true)}
                       onBlur={() => setIsFocus(false)}
@@ -425,7 +433,7 @@ export const EditCommittee = ({ route }) => {
                       placeholder={start}
                       value={date ? dayjs(date).format('DD-MM-YYYY') : start}
                       rightIcon={
-                        <Icon name="calendar-today" size={22} color="#666" />
+                        <Icon name="calendar-today" size={22} color={AppColors.link} />
                       }
                       onRightIconPress={() => setShow(true)}
                     />
@@ -466,6 +474,8 @@ export const EditCommittee = ({ route }) => {
                       }}
                       onblur={handleBlur('due_on')}
                       error={touched.due_on && errors.due_on}
+                      rightIcon={<Icon name="edit" size={20} color={AppColors.link} />}
+
                     />
                   </View>
 
@@ -484,24 +494,24 @@ export const EditCommittee = ({ route }) => {
                       }}
                       setItems={setItems}
                       placeholder="Select Status"
-                      style={styles.dropDown}
+                      style={[styles.dropdown, isFocus && { borderColor: AppColors.primary }]}
+
                       dropDownContainerStyle={{
-                        borderColor: '#ccc',
-                        borderRadius: 10,
+                        borderRadius: 25,
                         flexDirection: 'row',
                         alignItems: 'center',
                         borderWidth: 1,
-                        borderColor: '#ccc',
+                        borderColor: AppColors.cardLight,
                         borderRadius: '10@ms',
-                        backgroundColor: '#f7f4f4ff',
+                        backgroundColor: AppColors.background,
                         paddingHorizontal: '10@ms',
                       }}
                       listMode="SCROLLVIEW"
                       ArrowDownIconComponent={({ style }) => (
-                        <Icon name="arrow-drop-down" size={24} color="#666" />
+                        <Icon name="arrow-drop-down" size={24} color={AppColors.link} />
                       )}
                       ArrowUpIconComponent={({ style }) => (
-                        <Icon name="arrow-drop-up" size={24} color="#666" />
+                        <Icon name="arrow-drop-up" size={24} color={AppColors.link} />
                       )}
                     />
                   </View>
@@ -552,7 +562,7 @@ const styles = ScaledSheet.create({
     // padding: 10,
   },
   h1: {
-    fontSize: moderateScale(24),
+    fontSize: RFValue(22),
     color: AppColors.title,
     fontWeight: '600',
     paddingLeft: 6,
@@ -572,19 +582,21 @@ const styles = ScaledSheet.create({
   createCommitteForm: {
     padding: 15,
   },
-  label: {
+  label2: {
     marginBottom: '5@ms',
     fontSize: '14@ms',
-    color: '#333',
+    color: AppColors.primary,
   },
-  dropDown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
+  dropdown: {
+    height: '48@ms',
+    borderWidth: 0.5,
+    borderColor: AppColors.primary,
     borderRadius: '10@ms',
-    backgroundColor: '#f7f4f4ff',
-    paddingHorizontal: '10@ms',
+    paddingHorizontal: '12@ms',
+    fontSize: '15@ms',
+    backgroundColor: AppColors.background,
+    color: '#000',
+    elevation: 3
   },
   button: {
     padding: 12,
@@ -610,46 +622,49 @@ const styles = ScaledSheet.create({
 
     paddingTop: 10,
   },
-  dropdown: {
-    backgroundColor: '#f7f4f4ff',
+  // dropdown: {
+  //   backgroundColor: '#f7f4f4ff',
 
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
+  //   height: 50,
+  //   borderColor: 'gray',
+  //   borderWidth: 0.5,
+  //   borderRadius: 8,
+  //   paddingHorizontal: 8,
+  // },
   icon: {
     marginRight: 5,
   },
-  label: {
-    position: 'absolute',
-    backgroundColor: '#f7f4f4ff',
-    left: 22,
-    top: 3,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-    borderRadius: 10
-  },
+  // label: {
+  //   position: 'absolute',
+  //   backgroundColor: '#f7f4f4ff',
+  //   left: 22,
+  //   top: 3,
+  //   zIndex: 999,
+  //   paddingHorizontal: 8,
+  //   fontSize: 14,
+  //   borderRadius: 10
+  // },
   placeholderStyle: {
     fontSize: 16,
     color: AppColors.blackText
   },
   selectedTextStyle: {
     fontSize: 16,
+
   },
   iconStyle: {
     width: 20,
     height: 20,
+    color: AppColors.link,
+
   },
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
   },
-  label2: {
-    marginBottom: '5@ms',
-    fontSize: '14@ms',
-    color: '#333',
-  },
+  // label2: {
+  //   marginBottom: '5@ms',
+  //   fontSize: '14@ms',
+  //   color: '#333',
+  // },
 });

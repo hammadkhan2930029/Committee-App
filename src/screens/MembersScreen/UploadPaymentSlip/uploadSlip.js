@@ -217,7 +217,7 @@ export const UploadSlip = ({ route }) => {
     setAmountError('');
     setUserAmount(numericValue);
   };
-  
+
 
   return (
     <View style={styles.conatiner}>
@@ -233,10 +233,10 @@ export const UploadSlip = ({ route }) => {
                 <View style={styles.backAndText}>
                   <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon
-                                         name="arrow-back"
-                                         size={28}
-                                         color={AppColors.title}
-                                       />
+                      name="arrow-back"
+                      size={28}
+                      color={AppColors.title}
+                    />
                   </TouchableOpacity>
                   <Text style={styles.h1}>Upload Payment Slip </Text>
                 </View>
@@ -273,7 +273,7 @@ export const UploadSlip = ({ route }) => {
               <Text style={styles.label}>Due Date</Text>
               <Text style={styles.value}>{data.due_date}</Text>
             </View>
-           
+
             <View style={styles.uploadSlip}>
               <View
                 style={[
@@ -366,7 +366,7 @@ export const UploadSlip = ({ route }) => {
 const styles = ScaledSheet.create({
   conatiner: {
     flex: 1,
-     backgroundColor: AppColors.background,
+    backgroundColor: AppColors.background,
   },
   arrowBack: {
     width: 28,

@@ -27,7 +27,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 //-----------------------------------------
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
-import { CustomPhoneInput } from '../../../components/CustomePhoneInput'
+import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
+import auth from '@react-native-firebase/auth';
+
 
 const registerSchema = Yup.object().shape({
   name: Yup.string()
@@ -35,10 +37,7 @@ const registerSchema = Yup.object().shape({
     .required('Name is required'),
 
   phone: Yup.string()
-    // .matches(
-    //   /^03[0-9]{9}$/,
-    //   'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
-    // )
+
     .required('Phone number is required'),
 
   password: Yup.string()
@@ -64,62 +63,82 @@ export const Register = () => {
   ///-------------------------------------------
   const [selectedCallingCode, setSelectedCallingCode] = useState('92');
   //--------------------------------------------
-  const register = async value => {
-    setLoading(true);
-    const fullNumber = `+${selectedCallingCode}${value.phone}`;
-    console.log("Sending Phone:", fullNumber);
+  // const register = async value => {
+  //   setLoading(true);
+  
+  //   try {
+  //     var formData = new FormData();
+  //     formData.append('full_name', value.name);
+  //     formData.append('phone', fullNumber);
+  //     formData.append('password', value.password);
+  //     formData.append('confirm_password', value.confirmPassword);
+
+  //     const res = await api.post('/user/register', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
+  //     console.log('response :', res?.data?.msg[0]?.response);
+  //     if (res?.status === 200 && res?.data?.msg[0]?.response === 'register') {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Success',
+  //         text2: res?.data?.msg[0]?.response || 'Successfully Registered',
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'green',
+  //         },
+  //       });
+  //       navigation.goBack();
+  //     } else {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Warning',
+  //         text2: res?.data?.msg[0]?.response || 'User already exist',
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'orange',
+  //         },
+  //       });
+  //     }
+
+  //     console.log('response :', res);
+  //   } catch (error) {
+  //     console.log('Try Catch Error :', error);
+  //     Toast.show({
+  //       type: 'customToast',
+  //       text1: 'Error',
+  //       text2:
+  //         error?.response?.data?.message || 'Server error, please try again',
+  //       props: {
+  //         bgColor: AppColors.background,
+  //         borderColor: '#ff5252',
+  //       },
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  /// ---------------------Send OTP--------------------------
+  const sendOTP = async (values) => {
+    setLoading(true)
     try {
-      var formData = new FormData();
-      formData.append('full_name', value.name);
-      formData.append('phone', fullNumber);
-      formData.append('password', value.password);
-      formData.append('confirm_password', value.confirmPassword);
+      const fullNumber = `+${selectedCallingCode}${values.phone}`;
 
-      const res = await api.post('/user/register', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const confirmation = await auth().signInWithPhoneNumber(fullNumber);
+
+      // ✅ yahan values pass karo (form data)
+      navigation.navigate('Otp', {
+        confirmation: confirmation,
+        phone: fullNumber,
+        userData: values, // 🔥 yeh important hai
       });
-      console.log('response :', res?.data?.msg[0]?.response);
-      if (res?.status === 200 && res?.data?.msg[0]?.response === 'register') {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Success',
-          text2: res?.data?.msg[0]?.response || 'Successfully Registered',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'green',
-          },
-        });
-        navigation.goBack();
-      } else {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Warning',
-          text2: res?.data?.msg[0]?.response || 'User already exist',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'orange',
-          },
-        });
-      }
 
-      console.log('response :', res);
     } catch (error) {
-      console.log('Try Catch Error :', error);
-      Toast.show({
-        type: 'customToast',
-        text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Server error, please try again',
-        props: {
-          bgColor: AppColors.background,
-          borderColor: '#ff5252',
-        },
-      });
+      console.log("OTP ERROR:", error.message);
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
-  /// -----------------------------------------------
+  //-----------------------------------------------------
 
   return (
     <KeyboardAvoidingView
@@ -170,7 +189,7 @@ export const Register = () => {
               }}
               validationSchema={registerSchema}
               onSubmit={(values, { resetForm }) => {
-                register(values);
+                sendOTP(values);
                 resetForm();
               }}
             >
@@ -196,15 +215,7 @@ export const Register = () => {
                         error={touched.name && errors.name}
                       />
 
-                      {/* <CustomInput
-                        label="Phone Number"
-                        type="numeric"
-                        placeholder="Enter your phone number"
-                        value={values.phone}
-                        onChangeText={handleChange('phone')}
-                        onBlur={handleBlur('phone')}
-                        error={touched.phone && errors.phone}
-                      /> */}
+
                       <CustomPhoneInput
                         label="Phone Number"
                         value={values.phone}
@@ -238,7 +249,10 @@ export const Register = () => {
                     </View>
                   </View>
                   <View style={styles.LoginBtn}>
-                    <CustomButton title="Register" onPress={handleSubmit} />
+                    <CustomButton
+                      title="Register"
+                      onPress={handleSubmit}
+                    />
                   </View>
                 </View>
               )}

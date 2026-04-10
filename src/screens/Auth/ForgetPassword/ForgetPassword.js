@@ -21,83 +21,105 @@ import { Loader } from '../../Loader/loader';
 import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AppImages } from '../../../constant/appImages';
-
+import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
+import auth from '@react-native-firebase/auth';
 //-----------------------------------------------------
 
 const resetPasswordSchema = Yup.object().shape({
   phone: Yup.string()
-    // .matches(
-    //   /^03[0-9]{9}$/,
-    //   'Phone number must be a valid Pakistani number (11 digits, starting with 03)',
-    // )
+
     .required('Phone number is required'),
 
-  // newPassword: Yup.string()
-  //   .min(6, 'Password kam az kam 6 characters ka ho')
-  //   .required('Password required hai'),
+  newPassword: Yup.string()
+    .min(6, 'Password must be at least 6 characters long')
+    .required('Password is required'),
 
-  // confirmPassword: Yup.string()
-  //   .oneOf([Yup.ref('newPassword')], 'Password match nahi kar raha')
-  //   .required('Confirm password required hai'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('newPassword')], 'Passwords do not match')
+    .required('Confirm password is required'),
 });
 
 //----------------------------------------------------
 export const ResetPassword = () => {
-  const [loader, setLoader] = useState(false);
+  const [Loading, setLoading] = useState(false);
+  // const [loader, setLoader] = useState(false);
+
   const navigation = useNavigation();
+  const [selectedCallingCode, setSelectedCallingCode] = useState('92');
 
   //----------------------------------------------------
-  const resetPassword = async value => {
-    console.log('reset:', value);
-    setLoader(true);
+  // const resetPassword = async value => {
+  //   console.log('reset:', value);
+  //   const fullNumber = `+${selectedCallingCode}${value.phone}`;
+  //   console.log("Sending Phone:", fullNumber);
+  //   setLoader(true);
+  //   try {
+  //     var formData = new FormData();
+  //     formData.append('phone', fullNumber);
+  //     formData.append('new_password', value.newPassword);
+  //     formData.append('confirm_password', value.confirmPassword);
+
+  //     const res = await api.post('/user/forgot-password', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
+  //     if (res?.data?.msg[0].response === 'password updated') {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Success',
+  //         text2: res?.data?.msg[0].response,
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'green',
+  //         },
+  //       });
+  //       navigation.goBack();
+  //     } else {
+  //       Toast.show({
+  //         type: 'customToast',
+  //         text1: 'Warning',
+  //         text2: res?.data?.msg[0].response,
+  //         props: {
+  //           bgColor: AppColors.background,
+  //           borderColor: 'orange',
+  //         },
+  //       });
+  //     }
+
+  //     console.log('response reset api :', res);
+  //   } catch (error) {
+  //     console.log('Try Catch error reset password :', error);
+  //     Toast.show({
+  //       type: 'customToast',
+  //       text1: 'Error',
+  //       text2:
+  //         error?.response?.data?.message || 'Server error, please try again',
+  //       props: {
+  //         bgColor: AppColors.background,
+  //         borderColor: '#ff5252',
+  //       },
+  //     });
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+  /// ---------------------Send OTP--------------------------
+  const sendOTP = async (values) => {
+    setLoading(true)
     try {
-      var formData = new FormData();
-      formData.append('phone', value.phone);
-      // formData.append('new_password', value.newPassword);
-      // formData.append('confirm_password', value.confirmPassword);
+      const fullNumber = `+${selectedCallingCode}${values.phone}`;
 
-      const res = await api.post('/user/forgot-password', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const confirmation = await auth().signInWithPhoneNumber(fullNumber);
+
+      navigation.navigate('Otp', {
+        confirmation: confirmation,
+        phone: fullNumber,
+        forgetPassData: values,
       });
-      console.log('response', res.data.msg[0].response)
-      if (res?.data?.code === 200) {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Success',
-          text2: res?.data?.msg[0].response,
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'green',
-          },
-        });
-        navigation.goBack();
-      } else {
-        Toast.show({
-          type: 'customToast',
-          text1: 'Warning',
-          text2: res?.data?.msg[0].response || 'Invalid credentials',
-          props: {
-            bgColor: AppColors.background,
-            borderColor: 'orange',
-          },
-        });
-      }
 
-      console.log('response reset api :', res);
     } catch (error) {
-      console.log('Try Catch error reset password :', error);
-      Toast.show({
-        type: 'customToast',
-        text1: 'Error',
-        text2:
-          error?.response?.data?.message || 'Server error, please try again',
-        props: {
-          bgColor: AppColors.background,
-          borderColor: '#ff5252',
-        },
-      });
+      console.log("OTP ERROR:", error.message);
     } finally {
-      setLoader(false);
+      setLoading(false)
     }
   };
   //----------------------------------------------------------
@@ -109,25 +131,7 @@ export const ResetPassword = () => {
         barStyle="light-content"
       />
       <ScrollView>
-        {/* <View style={styles.header}>
 
-          <View style={styles.arrowBackView}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                size={28}
-                color="#fff"
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.headingView}>
-            <Text style={styles.h1}>Reset Password</Text>
-            <Text style={styles.h4}>
-              Enter your phone number to reset your password.
-            </Text>
-          </View>
-        </View> */}
         <View>
           <ImageBackground
             source={AppImages.Rectangle}
@@ -163,11 +167,14 @@ export const ResetPassword = () => {
             <Formik
               initialValues={{
                 phone: '',
+                newPassword: '',
+                confirmPassword: ''
 
               }}
               onSubmit={(values, { resetForm }) => {
-                resetPassword(values);
-                resetForm();
+                // resetPassword(values);
+                sendOTP(values)
+                // resetForm();
               }}
               validationSchema={resetPasswordSchema}
             >
@@ -182,16 +189,15 @@ export const ResetPassword = () => {
               }) => (
                 <View>
                   <View>
-                    <CustomInput
+
+                    <CustomPhoneInput
                       label="Phone Number"
-                      type="numeric"
-                      placeholder="Enter your phone number"
                       value={values.phone}
                       onChangeText={handleChange('phone')}
-                      onBlur={handleBlur('phone')}
                       error={touched.phone && errors.phone}
+                      onCodeChange={(code) => setSelectedCallingCode(code)}
                     />
-                    {/* <CustomInput
+                    <CustomInput
                       label="New Password"
                       type="password"
                       placeholder="Enter your new password"
@@ -208,7 +214,7 @@ export const ResetPassword = () => {
                       onChangeText={handleChange('confirmPassword')}
                       onBlur={handleBlur('confirmPassword')}
                       error={touched.confirmPassword && errors.confirmPassword}
-                    /> */}
+                    />
                   </View>
 
                   <View style={styles.btn}>
@@ -229,7 +235,7 @@ export const ResetPassword = () => {
           </View>
         </View>
       </ScrollView>
-      <Loader visible={loader} />
+      <Loader visible={Loading} />
     </View>
   );
 };

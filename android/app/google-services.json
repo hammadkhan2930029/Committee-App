@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "977661918405",
+    "project_id": "bachat-committee-app",
+    "storage_bucket": "bachat-committee-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977661918405:android:54435c713ac224be7e84ac",
+        "android_client_info": {
+          "package_name": "com.comitte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZmWebq_KuAw-RPXwaBojpce-DLPiUXSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

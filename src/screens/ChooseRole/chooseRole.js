@@ -6,9 +6,7 @@ import { AppImages } from '../../constant/appImages';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
-import { AppIcons } from '../../constant/appIcons';
 import { CustomButton } from '../../components/customButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
 import { DisclaimerModal } from '../../components/disclaimerModal'
@@ -17,6 +15,7 @@ import { getStoredUser } from '../../Utils/getUser';
 const screenWidth = Dimensions.get('window').width;
 
 export const ChooseRole = () => {
+  const [imgError, setImgError] = useState(false);
   const navigation = useNavigation();
   const [selected, setSelected] = useState(1);
   const [userData, setUserData] = useState()
@@ -61,13 +60,16 @@ export const ChooseRole = () => {
           </View>
         </ImageBackground>
         <View style={styles.profileView}>
-          <Image 
-          source={
-            userData?.image
-              ? { uri: userData.image }
-              : AppImages.profileAvatar
-          }
-            style={styles.profileImage} />
+
+          <Image
+            source={
+              userData?.image && !imgError
+                ? { uri: userData.image }
+                : AppImages.profileAvatar
+            }
+            style={styles.profileImage}
+            onError={() => setImgError(true)}
+          />
         </View>
 
         <View style={styles.cardView}>
@@ -204,6 +206,8 @@ const styles = ScaledSheet.create({
     marginTop: -100,
   },
   profileImage: {
+    backgroundColor: AppColors.background,
+
     width: screenWidth * 0.45,
     height: screenWidth * 0.45,
     resizeMode: 'contain',

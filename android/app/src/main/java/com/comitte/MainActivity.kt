@@ -5,6 +5,10 @@ import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
+import android.os.Bundle // Ye line add karen
+import android.app.NotificationChannel // Ye line add karen
+import android.app.NotificationManager // Ye line add karen
+import android.os.Build
 
 
 class MainActivity : ReactActivity() {
@@ -15,8 +19,24 @@ class MainActivity : ReactActivity() {
    */
   override fun getMainComponentName(): String = "comitte"
 
-  
 
+// --- Ye hissa add karen ---
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(null)
+    
+    // Notification Channel banana
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channelId = "default_channel"
+        val channelName = "Main Channel"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(channelId, channelName, importance)
+        
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
+    }
+  }
+  
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]

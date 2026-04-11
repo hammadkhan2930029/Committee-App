@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-
 import { AppNavigator } from '../navigations/AppNavigator';
 
+
+
 export const Home = () => {
-  return (
-    <View style={{ flex: 1 }}>
-      <AppNavigator/>
-    </View>
-  );
+   
+    return (
+        <View style={{ flex: 1 }}>
+            <AppNavigator />
+        </View>
+    );
 };

@@ -30,7 +30,9 @@ import { Notifications } from '../screens/MembersScreen/Notifications/notificati
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { UpComingPayments } from '../screens/MembersScreen/UpComingPayments/upComingPayments'
 import { SuggestionScreen } from '../screens/SuggestionsAndSupport/Suggestion'
-import { SupportTeam } from '../screens/SuggestionsAndSupport/Support'
+import { SupportTeam } from '../screens/SuggestionsAndSupport/Support';
+import { ChangePassword } from '../screens/Auth/ChangePassword/changePassword';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -81,6 +83,8 @@ export const AppNavigator = () => {
       <Stack.Screen name="UpComingPayments" component={UpComingPayments} />
       <Stack.Screen name="SuggestionScreen" component={SuggestionScreen} />
       <Stack.Screen name="SupportTeam" component={SupportTeam} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
+
 
 
 

@@ -12,7 +12,6 @@ import {
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
 import { AppImages } from '../../../constant/appImages';
-import { AppIcons } from '../../../constant/appIcons';
 import { CustomButton } from '../../../components/customButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
@@ -32,12 +31,10 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
     withSequence,
-    withRepeat,
 } from 'react-native-reanimated';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 export const AdminDashboard = () => {
     //--------------------------------------------
-    const [visible, setVisible] = useState(false);
+    // const [visible, setVisible] = useState(false);
 
 
     //-------------------------------------------------
@@ -54,13 +51,13 @@ export const AdminDashboard = () => {
                 const user = await getStoredUser();
                 if (user) {
                     setUserData(user);
-                    console.log(user.full_name, user.user_id);
+                    // console.log(user.full_name, user.user_id);
                 }
             };
             loadUser();
         }, []),
     );
-    console.log('userData', userData);
+    // console.log('userData', userData);
     //---------------Total User total active bCs------------------------------
     const counterApi = async () => {
         try {
@@ -84,7 +81,7 @@ export const AdminDashboard = () => {
             counterApi();
         }
     }, [userData]);
-    console.log('counter :', counter);
+    // console.log('counter :', counter);
 
     //----------------------------------------------------------------------------
     const wave = useSharedValue(0);
@@ -128,21 +125,21 @@ export const AdminDashboard = () => {
     }, []);
     //--------------------------------------------------------------
 
-    const toggleMenu = () => {
-        setVisible(!visible);
-    };
+    // const toggleMenu = () => {
+    //     setVisible(!visible);
+    // };
 
-    const handleOption = (type) => {
-        setVisible(false);
+    // const handleOption = (type) => {
+    //     setVisible(false);
 
-        if (type === 'share') {
-            onShare()
-        } else if (type === 'suggestion') {
-            navigation.navigate('SuggestionScreen')
-        } else if (type === 'support') {
-            navigation.navigate('SupportTeam')
-        }
-    };
+    //     if (type === 'share') {
+    //         onShare()
+    //     } else if (type === 'suggestion') {
+    //         navigation.navigate('SuggestionScreen')
+    //     } else if (type === 'support') {
+    //         navigation.navigate('SupportTeam')
+    //     }
+    // };
     //---------------------------Share App------------------------------------
     const onShare = async () => {
         try {
@@ -201,14 +198,18 @@ export const AdminDashboard = () => {
                                 </View>
 
                                 <View style={styles.container3}>
-
-                                    {/* 3 DOT ICON */}
-                                    <TouchableOpacity onPress={toggleMenu}>
-                                        <MaterialCommunityIcons name="dots-horizontal" size={35} color="#fff" />
+                                    <TouchableOpacity onPress={() => onShare('share')} style={styles.shareApp}>
+                                        <Icon name="share" size={24} color={AppColors.link} />
+                                        <Text style={styles.shareAppText}>Share App</Text>
                                     </TouchableOpacity>
 
+                                    {/* 3 DOT ICON */}
+                                    {/* <TouchableOpacity onPress={toggleMenu}>
+                                        <MaterialCommunityIcons name="dots-horizontal" size={35} color="#fff" />
+                                    </TouchableOpacity> */}
+
                                     {/* DROPDOWN */}
-                                    {visible && (
+                                    {/* {visible && (
                                         <View style={styles.dropdown}>
                                             <TouchableOpacity onPress={() => handleOption('share')} style={styles.item}>
                                                 <Icon name="share" size={24} color={AppColors.link} />
@@ -227,7 +228,7 @@ export const AdminDashboard = () => {
                                                 <Text style={styles.text}>Support</Text>
                                             </TouchableOpacity>
                                         </View>
-                                    )}
+                                    )} */}
                                 </View>
 
 
@@ -349,7 +350,7 @@ const styles = ScaledSheet.create({
         width: wp('14%'),
         height: wp('14%'),
         elevation: 5,
-        borderRadius:50
+        borderRadius: 50
     },
     textView: {
         padding: 15,
@@ -448,26 +449,40 @@ const styles = ScaledSheet.create({
         position: 'relative',
         paddingRight: 15
     },
-    dropdown: {
-        position: 'absolute',
-        top: 35,
-        right: 5,
-        width: 180,
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        paddingVertical: 8,
-        elevation: 5,
-        zIndex: 100
-    },
-    item: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
+    shareApp: {
+        backgroundColor: AppColors.background,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 5,
+        borderRadius: 50,
+        elevation: 5
     },
-    text: {
+    shareAppText: {
         fontSize: 14,
-        color: '#333',
-        paddingLeft: 4
-    },
+        color: AppColors.blackText
+    }
+
+    // dropdown: {
+    //     position: 'absolute',
+    //     top: 35,
+    //     right: 5,
+    //     width: 180,
+    //     backgroundColor: '#fff',
+    //     borderRadius: 12,
+    //     paddingVertical: 8,
+    //     elevation: 5,
+    //     zIndex: 100
+    // },
+    // item: {
+    //     paddingVertical: 10,
+    //     paddingHorizontal: 15,
+    //     flexDirection: 'row',
+    //     alignItems: 'center'
+    // },
+    // text: {
+    //     fontSize: 14,
+    //     color: '#333',
+    //     paddingLeft: 4
+    // },
 });

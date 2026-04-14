@@ -1,87 +1,92 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     View,
     Text,
     StatusBar,
-    ImageBackground,
+    Image,
+    TextBase,
+    TextInput,
     TouchableOpacity,
     ScrollView,
+    ImageBackground
 } from 'react-native';
 import { AppColors } from '../../../constant/appColors';
+import { AppIcons } from '../../../constant/appIcons';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { ScaledSheet } from 'react-native-size-matters';
 import { OtpInput } from 'react-native-otp-entry';
 import { CustomButton } from '../../../components/customButton';
 import { CustomInput } from '../../../components/customTextInput';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
-import { api } from '../../../services/api';
-import Toast from 'react-native-toast-message';
-import { Loader } from '../../Loader/loader';
-import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { api } from '../../../services/api';
 import { AppImages } from '../../../constant/appImages';
-import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
-import auth from '@react-native-firebase/auth';
-//-----------------------------------------------------
+import { getStoredUser } from '../../../Utils/getUser'
+import { Loader } from '../../Loader/loader';
+import Toast from 'react-native-toast-message';
+import { CommonActions } from '@react-navigation/native';
 
-const resetPasswordSchema = Yup.object().shape({
-    email: Yup.string()
-        .email('Invalid email format')
-        .required('Email is required'),
-    // phone: Yup.string()
-    //     .matches(/^[1-9][0-9]*$/, 'Phone number cannot start with zero')
-    //     .required('Phone number is required'),
 
-    // newPassword: Yup.string()
-    //     .min(6, 'Password must be at least 6 characters long')
-    //     .required('Password is required'),
+export const ResetPassword = ({ route }) => {
 
-    // confirmPassword: Yup.string()
-    //     .oneOf([Yup.ref('newPassword')], 'Passwords do not match')
-    //     .required('Confirm password is required'),
-});
-
-//----------------------------------------------------
-export const ForgetPassword = () => {
-    const [Loading, setLoading] = useState(false);
-    // const [loader, setLoader] = useState(false);
-
+    const { email } = route.params
     const navigation = useNavigation();
-    // const [selectedCallingCode, setSelectedCallingCode] = useState('92');
+    const [userData, setUserData] = useState();
+    const [loading, setLoading] = useState(false);
 
-    //----------------------------------------------------
-    const resetPassword = async value => {
-        console.log('reset:', value);
+    console.log('email resett:', email)
 
-        setLoading(true);
+
+    //-------------------------------------------
+    useFocusEffect(
+        useCallback(() => {
+            const loadUser = async () => {
+                const user = await getStoredUser();
+                if (user) {
+                    setUserData(user);
+                }
+            };
+            loadUser();
+        }, []),
+    );
+    //--------------------------change password----------------------------------
+    const changePassword = async (value) => {
+        setLoading(true)
         try {
-            var formData = new FormData();
+            var formData = new FormData()
+            formData.append('email', email)
+            formData.append('new_password', value.newPassword)
+            formData.append('confirm_password', value.confirmPassword)
 
-            formData.append('email', value.email);
-
-
-            const res = await api.post('/user/forgot-password', formData, {
+            const response = await api.post('/user/reset-password', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            console.log('res :', res)
 
-            if (res?.data?.msg[0].response === 'request send') {
+            })
+            const result = response?.data?.msg[0]?.response
+            console.log('changePassword', result)
+
+            if (response?.data?.code === '200') {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg[0].response,
+                    text2: result,
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
                     },
                 });
-                navigation.navigate("Otp", { email: value.email, type: 'forgot password' });
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: 'AuthStack' }],
+                    }),
+                );
             } else {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg[0].response,
+                    text2: result,
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -89,9 +94,9 @@ export const ForgetPassword = () => {
                 });
             }
 
-            // console.log('response reset api :', res);
+
         } catch (error) {
-            console.log('Try Catch error reset password :', error);
+            console.log('Try Catch error', error)
             Toast.show({
                 type: 'customToast',
                 text1: 'Error',
@@ -103,30 +108,12 @@ export const ForgetPassword = () => {
                 },
             });
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
-    /// ---------------------Send OTP--------------------------
-    // const sendOTP = async (values) => {
-    //   setLoading(true)
-    //   try {
-    //     const fullNumber = `+${selectedCallingCode}${values.phone}`;
+    }
+    //--------------------------------------------------------------------------
 
-    //     const confirmation = await auth().signInWithPhoneNumber(fullNumber);
 
-    //     navigation.navigate('Otp', {
-    //       confirmation: confirmation,
-    //       phone: fullNumber,
-    //       forgetPassData: values,
-    //     });
-
-    //   } catch (error) {
-    //     console.log("OTP ERROR:", error.message);
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // };
-    //----------------------------------------------------------
 
     return (
         <View style={styles.Container}>
@@ -156,32 +143,26 @@ export const ForgetPassword = () => {
                             <View style={styles.headingsAlign}>
                                 <Text style={styles.h1}>Reset Password</Text>
                                 <Text style={styles.h4}>
-                                    Enter your phone number to reset your password.
+                                    Reset your account security
                                 </Text>
                             </View>
                         </View>
                     </ImageBackground>
                 </View>
-
-
-
                 <View style={styles.main}>
 
                     <View style={styles.formView}>
                         <Formik
                             initialValues={{
-                                // phone: '',
-                                // newPassword: '',
-                                // confirmPassword: '',
-                                email: '',
-
+                                email: email,
+                                newPassword: '',
+                                confirmPassword: '',
                             }}
                             onSubmit={(values, { resetForm }) => {
-                                resetPassword(values);
-                                // sendOTP(values)
-                                resetForm(values);
+                                changePassword(values)
+                                // resetForm()
+
                             }}
-                            validationSchema={resetPasswordSchema}
                         >
                             {({
                                 values,
@@ -189,52 +170,36 @@ export const ForgetPassword = () => {
                                 handleChange,
                                 handleSubmit,
                                 handleReset,
-                                touched,
                                 errors,
                             }) => (
                                 <View>
                                     <View>
-
-                                        {/* <CustomPhoneInput
-                                            label="Phone Number"
-                                            value={values.phone}
-                                            onChangeText={handleChange('phone')}
-                                            error={touched.phone && errors.phone}
-                                            onCodeChange={(code) => setSelectedCallingCode(code)}
-                                        /> */}
                                         <CustomInput
                                             label="Email"
-                                            type="email"
-                                            placeholder="Enter email"
                                             value={values.email}
-                                            onChangeText={handleChange('email')}
-                                            onBlur={handleBlur('email')}
-                                            error={touched.email && errors.email}
+                                            editable={false}
                                         />
-
-                                        {/* <CustomInput
+                                        <CustomInput
                                             label="New Password"
                                             type="password"
                                             placeholder="Enter new password"
                                             value={values.newPassword}
                                             onChangeText={handleChange('newPassword')}
                                             onBlur={handleBlur('newPassword')}
-                                            error={touched.newPassword && errors.newPassword}
                                         />
                                         <CustomInput
                                             label="Confirm Password"
                                             type="password"
-                                            placeholder="Re-enter password"
+                                            placeholder="Re-enter  password"
                                             value={values.confirmPassword}
                                             onChangeText={handleChange('confirmPassword')}
                                             onBlur={handleBlur('confirmPassword')}
-                                            error={touched.confirmPassword && errors.confirmPassword}
-                                        /> */}
+                                        />
                                     </View>
 
                                     <View style={styles.btn}>
                                         <CustomButton
-                                            title="Reset Password"
+                                            title="Change Password"
                                             onPress={handleSubmit}
                                         />
                                     </View>
@@ -243,14 +208,10 @@ export const ForgetPassword = () => {
                         </Formik>
                     </View>
 
-                    <View style={styles.reciveCode}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Text style={styles.h4}>Back to Login</Text>
-                        </TouchableOpacity>
-                    </View>
+
                 </View>
             </ScrollView>
-            <Loader visible={Loading} />
+            <Loader visible={loading} />
         </View>
     );
 };
@@ -307,28 +268,7 @@ const styles = ScaledSheet.create({
 
         elevation: 5
     },
-    headingView: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 5,
-    },
-    h1: {
-        fontSize: moderateScale(24),
-        color: '#fff',
-        fontWeight: '700',
-        padding: 5,
-    },
-    h4: {
-        fontSize: moderateScale(16),
-        color: '#fff',
-        opacity: 0.7,
-        padding: 15,
-        textAlign: 'center',
-    },
-    arrowBackView: {
-        marginTop: 20,
-        padding: 10,
-    },
+
     view: {
         padding: 10,
     },
@@ -348,9 +288,4 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         padding: 15,
     },
-    header: {
-        backgroundColor: AppColors.primary,
-        borderBottomLeftRadius: 50,
-        borderBottomRightRadius: 50
-    }
 });

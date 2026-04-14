@@ -329,14 +329,12 @@ export const MembersDashboard = () => {
                     </Text>
                   </TouchableOpacity>
                   {/* //////////////////////////////////// */}
-                  <View style={styles.container3}>
+                  {/* <View style={styles.container3}>
 
-                    {/* 3 DOT ICON */}
                     <TouchableOpacity onPress={toggleMenu}>
                       <MaterialCommunityIcons name="dots-horizontal" size={40} color="#fff" />
                     </TouchableOpacity>
 
-                    {/* DROPDOWN */}
                     {visible && (
                       <View style={styles.dropdown}>
                         <TouchableOpacity onPress={() => handleOption('share')} style={styles.item}>
@@ -357,7 +355,7 @@ export const MembersDashboard = () => {
                         </TouchableOpacity>
                       </View>
                     )}
-                  </View>
+                  </View> */}
                 </View>
                 {/* ///////////////////////////////////////// */}
               </View>

@@ -19,6 +19,12 @@ import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CommonActions } from '@react-navigation/native';
 import { CustomButtonLight } from '../../components/customeButtonLight';
+import { getStoredUser } from '../../Utils/getUser';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 
 const { width } = Dimensions.get('window');
 
@@ -26,18 +32,39 @@ export const AdminProfile = () => {
     const [userdata, setUserData] = useState(null);
     const [isLodaing, setIsLoading] = useState(false);
     const navigation = useNavigation();
-
-    const getData = async () => {
-        const user = await AsyncStorage.getItem('user');
-        if (user) setUserData(JSON.parse(user));
+    const [visible, setVisible] = useState(false)
+    //--------------------------------------------
+    const toggleMenu = () => {
+        setVisible(!visible);
     };
+
+    const handleOption = (type) => {
+        setVisible(false);
+
+        if (type === 'ChangePassword') {
+            navigation.navigate('ChangePassword')
+
+        } else if (type === 'suggestion') {
+            navigation.navigate('SuggestionScreen')
+        } else if (type === 'support') {
+            navigation.navigate('SupportTeam')
+        }
+    };
+    //--------------------------------------------
 
     useFocusEffect(
         useCallback(() => {
-            getData();
+            const loadUser = async () => {
+                const user = await getStoredUser();
+                if (user) {
+                    setUserData(user);
+                    // console.log(user.full_name, user.user_id);
+                }
+            };
+            loadUser();
         }, []),
     );
-    console.log("profile user", userdata)
+
     const logout = async () => {
         setIsLoading(true);
         await AsyncStorage.multiRemove(['user', 'token', 'ModalClosed']);
@@ -52,8 +79,49 @@ export const AdminProfile = () => {
         setIsLoading(false);
     };
 
-    console.log('user data async :', userdata)
     if (!userdata) return <Loader visible />;
+
+    //---------------------------------------------------------
+
+    const copyToClipboard = (value) => {
+        Clipboard.setString(value);
+
+        Toast.show({
+            type: 'customToast',
+            text1: 'Copied',
+            text2: 'Code copied successfully ✅',
+            props: {
+                bgColor: AppColors.background,
+                borderColor: 'green',
+            },
+        });
+    };
+
+    //---------------------------------------------------------
+
+    const renderRow = (label, value, isCopy = false) => (
+        <View style={styles.row}>
+            <Text style={styles.label}>{label}</Text>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.value}>{value}</Text>
+
+                {isCopy && (
+                    <TouchableOpacity onPress={() => copyToClipboard(value)}>
+                        <MaterialIcons
+                            name="content-copy"
+                            size={18}
+                            color={AppColors.primary}
+                            style={{ marginLeft: 8 }}
+                        />
+                    </TouchableOpacity>
+                )}
+            </View>
+        </View>
+    );
+
+    //---------------------------------------------------------
+
 
     return (
         <View style={styles.container}>
@@ -68,8 +136,23 @@ export const AdminProfile = () => {
                     </TouchableOpacity>
 
                     <Text style={styles.headerTitle}>My Profile</Text>
+                    <TouchableOpacity onPress={toggleMenu}>
 
-                    <Icon name="settings" size={24} color="#fff" />
+                        <Icon name="settings" size={24} color="#fff" />
+                    </TouchableOpacity>
+
+
+                    {/* DROPDOWN */}
+                    {visible && (
+                        <View style={styles.dropdown}>
+                            <TouchableOpacity onPress={() => handleOption('ChangePassword')} style={styles.item}>
+                                <Icon name="password" size={24} color={AppColors.link} />
+                                <Text style={styles.text}>Change Password</Text>
+                            </TouchableOpacity>
+
+                            
+                        </View>
+                    )}
                 </View>
 
                 {/* PROFILE CARD */}
@@ -91,7 +174,9 @@ export const AdminProfile = () => {
                 <View style={styles.infoCard}>
                     {renderRow('Full Name', userdata?.full_name)}
                     {renderRow('Phone', userdata?.phone)}
-                    {renderRow('Code', userdata?.reg_code)}
+                    {renderRow('Email', userdata?.email)}
+                    {renderRow('User Code', userdata?.reg_code, true)}
+
                 </View>
 
                 {/* BUTTONS */}
@@ -119,12 +204,10 @@ export const AdminProfile = () => {
     );
 };
 
-const renderRow = (label, value) => (
-    <View style={styles.row}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>{value}</Text>
-    </View>
-);
+//-----------------------------------------------------------------
+
+
+//-----------------------------------------------------------------
 
 const styles = ScaledSheet.create({
     container: {
@@ -146,6 +229,9 @@ const styles = ScaledSheet.create({
         borderBottomLeftRadius: '45@ms',
         borderBottomRightRadius: '45@ms',
         elevation: 8,
+        position: 'relative',
+        zIndex: 50
+
     },
 
     headerTitle: {
@@ -235,5 +321,33 @@ const styles = ScaledSheet.create({
     logoutText: {
         color: 'red',
         fontWeight: '600',
+    },
+    //-------------------------------------
+    container3: {
+
+        position: 'relative',
+        paddingRight: 15
+    },
+    dropdown: {
+        position: 'absolute',
+        top: 55,
+        right: 20,
+        width: 180,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        paddingVertical: 8,
+        elevation: 5,
+        zIndex: 110
+    },
+    item: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    text: {
+        fontSize: 14,
+        color: '#333',
+        paddingLeft: 4
     },
 });

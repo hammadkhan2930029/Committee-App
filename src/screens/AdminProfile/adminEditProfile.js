@@ -200,6 +200,7 @@ export const AdminEditProfile = ({ route }) => {
                         initialValues={{
                             fullName: user.full_name || '',
                             phoneNumber: user.phone || '',
+                            email: user.email || ''
                         }}
                         onSubmit={values => editProfile(values)}
                     >
@@ -220,6 +221,13 @@ export const AdminEditProfile = ({ route }) => {
                                     value={values.phoneNumber}
                                     onChangeText={handleChange('phoneNumber')}
                                     onBlur={handleBlur('phoneNumber')}
+                                />
+                                <CustomInput
+                                    label="Email"
+                                    placeholder="Enter email"
+                                    value={values.email}
+                                    onChangeText={handleChange('email')}
+                                    onBlur={handleBlur('email')}
                                 />
 
                                 <View style={styles.btn}>

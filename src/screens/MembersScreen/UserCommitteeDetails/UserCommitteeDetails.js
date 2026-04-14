@@ -345,7 +345,7 @@ export const UserCommitteeDetails = ({ route }) => {
                         }
                       />
                     ) : (
-                      <DisabledButton title="Payment Now" />
+                      <DisabledButton title="Pay Now" />
                     )}
                   </View>
                 </View>

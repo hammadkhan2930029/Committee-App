@@ -138,7 +138,7 @@ export const CreateCommittee = () => {
             });
 
             const msg = response?.data?.msg?.[0];
-            if (response.status === 200) {
+            if (response.data.code == '200') {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
@@ -179,12 +179,8 @@ export const CreateCommittee = () => {
             setLoading(false);
         }
     };
-    //----------------------------------------------------
 
-
-
-
-    //--------------------currency list-------------------------
+//--------------------currency list-------------------------
 
     const currencyFun = async () => {
         try {
@@ -196,7 +192,6 @@ export const CreateCommittee = () => {
                 value: item.id,
             }));
 
-            // console.log("Currency :", formattedData)
             setCurrency(formattedData)
 
         } catch (error) {
@@ -207,7 +202,7 @@ export const CreateCommittee = () => {
     useEffect(() => {
         currencyFun()
     }, [])
-    //-------------------------------
+//-------------------------------------------------------------------
 
 
 
@@ -255,7 +250,7 @@ export const CreateCommittee = () => {
                             totalAmount: '',
                             startDate: '',
                             due_on: '',
-                            currency_id: ''
+                            currency_id: '1'
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { resetForm }) => {
@@ -380,14 +375,12 @@ export const CreateCommittee = () => {
                                     />
                                     {/* ======================================================= */}
                                     <View style={styles.DropDowncontainer}>
-                                        {/* {renderLabel()} */}
                                         <Text style={styles.label2}>Select Currency</Text>
                                         <Dropdown
-                                            // style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                                             style={[
                                                 styles.dropdown,
                                                 isFocus && { borderColor: 'blue' },
-                                                touched.currency_id && errors.currency_id && { borderColor: 'red' } // Red border
+                                                touched.currency_id && errors.currency_id && { borderColor: 'red' } 
                                             ]}
                                             placeholderStyle={styles.placeholderStyle}
                                             selectedTextStyle={styles.selectedTextStyle}

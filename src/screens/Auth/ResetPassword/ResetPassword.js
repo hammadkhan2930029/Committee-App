@@ -154,7 +154,7 @@ export const ResetPassword = ({ route }) => {
                     <View style={styles.formView}>
                         <Formik
                             initialValues={{
-                                email: email,
+                                email,
                                 newPassword: '',
                                 confirmPassword: '',
                             }}

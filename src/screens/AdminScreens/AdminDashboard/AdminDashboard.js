@@ -17,7 +17,6 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
@@ -35,8 +34,6 @@ import Animated, {
 
 
 export const AdminDashboard = () => {
-    //--------------------------------------------
-    // const [visible, setVisible] = useState(false);
 
 
     //-------------------------------------------------
@@ -53,13 +50,11 @@ export const AdminDashboard = () => {
                 const user = await getStoredUser();
                 if (user) {
                     setUserData(user);
-                    // console.log(user.full_name, user.user_id);
                 }
             };
             loadUser();
         }, []),
     );
-    // console.log('userData', userData);
     //---------------Total User total active bCs------------------------------
     const counterApi = async () => {
         try {
@@ -125,23 +120,8 @@ export const AdminDashboard = () => {
     useEffect(() => {
         triggerHandWave();
     }, []);
-    //--------------------------------------------------------------
 
-    // const toggleMenu = () => {
-    //     setVisible(!visible);
-    // };
 
-    // const handleOption = (type) => {
-    //     setVisible(false);
-
-    //     if (type === 'share') {
-    //         onShare()
-    //     } else if (type === 'suggestion') {
-    //         navigation.navigate('SuggestionScreen')
-    //     } else if (type === 'support') {
-    //         navigation.navigate('SupportTeam')
-    //     }
-    // };
     //---------------------------Share App------------------------------------
     const onShare = async () => {
         try {
@@ -205,35 +185,7 @@ export const AdminDashboard = () => {
                                         <Text style={styles.shareAppText}>Share App</Text>
                                     </TouchableOpacity>
 
-                                    {/* 3 DOT ICON */}
-                                    {/* <TouchableOpacity onPress={toggleMenu}>
-                                        <MaterialCommunityIcons name="dots-horizontal" size={35} color="#fff" />
-                                    </TouchableOpacity> */}
-
-                                    {/* DROPDOWN */}
-                                    {/* {visible && (
-                                        <View style={styles.dropdown}>
-                                            <TouchableOpacity onPress={() => handleOption('share')} style={styles.item}>
-                                                <Icon name="share" size={24} color={AppColors.link} />
-                                                <Text style={styles.text}>Share App</Text>
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity onPress={() => handleOption('suggestion')} style={styles.item}>
-                                                <MaterialCommunityIcons name="lightbulb-outline" size={24} color={AppColors.link} />
-
-                                                <Text style={styles.text}>Suggestion</Text>
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity onPress={() => handleOption('support')} style={styles.item}>
-                                                <MaterialCommunityIcons name="comment-text-outline" size={24} color={AppColors.link} />
-
-                                                <Text style={styles.text}>Support</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    )} */}
                                 </View>
-
-
                             </View>
 
                         </View>
@@ -253,9 +205,7 @@ export const AdminDashboard = () => {
                                         <Icon name="group-add" size={34} color={AppColors.link} />
                                         <Text style={styles.activeBC}>Active BCs</Text>
                                     </View>
-                                    {/* <Text style={styles.activeBC_details}>
-                    2 starting this month
-                  </Text> */}
+                                  
                                 </View>
                                 <View style={styles.counter}>
                                     <Text style={styles.counter_text}>
@@ -264,23 +214,7 @@ export const AdminDashboard = () => {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        {/* -------Total Users------- */}
-                        {/* <TouchableOpacity activeOpacity={0.7}>
-              <View style={styles.Dashboardcard}>
-                <View>
-                  <View style={styles.imgText}>
-                    <Icon name="groups" size={34} color={AppColors.link} />
-                    <Text style={styles.activeBC}>Total Users</Text>
-                  </View>
-                  <Text style={styles.activeBC_details}>
-                    3 joined this week{' '}
-                  </Text>
-                </View>
-                <View style={styles.counter}>
-                  <Text style={styles.counter_text}>{counter.total_users}</Text>
-                </View>
-              </View>
-            </TouchableOpacity> */}
+                        
                         {/* -------Pending Payments------- */}
                         <TouchableOpacity
                             activeOpacity={0.7}
@@ -465,26 +399,5 @@ const styles = ScaledSheet.create({
         color: AppColors.blackText
     }
 
-    // dropdown: {
-    //     position: 'absolute',
-    //     top: 35,
-    //     right: 5,
-    //     width: 180,
-    //     backgroundColor: '#fff',
-    //     borderRadius: 12,
-    //     paddingVertical: 8,
-    //     elevation: 5,
-    //     zIndex: 100
-    // },
-    // item: {
-    //     paddingVertical: 10,
-    //     paddingHorizontal: 15,
-    //     flexDirection: 'row',
-    //     alignItems: 'center'
-    // },
-    // text: {
-    //     fontSize: 14,
-    //     color: '#333',
-    //     paddingLeft: 4
-    // },
+
 });

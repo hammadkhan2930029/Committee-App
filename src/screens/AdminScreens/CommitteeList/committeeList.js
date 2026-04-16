@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  View,
-  StatusBar,
-  ImageBackground,
-  Image,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  FlatList,
+    View,
+    StatusBar,
+    ImageBackground,
+    Image,
+    Text,
+    ScrollView,
+    TouchableOpacity,
+    FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -19,492 +19,490 @@ import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const CommitteeList = () => {
-  const [loading, setLoading] = useState(true);
-  const [listView, setListView] = useState([]);
-  const navigation = useNavigation();
-  const [hasFetched, setHasFetched] = useState(false);
-  //----------------------------------------------
-  const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [listView, setListView] = useState([]);
+    const navigation = useNavigation();
+    const [hasFetched, setHasFetched] = useState(false);
+    //----------------------------------------------
+    const [userData, setUserData] = useState(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadUser = async () => {
-        const user = await getStoredUser();
-        if (user) {
-          setUserData(user);
-          console.log(user.full_name, user.user_id);
-        }
-      };
-      loadUser();
-    }, []),
-  );
-  //---thousand separator---only display ke liye-------
-  const formatNumber = value => {
-    if (!value) return '';
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  };
-
-  //---- User input se commas remove karne ke liye-------
-  const removeCommas = value => value.replace(/,/g, '');
-  //----------get committee list----------------------
-
-  const committeeList = async () => {
-    if (hasFetched) return;
-    setLoading(true);
-    try {
-      const response = await api.get(
-        `/user/view-committees/${userData.user_id}`,
-      );
-
-      setListView(response.data.msg);
-      if (response.data.msg) {
-        setLoading(false);
-      }
-      console.log('committee :', response.data.msg);
-      setHasFetched(true);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (userData?.user_id && !hasFetched) {
-  //     committeeList();
-  //   }
-  // }, [userData?.user_id]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (userData?.user_id && !hasFetched) {
-        committeeList();
-      }
-
-    }, [userData?.user_id])
-  )
-
-  //----------------------Skeleton-----------------------------
-  const MySkeleton = () => {
-    return (
-      <View>
-        {[...Array(6)].map((_, index) => (
-          <SkeletonPlaceholder>
-            <SkeletonPlaceholder.Item
-              justifyContent="center"
-              alignItems="center"
-            >
-              <View
-                style={{
-                  backgroundColor: AppColors.background,
-                  padding: 10,
-                  borderRadius: 20,
-                  margin: 10,
-                  borderColor: AppColors.primary,
-                  borderWidth: 1,
-                  height: 420,
-                  width: '95%',
-                  height: 120,
-                }}
-              >
-                <SkeletonPlaceholder.Item
-                  width={'100%'}
-                  padding={10}
-                  flexDirection="row"
-                  justifyContent="space-between"
-                >
-                  {/* Text */}
-                  <SkeletonPlaceholder.Item>
-                    <SkeletonPlaceholder.Item
-                      width={120}
-                      height={20}
-                      borderRadius={4}
-                    />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={80}
-                      height={20}
-                      borderRadius={4}
-                    />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={80}
-                      height={20}
-                      borderRadius={4}
-                    />
-                  </SkeletonPlaceholder.Item>
-                  <SkeletonPlaceholder.Item
-                    justifyContent="flex-end"
-                    alignItems="flex-end"
-                  >
-                    <SkeletonPlaceholder.Item
-                      width={80}
-                      height={25}
-                      borderRadius={30}
-                    />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={120}
-                      height={20}
-                      borderRadius={4}
-                    />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={80}
-                      height={20}
-                      borderRadius={4}
-                    />
-                  </SkeletonPlaceholder.Item>
-                </SkeletonPlaceholder.Item>
-              </View>
-            </SkeletonPlaceholder.Item>
-          </SkeletonPlaceholder>
-        ))}
-      </View>
+    useFocusEffect(
+        useCallback(() => {
+            const loadUser = async () => {
+                const user = await getStoredUser();
+                if (user) {
+                    setUserData(user);
+                }
+            };
+            loadUser();
+        }, []),
     );
-  };
-  //-------------header---------------
-  const HeaderComponenet = useMemo(() => {
-    return (
-      <View>
-        <ImageBackground
-          source={AppImages.Rectangle2}
-          style={styles.RectangleImg}
-          resizeMode="cover"
-        >
-          <View style={styles.main}>
-            <View style={styles.TopView}>
-              <View style={styles.backAndText}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Icon name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.h1}>Committees</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('AdminProfile')}
-              >
-                <Image
-                  source={
-                    userData?.image
-                      ? { uri: userData.image }
-                      : AppImages.profileAvatar
-                  }
-                  style={styles.avatar}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.textView}>
-              <Text style={styles.h4}>Manage all your active and</Text>
-              <Text style={styles.h4}>completed BCs below.</Text>
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
+    console.log('user :', userData);
+
+
+    //---thousand separator---only display ke liye-------
+    const formatNumber = value => {
+        if (!value) return '';
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    //---- User input se commas remove karne ke liye-------
+    const removeCommas = value => value.replace(/,/g, '');
+    //----------get committee list----------------------
+
+    const committeeList = async () => {
+        if (hasFetched) return;
+        setLoading(true);
+        try {
+            const response = await api.get(
+                `/user/view-committees/${userData.user_id}`,
+            );
+
+            setListView(response.data.msg);
+            if (response.data.msg) {
+                setLoading(false);
+            }
+            console.log('committee :', response.data.msg);
+            setHasFetched(true);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+    useFocusEffect(
+        useCallback(() => {
+            if (userData?.user_id && !hasFetched) {
+                committeeList();
+            }
+
+        }, [userData?.user_id])
     )
-  }, [])
 
-  return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-      <View style={styles.addView}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => navigate('CreateCommittee')}
-        >
-          <Image source={AppIcons.Add} style={styles.add} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.scrollView}>
-
-
-        {/* ---------------------------------------------- */}
-        {loading ? (
-          <MySkeleton />
-        ) : (
-          <View>
-            <FlatList
-              data={listView}
-              keyExtractor={(item, index) => index.toString()}
-              ListHeaderComponent={HeaderComponenet}
-
-              renderItem={item => {
-                const datalist = item.item;
-                console.log('data list:', datalist);
-
-                return (
-                  <View style={styles.Committee_View}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigate('CommitteeDetails', { id: datalist.id })
-                      }
-                    >
-                      <View
-                        style={[
-                          styles.Dashboardcard,
-                          { display: datalist.name ? 'flex' : 'none' },
-                        ]}
-                      >
-                        <View style={styles.first_view}>
-                          <View style={styles.committeeName_View}>
-                            <Text style={styles.committeeName}>{datalist.name}</Text>
-                          </View>
-                          <TouchableOpacity
-                            style={
-                              datalist.status === 'Active'
-                                ? styles.BtnActive
-                                : styles.Btncomplete
-                            }
-                          >
-                            <Text style={styles.complete}>
-                              {datalist.status}
-                            </Text>
-                          </TouchableOpacity>
+    //----------------------Skeleton-----------------------------
+    const MySkeleton = () => {
+        return (
+            <View>
+                {[...Array(6)].map((_, index) => (
+                    <SkeletonPlaceholder>
+                        <SkeletonPlaceholder.Item
+                            justifyContent="center"
+                            alignItems="center"
+                        >
+                            <View
+                                style={{
+                                    backgroundColor: AppColors.background,
+                                    padding: 10,
+                                    borderRadius: 20,
+                                    margin: 10,
+                                    borderColor: AppColors.primary,
+                                    borderWidth: 1,
+                                    height: 420,
+                                    width: '95%',
+                                    height: 120,
+                                }}
+                            >
+                                <SkeletonPlaceholder.Item
+                                    width={'100%'}
+                                    padding={10}
+                                    flexDirection="row"
+                                    justifyContent="space-between"
+                                >
+                                    {/* Text */}
+                                    <SkeletonPlaceholder.Item>
+                                        <SkeletonPlaceholder.Item
+                                            width={120}
+                                            height={20}
+                                            borderRadius={4}
+                                        />
+                                        <SkeletonPlaceholder.Item
+                                            marginTop={6}
+                                            width={80}
+                                            height={20}
+                                            borderRadius={4}
+                                        />
+                                        <SkeletonPlaceholder.Item
+                                            marginTop={6}
+                                            width={80}
+                                            height={20}
+                                            borderRadius={4}
+                                        />
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item
+                                        justifyContent="flex-end"
+                                        alignItems="flex-end"
+                                    >
+                                        <SkeletonPlaceholder.Item
+                                            width={80}
+                                            height={25}
+                                            borderRadius={30}
+                                        />
+                                        <SkeletonPlaceholder.Item
+                                            marginTop={6}
+                                            width={120}
+                                            height={20}
+                                            borderRadius={4}
+                                        />
+                                        <SkeletonPlaceholder.Item
+                                            marginTop={6}
+                                            width={80}
+                                            height={20}
+                                            borderRadius={4}
+                                        />
+                                    </SkeletonPlaceholder.Item>
+                                </SkeletonPlaceholder.Item>
+                            </View>
+                        </SkeletonPlaceholder.Item>
+                    </SkeletonPlaceholder>
+                ))}
+            </View>
+        );
+    };
+    //-------------header---------------
+    const HeaderComponenet = useMemo(() => {
+        return (
+            <View>
+                <ImageBackground
+                    source={AppImages.Rectangle2}
+                    style={styles.RectangleImg}
+                    resizeMode="cover"
+                >
+                    <View style={styles.main}>
+                        <View style={styles.TopView}>
+                            <View style={styles.backAndText}>
+                                <TouchableOpacity onPress={() => navigation.goBack()}>
+                                    <Icon name="arrow-back" size={24} color="#fff" />
+                                </TouchableOpacity>
+                                <Text style={styles.h1}>Committees</Text>
+                            </View>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('AdminProfile')}
+                            >
+                                <Image
+                                    source={
+                                        userData?.image
+                                            ? { uri: userData.image }
+                                            : AppImages.profileAvatar
+                                    }
+                                    style={styles.avatar}
+                                />
+                            </TouchableOpacity>
                         </View>
-                        <View style={styles.first_view}>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Members :</Text>
-                            <Text style={styles.count}>
-                              {' '}
-                              {datalist.total_member}
-                            </Text>
-                          </View>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Amount :</Text>
-                            <Text style={styles.count}>
-                              {' '}
-                              {formatNumber(datalist.amount_per_member)}
-                            </Text>
-                          </View>
+                        <View style={styles.textView}>
+                            <Text style={styles.h4}>Manage all your active and</Text>
+                            <Text style={styles.h4}>completed BCs below.</Text>
                         </View>
-                        <View style={styles.first_view}>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Rounds :</Text>
-                            <Text style={styles.count}>
-                              {' '}
-                              {datalist.total_rounds}
-                            </Text>
-                          </View>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Start :</Text>
-                            <Text style={styles.count}>
-                              {' '}
-                              {datalist.start_date}
-                            </Text>
-                          </View>
-                        </View>
-                        <View style={styles.first_view}>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Total :</Text>
-                            <Text style={styles.count}>
-                              {' '}
-                              {formatNumber(datalist.total)}
-                            </Text>
-                          </View>
-                          <View style={styles.details}>
-                            <Text style={styles.one}>Due on:</Text>
-                            <Text style={styles.count}> {datalist.due_on}</Text>
-                          </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                    <View
-                      style={[
-                        styles.dataEmpty,
-                        { display: datalist.name ? 'none' : 'flex' },
-                      ]}
-                    >
-                      <Text style={styles.emptyText}>Data not available</Text>
                     </View>
-                  </View>
-                );
-              }}
-              ListEmptyComponent={() => (
-                !loading ? (
-                  <View style={styles.dataEmpty}>
-                    <Text style={styles.emptyText}>Data not available</Text>
-                  </View>
-                ) : null
-              )}
-            />
-          </View>
-        )}
+                </ImageBackground>
+            </View>
+        )
+    }, [userData])
 
-        {/* ------------------------------------------------------------------------- */}
-      </View>
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
+            <View style={styles.addView}>
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigate('CreateCommittee')}
+                >
+                    <Image source={AppIcons.Add} style={styles.add} />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.scrollView}>
+
+
+                {/* ---------------------------------------------- */}
+                {loading ? (
+                    <MySkeleton />
+                ) : (
+                    <View>
+                        <FlatList
+                            data={listView}
+                            keyExtractor={(item, index) => index.toString()}
+                            ListHeaderComponent={HeaderComponenet}
+
+                            renderItem={item => {
+                                const datalist = item.item;
+                                console.log('data list:', datalist);
+
+                                return (
+                                    <View style={styles.Committee_View}>
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                navigate('CommitteeDetails', { id: datalist.id })
+                                            }
+                                        >
+                                            <View
+                                                style={[
+                                                    styles.Dashboardcard,
+                                                    { display: datalist.name ? 'flex' : 'none' },
+                                                ]}
+                                            >
+                                                <View style={styles.first_view}>
+                                                    <View style={styles.committeeName_View}>
+                                                        <Text style={styles.committeeName}>{datalist.name}</Text>
+                                                    </View>
+                                                    <TouchableOpacity
+                                                        style={
+                                                            datalist.status === 'Active'
+                                                                ? styles.BtnActive
+                                                                : styles.Btncomplete
+                                                        }
+                                                    >
+                                                        <Text style={styles.complete}>
+                                                            {datalist.status}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <View style={styles.first_view}>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Members :</Text>
+                                                        <Text style={styles.count}>
+                                                            {' '}
+                                                            {datalist.total_member}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Amount :</Text>
+                                                        <Text style={styles.count}>
+                                                            {' '}
+                                                            {formatNumber(datalist.amount_per_member)}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.first_view}>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Rounds :</Text>
+                                                        <Text style={styles.count}>
+                                                            {' '}
+                                                            {datalist.total_rounds}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Start :</Text>
+                                                        <Text style={styles.count}>
+                                                            {' '}
+                                                            {datalist.start_date}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.first_view}>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Total :</Text>
+                                                        <Text style={styles.count}>
+                                                            {' '}
+                                                            {formatNumber(datalist.total)}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={styles.details}>
+                                                        <Text style={styles.one}>Due on:</Text>
+                                                        <Text style={styles.count}> {datalist.due_on}</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                        <View
+                                            style={[
+                                                styles.dataEmpty,
+                                                { display: datalist.name ? 'none' : 'flex' },
+                                            ]}
+                                        >
+                                            <Text style={styles.emptyText}>Data not available</Text>
+                                        </View>
+                                    </View>
+                                );
+                            }}
+                            ListEmptyComponent={() => (
+                                !loading ? (
+                                    <View style={styles.dataEmpty}>
+                                        <Text style={styles.emptyText}>Data not available</Text>
+                                    </View>
+                                ) : null
+                            )}
+                        />
+                    </View>
+                )}
+
+                {/* ------------------------------------------------------------------------- */}
+            </View>
+        </View>
+    );
 };
 
 const styles = ScaledSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.background,
-  },
-  scrollView: {
-    marginBottom: hp('8%'),
-  },
-  arrowBack: {
-    width: wp('7%'),
-    height: wp('7%'),
-  },
-  RectangleImg: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'contain',
-  },
-  TopView: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-    width: wp('100%'),
-    padding: wp('4%'),
-    marginTop: hp('2%'),
-  },
-  backAndText: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  h1: {
-    fontSize: RFValue(22),
-    color: AppColors.title,
-    fontWeight: '600',
-    paddingLeft: 6,
-  },
-  avatar: {
-    width: wp('14%'),
-    height: wp('14%'),
-    elevation: 5,
-    borderRadius: 50
-  },
-  textView: {
-    padding: wp('2%'),
-  },
-  h4: {
-    color: AppColors.title,
-    fontSize: RFValue(14),
-    opacity: 0.9,
-    padding: wp('1%'),
-  },
-  //---------------------------------
-  Committee_View: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  Dashboardcard: {
-    width: wp('95%'),
-    backgroundColor: AppColors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    padding: 15,
-    elevation: 5,
-    borderRadius: wp('5%'),
-    margin: wp('2%'),
-    borderColor: AppColors.primary,
-    borderWidth: 1,
-  },
-  first_view: {
-    width: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  last_view: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  committeeName_View: {
-    backgroundColor: AppColors.background,
-    borderWidth: 1,
-    borderColor: AppColors.primary,
-    borderRadius: 50,
-    elevation: 3
-  },
-  committeeName: {
-    fontSize: RFValue(15),
-    color: AppColors.blackText,
-    fontWeight: '600',
-    paddingHorizontal: 15,
-    paddingVertical: 5
+    container: {
+        flex: 1,
+        backgroundColor: AppColors.background,
+    },
+    scrollView: {
+        marginBottom: hp('8%'),
+    },
+    arrowBack: {
+        width: wp('7%'),
+        height: wp('7%'),
+    },
+    RectangleImg: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'contain',
+    },
+    TopView: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        width: wp('100%'),
+        padding: wp('4%'),
+        marginTop: hp('2%'),
+    },
+    backAndText: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    h1: {
+        fontSize: RFValue(22),
+        color: AppColors.title,
+        fontWeight: '600',
+        paddingLeft: 6,
+    },
+    avatar: {
+        width: wp('14%'),
+        height: wp('14%'),
+        elevation: 5,
+        borderRadius: 50
+    },
+    textView: {
+        padding: wp('2%'),
+    },
+    h4: {
+        color: AppColors.title,
+        fontSize: RFValue(14),
+        opacity: 0.9,
+        padding: wp('1%'),
+    },
+    //---------------------------------
+    Committee_View: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    Dashboardcard: {
+        width: wp('95%'),
+        backgroundColor: AppColors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        padding: 15,
+        elevation: 5,
+        borderRadius: wp('5%'),
+        margin: wp('2%'),
+        borderColor: AppColors.primary,
+        borderWidth: 1,
+    },
+    first_view: {
+        width: '100%',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    last_view: {
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    committeeName_View: {
+        backgroundColor: AppColors.background,
+        borderWidth: 1,
+        borderColor: AppColors.primary,
+        borderRadius: 50,
+        elevation: 3
+    },
+    committeeName: {
+        fontSize: RFValue(15),
+        color: AppColors.blackText,
+        fontWeight: '600',
+        paddingHorizontal: 15,
+        paddingVertical: 5
 
-  },
-  Btncomplete: {
-    backgroundColor: 'green',
-    borderRadius: wp('5%'),
-    paddingVertical: hp('0.5%'),
-    paddingHorizontal: wp('2%'),
-  },
-  complete: {
-    fontSize: RFValue(15),
-    color: AppColors.title,
-    paddingHorizontal: wp('2%'),
-  },
-  BtnActive: {
-    backgroundColor: AppColors.primary,
-    borderRadius: wp('5%'),
-    paddingVertical: hp('0.5%'),
-    paddingHorizontal: wp('2%'),
-    borderColor: AppColors.primary,
-    borderWidth: 1,
-    elevation: 5
+    },
+    Btncomplete: {
+        backgroundColor: 'green',
+        borderRadius: wp('5%'),
+        paddingVertical: hp('0.5%'),
+        paddingHorizontal: wp('2%'),
+    },
+    complete: {
+        fontSize: RFValue(15),
+        color: AppColors.title,
+        paddingHorizontal: wp('2%'),
+    },
+    BtnActive: {
+        backgroundColor: AppColors.primary,
+        borderRadius: wp('5%'),
+        paddingVertical: hp('0.5%'),
+        paddingHorizontal: wp('2%'),
+        borderColor: AppColors.primary,
+        borderWidth: 1,
+        elevation: 5
 
-  },
-  active: {
-    fontSize: RFValue(14),
-    color: AppColors.link,
-  },
-  details: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingTop: hp('1%'),
-  },
-  one: {
-    fontSize: RFValue(13),
-    color: AppColors.blackText,
-  },
-  count: {
-    fontSize: RFValue(13),
-    color: AppColors.link,
-    fontWeight: '600',
-  },
-  //---------------------------------
-  addView: {
-    position: 'absolute',
-    bottom: hp(10),
-    right: wp('5%'),
-    width: wp('15%'),
-    height: wp('15%'),
-    borderRadius: wp('7.5%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  add: {
-    width: wp('18%'),
-    height: wp('18%'),
-    resizeMode: 'contain',
-    elevation: 10,
-  },
-  dataEmpty: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: wp('4%'),
-  },
-  emptyText: {
-    fontSize: RFValue(18),
-    color: AppColors.placeholder,
-  },
+    },
+    active: {
+        fontSize: RFValue(14),
+        color: AppColors.link,
+    },
+    details: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingTop: hp('1%'),
+    },
+    one: {
+        fontSize: RFValue(13),
+        color: AppColors.blackText,
+    },
+    count: {
+        fontSize: RFValue(13),
+        color: AppColors.link,
+        fontWeight: '600',
+    },
+    //---------------------------------
+    addView: {
+        position: 'absolute',
+        bottom: hp(10),
+        right: wp('5%'),
+        width: wp('15%'),
+        height: wp('15%'),
+        borderRadius: wp('7.5%'),
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+    add: {
+        width: wp('18%'),
+        height: wp('18%'),
+        resizeMode: 'contain',
+        elevation: 10,
+    },
+    dataEmpty: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: wp('4%'),
+    },
+    emptyText: {
+        fontSize: RFValue(18),
+        color: AppColors.placeholder,
+    },
 });

@@ -31,9 +31,7 @@ export const AddCommitteeMembers = ({ route }) => {
     const navigation = useNavigation();
     const [membersList, setMembersList] = useState([]);
     const [membersidList, setMembersidList] = useState([]);
-
     const [selectCode, setselectCode] = useState();
-
 
     //--------------------------------------------------------
     const [paymentList, setPaymentList] = useState([]);
@@ -46,10 +44,13 @@ export const AddCommitteeMembers = ({ route }) => {
     const committeeID = multipleData?.msg[0]?.committee_id;
 
     const membersID = multipleData.members.map(item => item);
+
     //---------------member list ma user_id null ho ----------------------
 
     const findMemberID = membersidList?.find(item => item.user_id === null);
+
     const filteredMemberID = findMemberID?.committe_member_id;
+
     //---------member list ma koi bhi user id khali nh ho usko check karna hy-----------
 
     const memberIdAndLenght = membersidList?.every(
@@ -90,8 +91,6 @@ export const AddCommitteeMembers = ({ route }) => {
             loadUser();
         }, []),
     );
-
-
 
     //-------------------add members api---------------------------
 
@@ -225,28 +224,19 @@ export const AddCommitteeMembers = ({ route }) => {
             }
         }, [userdata]),
     );
-    // console.log('Is veified :', isverified)
     //------------------------------------------------------------
 
     const len = membersidList.length;
     const emptyValue = membersidList.filter(item => item.user_id === null).length;
 
-    // console.log(`member id list : ${len - emptyValue}`);
     //------------------------------------------------------------
     const [error, setError] = useState('');
 
-    const internationalMobileRegex = /^\+[1-9]\d{1,3}-?\d{6,14}$/;
 
     const handleChange = text => {
         setselectCode(text);
 
-        // if (text.length === 0) {
-        //     setError('');
-        // } else if (!internationalMobileRegex.test(text)) {
-        //     setError('Number must start with country code (e.g. +92...)');
-        // } else {
-        //     setError('');
-        // }
+
     };
     //------------------------------------------------------------
 

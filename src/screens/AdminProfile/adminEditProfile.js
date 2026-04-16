@@ -84,15 +84,23 @@ export const AdminEditProfile = ({ route }) => {
 
     //------------------ API Call ------------------
     const editProfile = async value => {
+        console.log('full_name', value.fullName || user.full_name);
+        console.log('phone', value.phoneNumber || user.phone);
+        console.log('user_id', user.user_id);
+        console.log('email', value.email || user.email);
+        console.log('image', image);
+
 
         setIsLoading(true);
         try {
             let formData = new FormData();
 
 
-            formData.append('full_name', value.fullName);
-            formData.append('phone', value.phoneNumber);
+            formData.append('full_name', value.fullName || user.full_name);
+            formData.append('phone', value.phoneNumber || user.phone);
             formData.append('user_id', user.user_id);
+            formData.append('email', value.email || user.email);
+
 
             // IMAGE UPLOAD
             if (image) {
@@ -104,6 +112,7 @@ export const AdminEditProfile = ({ route }) => {
             }
             const res = await api.post('/user/edit-profile', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+
             });
             console.log("response :", res)
 
@@ -112,7 +121,8 @@ export const AdminEditProfile = ({ route }) => {
                     ...user,
                     full_name: value.fullName || user.full_name,
                     phone: value.phoneNumber || user.phone,
-                    image: image?.uri || user.image, // ✅ ADD THIS
+                    image: image?.uri || user.image,
+                    email: value.email || user.email// ✅ ADD THIS
                 };
 
                 await updateUserInStorage(updatedUser);

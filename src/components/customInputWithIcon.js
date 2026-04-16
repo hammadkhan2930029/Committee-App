@@ -72,7 +72,7 @@ export const CustomInputWithIcon = ({
         activeOpacity={type === 'date' ? 0.7 : 1}
         onPress={type === 'date' ? onRightIconPress : undefined}
       >
-        <View style={[styles.inputWrapper, error && styles.errorInput]}>
+        <View style={[styles.inputWrapper, error && styles.errorInput,{ backgroundColor: error ? '#fde1e1' : AppColors.background }]}>
 
           {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
 
@@ -85,7 +85,7 @@ export const CustomInputWithIcon = ({
             secureTextEntry={settings.secureTextEntry}
             autoCapitalize={settings.autoCapitalize}
             placeholderTextColor="#999"
-            style={[styles.input, inputStyle]}
+            style={[styles.input, inputStyle, ]}
             pointerEvents={type === 'date' ? 'none' : 'auto'}
             {...rest}
           />
@@ -115,6 +115,7 @@ const styles = ScaledSheet.create({
     marginBottom: '5@ms',
     fontSize: '14@ms',
     color: AppColors.link,
+    fontWeight:'600'
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -147,7 +148,7 @@ const styles = ScaledSheet.create({
   },
   iconRight: {
     marginLeft: '8@ms',
-   
+
   },
   errorInput: {
     borderColor: 'red',

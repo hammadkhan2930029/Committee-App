@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
 import { DisclaimerModal } from '../../components/disclaimerModal'
 import { getStoredUser } from '../../Utils/getUser';
+import { profileAvatar } from '../../assets/images/profileAvatar.png'
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -69,7 +70,7 @@ export const ChooseRole = () => {
                     resizeMode="cover"
                 >
                     <View style={styles.backgroundInnerView}>
-                        
+
 
                         <View style={styles.headingsAlign}>
                             <Text style={styles.h1}>Choose Your Role</Text>
@@ -334,7 +335,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'flex-end',
         flexDirection: 'row',
         padding: 5,
-        marginTop:30
+        marginTop: 30
     },
     shareApp: {
         width: 100,

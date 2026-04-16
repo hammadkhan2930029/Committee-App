@@ -32,6 +32,12 @@ export const UserPaymentDetails = ({ route }) => {
   const paid = Number(item.paid_amount);
   const b = total - paid;
   //------------------------------------
+  const formatNumber = value => {
+    if (value === null || value === undefined) return '';
+
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+  //------------------------------------------------------
 
   useEffect(() => {
     setTimeout(() => {
@@ -136,7 +142,7 @@ export const UserPaymentDetails = ({ route }) => {
 
               <View style={styles.row}>
                 <Text style={styles.text1}>Amount per member</Text>
-                <Text style={styles.text2}>{item.amount_per_member}</Text>
+                <Text style={styles.text2}>{formatNumber(item.amount_per_member)}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.text1}>Round Month</Text>

@@ -41,7 +41,7 @@ export const CustomInput = ({
         keyboardType={rest.keyboardType || settings.keyboardType}
         secureTextEntry={rest.secureTextEntry || settings.secureTextEntry}
         autoCapitalize={rest.autoCapitalize || settings.autoCapitalize}
-        style={[styles.input, style, error && styles.errorInput]}
+        style={[styles.input, style, error && styles.errorInput, { backgroundColor: error ? '#fde1e1' : AppColors.background }]}
         placeholderTextColor="#999"
         {...rest}
       />
@@ -60,6 +60,8 @@ const styles = ScaledSheet.create({
     marginBottom: '5@ms',
     fontSize: '14@ms',
     color: AppColors.primary,
+    fontWeight:'600'
+
   },
   input: {
     height: '48@ms',

@@ -32,6 +32,8 @@ import Animated, {
     withTiming,
     withSequence,
 } from 'react-native-reanimated';
+
+
 export const AdminDashboard = () => {
     //--------------------------------------------
     // const [visible, setVisible] = useState(false);
@@ -81,7 +83,7 @@ export const AdminDashboard = () => {
             counterApi();
         }
     }, [userData]);
-    // console.log('counter :', counter);
+    console.log('counter :', counter);
 
     //----------------------------------------------------------------------------
     const wave = useSharedValue(0);

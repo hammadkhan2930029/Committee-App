@@ -27,6 +27,10 @@ import {
 
 export const ActiveBCs = () => {
   const [committeeList, setCommitteeList] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [rounds, setRounds] = useState([]);
+
+
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState();
   const navigation = useNavigation()
@@ -56,7 +60,7 @@ export const ActiveBCs = () => {
     try {
       const response = await api.get(`/user/my-committees/${userID}`);
       const result = response?.data?.msg;
-      console.log('my committee list :', result);
+      // console.log('my committee list :', result);
       setCommitteeList(result);
       if (result) {
         setLoading(false);
@@ -70,6 +74,39 @@ export const ActiveBCs = () => {
       myCommitteeList();
     }
   }, [userID]);
+  //--------------------------------------------------
+  // const data = committeeList.map(item =>  item.committee_id)
+  // console.log('my committee list :', data[0]);
+
+  //------------------committeeDetails-----------------
+
+  // const committeeDetails = async () => {
+  //   try {
+  //     const response = await api.get(
+  //       `/user/view-committee-detail/${data[0]}`,
+  //     );
+
+  //     const result = response?.data?.msg[0];
+  //     const rounds = response?.data?.rounds;
+  //     console.log('members :', result)
+  //     console.log('rounds :', rounds)
+
+  //     if (result) {
+  //       setMembers(result);
+  //       setRounds(rounds);
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //       }, 1000);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (data) {
+  //     committeeDetails();
+  //   }
+  // }, [data]);
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
     return (
@@ -180,7 +217,7 @@ export const ActiveBCs = () => {
               data={committeeList}
               keyExtractor={(item, index) => index.toString()}
               renderItem={item => {
-                console.log('item :', item.item);
+                // console.log('item :', item.item);
                 const data = item.item;
                 return (
                   <View>
@@ -209,7 +246,7 @@ export const ActiveBCs = () => {
                             <Text style={styles.count}> {data.total_member}</Text>
                           </View>
                           <View style={styles.details}>
-                            <Text style={styles.one}>Amount per Member :</Text>
+                            <Text style={styles.one}>Amount/M :</Text>
                             <Text style={styles.count}>
                               {' '}
                               {formatNumber(data.amount_per_member)}

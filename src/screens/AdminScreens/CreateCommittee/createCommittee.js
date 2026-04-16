@@ -29,11 +29,18 @@ import Toast from 'react-native-toast-message';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
+    committeeName: Yup.string().required('Committee name is required'),
+    noOfMonths: Yup.number().required('Number of months is required').min(1, 'At least 1 month'),
+    totalMembers: Yup.number().required('Total members is required'),
+    totalRounds: Yup.number().required('Total rounds is required'),
+    roundsPerMonth: Yup.number().required('Required'),
+    amountPerMember: Yup.number().required('Amount is required'),
+    startDate: Yup.string().required('Start date is required'),
     due_on: Yup.number()
         .typeError('Only numbers allowed')
         .required('Due date is required')
-        .min(1, 'Minimum value is 1')
-        .max(31, 'Maximum value is 31'),
+        .min(1, 'Min 1')
+        .max(31, 'Max 31'),
 });
 
 const data = [
@@ -108,7 +115,7 @@ export const CreateCommittee = () => {
 
     //--------------------api--------------------------
     const createCommittee = async value => {
-        console.log(value)
+        console.log('Form data :', value)
 
         setLoading(true);
         try {
@@ -123,7 +130,7 @@ export const CreateCommittee = () => {
             formData.append('total', value.totalAmount);
             formData.append('start_date', value.startDate);
             formData.append('due_on', value.due_on);
-            formData.append('currency_id', currencyValue);
+            formData.append('currency_id', value.currency_id);
 
 
             const response = await api.post('/user/create-committee', formData, {
@@ -141,7 +148,10 @@ export const CreateCommittee = () => {
                         borderColor: 'green',
                     },
                 });
-                navigation.goBack();
+                setTimeout(() => {
+
+                    navigation.goBack();
+                }, 1000);
             } else {
                 Toast.show({
                     type: 'customToast',
@@ -173,16 +183,7 @@ export const CreateCommittee = () => {
 
 
 
-    // const renderLabel = () => {
-    //   if (value || isFocus) {
-    //     return (
-    //       <Text style={[styles.label, isFocus && { color: AppColors.link }]}>
-    //         Dropdown label
-    //       </Text>
-    //     );
-    //   }
-    //   return null;
-    // };
+
     //--------------------currency list-------------------------
 
     const currencyFun = async () => {
@@ -254,10 +255,12 @@ export const CreateCommittee = () => {
                             totalAmount: '',
                             startDate: '',
                             due_on: '',
+                            currency_id: ''
                         }}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { resetForm }) => {
                             createCommittee(values);
-                            // resetForm();
+                            resetForm();
                         }}
                     >
                         {({
@@ -304,6 +307,7 @@ export const CreateCommittee = () => {
                                         error={touched.committeeName && errors.committeeName}
                                     />
 
+
                                     <CustomInput
                                         label="No. Of Months"
                                         placeholder="Enter number of months"
@@ -314,7 +318,8 @@ export const CreateCommittee = () => {
                                         onblur={handleBlur('noOfMonths')}
                                         error={touched.noOfMonths && errors.noOfMonths}
                                     />
-                                    <CustomInput
+
+                                    {/* <CustomInput
                                         label="Total Members"
                                         placeholder="Enter total members"
                                         type="numeric"
@@ -322,9 +327,10 @@ export const CreateCommittee = () => {
                                         onChangeText={handleChange('totalMembers')}
                                         onblur={handleBlur('totalMembers')}
                                         error={touched.totalMembers && errors.totalMembers}
-                                    />
+                                    /> */}
 
-                                    <CustomInput
+
+                                    {/* <CustomInput
                                         label="Total Rounds"
                                         placeholder="Enter total rounds"
                                         type="numeric"
@@ -332,9 +338,10 @@ export const CreateCommittee = () => {
                                         onChangeText={handleChange('totalRounds')}
                                         onblur={handleBlur('totalRounds')}
                                         error={touched.totalRounds && errors.totalRounds}
-                                    />
+                                    /> */}
 
-                                    <CustomInput
+
+                                    {/* <CustomInput
                                         label="Round(s) Per Month"
                                         placeholder="Enter rounds per month"
                                         type="numeric"
@@ -342,7 +349,7 @@ export const CreateCommittee = () => {
                                         onChangeText={handleChange('roundsPerMonth')}
                                         onblur={handleBlur('roundsPerMonth')}
                                         error={touched.roundsPerMonth && errors.roundsPerMonth}
-                                    />
+                                    /> */}
 
 
                                     <CustomInput
@@ -360,6 +367,7 @@ export const CreateCommittee = () => {
                                         error={touched.amountPerMember && errors.amountPerMember}
                                     />
 
+
                                     <CustomInput
                                         label="Total Amount"
                                         placeholder="Calculated automatically"
@@ -375,7 +383,12 @@ export const CreateCommittee = () => {
                                         {/* {renderLabel()} */}
                                         <Text style={styles.label2}>Select Currency</Text>
                                         <Dropdown
-                                            style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                                            // style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                                            style={[
+                                                styles.dropdown,
+                                                isFocus && { borderColor: 'blue' },
+                                                touched.currency_id && errors.currency_id && { borderColor: 'red' } // Red border
+                                            ]}
                                             placeholderStyle={styles.placeholderStyle}
                                             selectedTextStyle={styles.selectedTextStyle}
                                             inputSearchStyle={styles.inputSearchStyle}
@@ -393,9 +406,13 @@ export const CreateCommittee = () => {
                                             onChange={item => {
                                                 setCurrencyValue(item.value);
                                                 setIsFocus(false);
+                                                setFieldValue('currency_id', item.value);
                                             }}
 
                                         />
+                                        {touched.currency_id && errors.currency_id && (
+                                            <Text style={{ color: 'red', fontSize: 12 }}>{errors.currency_id}</Text>
+                                        )}
                                     </View>
                                     {/* ======================================================= */}
                                     <View>
@@ -408,6 +425,7 @@ export const CreateCommittee = () => {
                                                 <Icon name="calendar-today" size={22} color="#666" />
                                             }
                                             onRightIconPress={() => setShow(true)}
+                                            error={touched.startDate && errors.startDate}
                                         />
 
                                         {show && (
@@ -511,7 +529,7 @@ const styles = ScaledSheet.create({
         padding: 5,
     },
     //----------------------------------------------------------------
-     committeeForm:{
+    committeeForm: {
         padding: 10,
         marginTop: -40,
 
@@ -519,9 +537,9 @@ const styles = ScaledSheet.create({
     },
     createCommitteForm: {
         padding: 10,
-        backgroundColor:AppColors.background,
-        elevation:5,
-        borderRadius:10
+        backgroundColor: AppColors.background,
+        elevation: 5,
+        borderRadius: 10
     },
     //--------------------------------------------------------------------
     DropDowncontainer: {
@@ -532,6 +550,8 @@ const styles = ScaledSheet.create({
         marginBottom: '5@ms',
         fontSize: '14@ms',
         color: AppColors.primary,
+        fontWeight: '600'
+
     },
     dropdown: {
         height: '48@ms',
@@ -572,7 +592,7 @@ const styles = ScaledSheet.create({
         height: 40,
         fontSize: 16,
     },
-    
-   
+
+
 
 });

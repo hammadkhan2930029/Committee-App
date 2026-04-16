@@ -60,6 +60,8 @@ export const UserCommitteeDetails = ({ route }) => {
   const { data } = route.params;
   const [details, setDetails] = useState([]);
   const [roundList, setRoundList] = useState([]);
+  const [memberList, setMemberList] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [currentMonthData, setCurrentMonthData] = useState([])
@@ -80,6 +82,7 @@ export const UserCommitteeDetails = ({ route }) => {
       loadUser();
     }, []),
   );
+  console.log('user data :', userdata.user_id)
   //-----------------------------------------------------------------------
 
   const formatNumber = value => {
@@ -98,8 +101,11 @@ export const UserCommitteeDetails = ({ route }) => {
 
       const result = response?.data?.msg[0];
       const rounds = response?.data?.rounds;
-      console.log('data :', rounds)
+      const members = response?.data?.members;
+
+      // console.log('response :', members)
       if (result) {
+        setMemberList(members)
         setDetails(result);
         setRoundList(rounds);
         setTimeout(() => {
@@ -117,7 +123,24 @@ export const UserCommitteeDetails = ({ route }) => {
   }, [data]);
   const paidRounds = roundList?.filter(item => item.status === 'Paid').length
   const pendingsRounds = roundList?.filter(item => item.status === 'Pending').length
-  // const visibleData = expanded ? roundList : roundList.slice(0, 4);
+
+  //--------------------------------------------------------------
+
+  const filterUser = memberList?.filter(item => item.user_id == userdata.user_id)[0]
+  const filterRound = roundList?.find(item =>
+    item.committee_member_id === filterUser?.committe_member_id
+  );
+
+  // Display logic with safety
+  const roundNo = filterRound?.round_no || "N/A";
+  // console.log('Round Number:', roundNo);
+  // console.log('filter:', filterUser);
+  // console.log('filterRound:', filterRound);
+  // console.log('roundList:', roundList);
+
+
+
+
 
   //-------------------------------------------------
 
@@ -158,7 +181,7 @@ export const UserCommitteeDetails = ({ route }) => {
     try {
       const res = await api.get(`/user/view-committee-payment/current-month/${details?.committee_id}/${currMonth}`)
       const result = res.data.msg[0]
-      console.log('result :', result)
+      // console.log('result :', result)
       if (result && res.data.code == 200) {
         setCurrentMonthData(result)
 
@@ -215,11 +238,29 @@ export const UserCommitteeDetails = ({ route }) => {
                   <Text style={styles.active}>{details?.status}</Text>
                 </View>
               </View>
+
             </View>
           </ImageBackground>
         </View>
         {/* ---------------------------------------------------------------- */}
         <View >
+          <View style={styles.cardContainer}>
+            <View style={styles.cardHeader2}>
+              <Icon name="event-repeat" size={24} color={AppColors.primary} />
+              <Text style={styles.cardTitle}>Committee Turn</Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.cardBody}>
+              <View style={styles.turnCircle}>
+                <Text style={styles.turnNumber}>{roundNo || '-'}</Text>
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.label}>Your Assigned Turn</Text>
+              </View>
+            </View>
+          </View>
 
           {/* ===== TOP PROGRESS SECTION ===== */}
           <View style={styles.topCard}>
@@ -565,394 +606,70 @@ const styles = ScaledSheet.create({
   paymentBTN: {
     padding: 15,
   },
+  //---------------------------------
+  cardContainer: {
+    marginTop: -30,
+    backgroundColor: '#fff',
+    borderRadius: '15@ms',
+    padding: '16@ms',
+    marginHorizontal: '10@ms',
+    marginVertical: '5@ms',
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    // Shadow for Android
+    elevation: 4,
+    borderLeftWidth: '5@ms',
+    borderLeftColor: AppColors.primary, // Card ki side pe aik primary color ki line
+  },
+  cardHeader2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: '10@ms',
+  },
+  cardTitle: {
+    fontSize: '16@ms',
+    fontWeight: '700',
+    color: AppColors.primary,
+    marginLeft: '8@ms',
+    textTransform: 'uppercase',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginBottom: '12@ms',
+  },
+  cardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  turnCircle: {
+    width: '50@ms',
+    height: '50@ms',
+    borderRadius: '25@ms',
+    backgroundColor: AppColors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+  },
+  turnNumber: {
+    color: '#fff',
+    fontSize: '20@ms',
+    fontWeight: 'bold',
+  },
+  textContainer: {
+    marginLeft: '15@ms',
+  },
+  label: {
+    fontSize: '15@ms',
+    fontWeight: '600',
+    color: '#333',
+  },
+  subLabel: {
+    fontSize: '12@ms',
+    color: '#777',
+    marginTop: '2@ms',
+  },
 });
-
-// const styles = ScaledSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: AppColors.background,
-//   },
-
-//   arrowBack: {
-//     width: 28,
-//     height: 28,
-//   },
-//   RectangleImg: {
-//     width: '100%',
-//     height: '250@vs',
-//     resizeMode: 'contain',
-//   },
-//   TopView: {
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//     marginTop: 5,
-//     alignSelf: 'center',
-//     width: '100%',
-//     padding: 15,
-//     marginTop: 20,
-//   },
-//   backAndText: {
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//     padding: 10,
-//   },
-//   h1: {
-//     fontSize: moderateScale(24),
-//     color: AppColors.title,
-//     fontWeight: '600',
-//     marginLeft: 6,
-//   },
-
-//   textView: {
-//     padding: 15,
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//   },
-
-//   h4: {
-//     color: AppColors.title,
-//     fontSize: moderateScale(20),
-//     padding: 5,
-//   },
-//   activeBtn: {
-//     backgroundColor: AppColors.background,
-//     paddingLeft: 10,
-//     paddingRight: 10,
-//     borderRadius: 20,
-//   },
-//   active: {
-//     fontSize: moderateScale(16),
-//     color: AppColors.link,
-//     textAlign: 'center',
-//     padding: 3,
-//   },
-//   //----------------------------------
-//   BCDetails: {
-//     width: '100%',
-
-//     padding: 20,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   row: {
-//     width: '100%',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//     padding: 6,
-//     borderBottomColor: AppColors.primary,
-//     borderBottomWidth: 2,
-//   },
-//   text1: {
-//     color: AppColors.blackText,
-//     fontSize: moderateScale(18),
-//   },
-//   text2: {
-//     color: AppColors.bodyText,
-//     fontSize: moderateScale(15),
-//   },
-//   buttons: {
-//     width: '100%',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   btnView: {
-//     width: '50%',
-//     margin: 5,
-//   },
-//   //--------------------------
-//   paymentStatus_view: {
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     padding: 5,
-//   },
-//   paymentStatus: {
-//     backgroundColor: AppColors.background,
-//     width: '98%',
-//     borderRadius: 20,
-//     borderColor: AppColors.primary,
-//     borderWidth: 1,
-//     elevation: 5,
-//     marginTop: 5,
-//   },
-//   cardHeader: {
-//     width: '100%',
-//     backgroundColor: AppColors.primary,
-//     padding: 15,
-//     borderTopRightRadius: 20,
-//     borderTopLeftRadius: 20,
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//   },
-//   status: {
-//     color: AppColors.title,
-//     fontSize: moderateScale(18),
-//   },
-//   statustype: {
-//     backgroundColor: AppColors.background,
-//     width: 80,
-//     padding: 3,
-//     borderRadius: 15,
-//   },
-//   statustype_paid: {
-//     backgroundColor: '#008200',
-//     width: 80,
-//     padding: 3,
-//     borderRadius: 15,
-//   },
-//   statustype_Overdue: {
-//     backgroundColor: '#DE3163',
-//     width: 80,
-//     padding: 3,
-//     borderRadius: 15,
-//   },
-//   statustype_Rejected: {
-//     backgroundColor: '#ec0936ff',
-//     width: 80,
-//     padding: 3,
-//     borderRadius: 15,
-//   },
-//   statustypeText: {
-//     textAlign: 'center',
-//     fontSize: moderateScale(14),
-//     color: AppColors.link,
-//   },
-//   paymentCardRow: {
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//     padding: 5,
-//     marginTop: 5,
-//   },
-//   label: {
-//     fontSize: moderateScale(16),
-//     padding: 3,
-//   },
-//   value: {
-//     fontSize: moderateScale(16),
-
-//     textAlign: 'center',
-//     color: AppColors.placeholder,
-//     padding: 3,
-//     textAlign: 'center',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   value_slip: {
-//     fontSize: moderateScale(16),
-
-//     textAlign: 'center',
-//     color: AppColors.link,
-//     padding: 3,
-//     textAlign: 'center',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   slipView: {
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//   },
-//   paymentBTN: {
-//     // backgroundColor:'green',
-//     padding: 15,
-//   },
-//   //-------------------------------------------
-//   topCard: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     backgroundColor: '#fff',
-//     margin: 10,
-//     borderRadius: 15,
-//     padding: 20,
-//     elevation: 5,
-//   },
-
-//   progressBox: {
-//     alignItems: 'center',
-//     flex: 1,
-//   },
-
-//   progressNumber: {
-//     fontSize: 28,
-//     fontWeight: 'bold',
-//   },
-
-//   progressSub: {
-//     fontSize: 14,
-//     color: '#666',
-//   },
-
-//   progressLabel: {
-//     marginTop: 5,
-//     fontSize: 14,
-//   },
-
-//   divider: {
-//     width: 1,
-//     backgroundColor: '#ddd',
-//   },
-
-//   cardsContainer: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-between',
-//     paddingHorizontal: 10,
-//   },
-
-//   card: {
-//     width: '47%',
-//     backgroundColor: '#fff',
-//     borderRadius: 15,
-//     padding: 15,
-//     marginVertical: 8,
-//     elevation: 3,
-//   },
-
-//   cardTitle: {
-//     color: '#888',
-//     fontSize: 13,
-//   },
-
-//   cardValue: {
-//     fontSize: 18,
-//     fontWeight: '600',
-//     marginTop: 5,
-//   },
-
-//   bigCard: {
-//     backgroundColor: '#fff',
-//     margin: 10,
-//     borderRadius: 15,
-//     padding: 15,
-//     elevation: 3,
-//   },
-
-//   sectionTitle: {
-//     fontSize: 16,
-//     fontWeight: '600',
-//     marginBottom: 10,
-//   },
-
-//   rowBetween: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//   },
-
-//   progressBarBg: {
-//     height: 8,
-//     backgroundColor: '#ddd',
-//     borderRadius: 10,
-//     marginTop: 10,
-//   },
-
-//   progressBarFill: {
-//     height: 8,
-//     backgroundColor: 'green',
-//     borderRadius: 10,
-//   },
-
-//   timelineItem: {
-//     marginVertical: 5,
-//   },
-
-//   btnRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//     marginVertical: 20,
-//   },
-
-//   editBtn: {
-//     backgroundColor: '#ff5a1f',
-//     padding: 12,
-//     borderRadius: 10,
-//     width: '40%',
-//     alignItems: 'center',
-//   },
-
-//   deleteBtn: {
-//     backgroundColor: '#ccc',
-//     padding: 12,
-//     borderRadius: 10,
-//     width: '40%',
-//     alignItems: 'center',
-//   },
-
-//   btnText: {
-//     color: '#fff',
-//     fontWeight: '600',
-//   },
-//   //----------------------------------
-//   card: {
-//     backgroundColor: '#fff',
-//     borderRadius: 15,
-//     padding: 15,
-//     marginBottom: 12,
-//     elevation: 3,
-//   },
-//   row: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   half: {
-//     flex: 1,
-//     alignItems: 'center',
-//   },
-//   divider: {
-//     width: 1,
-//     height: '80%',
-//     backgroundColor: '#ddd',
-//   },
-//   title: {
-//     marginTop: 10,
-//     fontSize: 14,
-//   },
-//   bold: {
-//     fontWeight: 'bold',
-//     fontSize: 16,
-//   },
-//   bigText: {
-//     fontSize: 28,
-//     fontWeight: 'bold',
-//   },
-//   gridView: {
-//     width: '100%',
-
-//   },
-//   grid2: {
-//     width: '100%',
-//     justifyContent: 'space-around',
-//     flexDirection: 'row',
-
-
-//   },
-//   smallCard: {
-//     width: '47%',
-//     alignItems: 'center',
-//   },
-//   sectionTitle: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     marginBottom: 10,
-//   },
-//   rowBetween: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     marginBottom: 10,
-//   },
-//   progressBar: {
-//     height: 8,
-//     backgroundColor: '#ddd',
-//     borderRadius: 10,
-//     overflow: 'hidden',
-//     marginBottom: 5,
-//   },
-//   progressFill: {
-//     height: '100%',
-//     backgroundColor: '#02af4a',
-//   },
-// });

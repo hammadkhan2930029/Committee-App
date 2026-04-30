@@ -154,7 +154,7 @@ export const ForgetPassword = () => {
                                 />
                             </TouchableOpacity>
                             <View style={styles.headingsAlign}>
-                                <Text style={styles.h1}>Reset Password</Text>
+                                <Text style={styles.h1}>Forgot Password</Text>
                                 <Text style={styles.h4}>
                                     Enter your phone number to reset your password.
                                 </Text>
@@ -234,7 +234,7 @@ export const ForgetPassword = () => {
 
                                     <View style={styles.btn}>
                                         <CustomButton
-                                            title="Reset Password"
+                                            title="Submit"
                                             onPress={handleSubmit}
                                         />
                                     </View>

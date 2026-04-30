@@ -162,7 +162,8 @@ export const Login = () => {
                                         <View>
                                             <CustomInput
                                                 label="Phone"
-                                                type="text"
+                                                type="numeric"
+                                                keyboardType="phone-pad"
                                                 placeholder="+92 300 1234567"
                                                 value={values.phone}
                                                 onChangeText={handleChange('phone')}

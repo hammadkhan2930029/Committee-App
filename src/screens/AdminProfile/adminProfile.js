@@ -1,7 +1,6 @@
 
 import React, { useCallback, useState } from 'react';
 import {
-    Image,
     ScrollView,
     StatusBar,
     Text,
@@ -11,7 +10,6 @@ import {
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
-import { AppImages } from '../../constant/appImages';
 import { CustomButton } from '../../components/customButton';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +22,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
+import { AppImages } from '../../constant/appImages';
 
 
 const { width } = Dimensions.get('window');
@@ -150,19 +150,16 @@ export const AdminProfile = () => {
                                 <Text style={styles.text}>Change Password</Text>
                             </TouchableOpacity>
 
-                            
+
                         </View>
                     )}
                 </View>
 
                 {/* PROFILE CARD */}
                 <View style={styles.card}>
-                    <Image
-                        source={
-                            userdata?.image
-                                ? { uri: userdata.image }
-                                : AppImages.profileAvatar
-                        }
+                    <ProfileAvatar
+                        imageUri={userdata?.image == 'https://committee.cogentdevs.com/images/user-profile/user-default.png' ? AppImages.profileAvatar : userdata?.image}
+
                         style={styles.image}
                     />
 

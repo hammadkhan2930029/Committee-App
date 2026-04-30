@@ -429,7 +429,7 @@ const styles = ScaledSheet.create({
         fontSize: moderateScale(16),
         color: AppColors.bodyText,
         padding: 15,
-        marginTop: 20
+        marginTop: 50
     },
 
 });

@@ -3,7 +3,6 @@ import {
     View,
     StatusBar,
     ImageBackground,
-    Image,
     Text,
     TouchableOpacity,
     FlatList,
@@ -22,6 +21,7 @@ import {
 } from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { Loader } from '../../Loader/loader';
+import { ProfileAvatar } from '../../../components/ProfileAvatar';
 
 export const Payments = () => {
 
@@ -98,11 +98,8 @@ export const Payments = () => {
                             <Text style={styles.h1}>Payments</Text>
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate('AdminProfile')}>
-                            <Image source={
-                                userData?.image
-                                    ? { uri: userData.image }
-                                    : AppImages.profileAvatar
-                            }
+                            <ProfileAvatar
+                                imageUri={userData?.image}
                                 style={styles.avatar}
                             />
                         </TouchableOpacity>

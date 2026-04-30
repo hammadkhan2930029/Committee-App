@@ -3,7 +3,6 @@ import {
     View,
     StatusBar,
     ImageBackground,
-    Image,
     Text,
     Share,
     ScrollView,
@@ -31,6 +30,7 @@ import Animated, {
     withTiming,
     withSequence,
 } from 'react-native-reanimated';
+import { ProfileAvatar } from '../../../components/ProfileAvatar';
 
 
 export const AdminDashboard = () => {
@@ -156,12 +156,8 @@ export const AdminDashboard = () => {
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate('AdminProfile')}
                                 >
-                                    <Image
-                                        source={
-                                            userData?.image
-                                                ? { uri: userData.image }
-                                                : AppImages.profileAvatar
-                                        }
+                                    <ProfileAvatar
+                                        imageUri={userData?.image == 'https://committee.cogentdevs.com/images/user-profile/user-default.png' ? AppImages.profileAvatar : userData?.image}
                                         style={styles.avatar}
                                     />
                                 </TouchableOpacity>

@@ -86,7 +86,7 @@ export const BottomTabNavigation = () => {
                         right: 5,
                         left: 5,
                         bottom: 5,
-                        borderRadius: 15,
+                        borderRadius: 50,
                         height: 60,
                         elevation: 12,
                     },

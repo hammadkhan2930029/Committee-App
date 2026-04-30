@@ -264,6 +264,8 @@ export const Register = () => {
 
                                             <CustomPhoneInput
                                                 label="Phone Number"
+                                                keyboardType="phone-pad"
+
                                                 value={values.phone}
                                                 onChangeText={handleChange('phone')}
                                                 error={touched.phone && errors.phone}

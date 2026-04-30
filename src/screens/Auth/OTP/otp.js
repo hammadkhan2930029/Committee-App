@@ -15,6 +15,7 @@ import { OtpInput } from 'react-native-otp-entry';
 import { CustomButton } from '../../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { api } from '../../../services/api';
@@ -232,7 +233,7 @@ export const OtpVerification = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('response :', res);
-            if (res?.data?.code === '200' && res?.data?.msg[0]?.response === 'register successfully') {
+            if (res?.data?.code === '200' && res?.data?.msg[0]?.response === 'Registered successfully') {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
@@ -246,7 +247,7 @@ export const OtpVerification = () => {
                     navigation.dispatch(
                         CommonActions.reset({
                             index: 0,
-                            routes: [{ name: 'AuthStack' }],
+                            routes: [{ name: 'Login' }],
                         }),
                     );
 

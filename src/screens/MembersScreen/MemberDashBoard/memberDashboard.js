@@ -3,7 +3,6 @@ import {
   View,
   StatusBar,
   ImageBackground,
-  Image,
   Text,
   Share,
   ScrollView,
@@ -34,6 +33,7 @@ import Animated, {
   withRepeat,
 } from 'react-native-reanimated';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { ProfileAvatar } from '../../../components/ProfileAvatar';
 
 
 export const MembersDashboard = () => {
@@ -292,14 +292,7 @@ export const MembersDashboard = () => {
                 <TouchableOpacity
                   onPress={() => navigation.navigate('AdminProfile')}
                 >
-                  <Image
-                    source={
-                      userdata?.image
-                        ? { uri: userdata.image }
-                        : AppImages.profileAvatar
-                    }
-                    style={styles.avatar}
-                  />
+                  <ProfileAvatar imageUri={userdata?.image} style={styles.avatar} />
                 </TouchableOpacity>
               </View>
               <View style={styles.nameAndNotifiView}>

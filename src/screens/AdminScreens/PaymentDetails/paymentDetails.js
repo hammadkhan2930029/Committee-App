@@ -43,23 +43,34 @@ export const PaymentDetails = ({ route }) => {
     //-------------------------------------------
 
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedPaymentType, setSelectedPaymentType] = useState(null);
 
     const handleVerifyPress = () => {
+        setSelectedPaymentType(null);
         setIsModalVisible(true);
     };
 
-    const onPaymentSelect = (type) => {
+    const handleModalClose = () => {
+        setSelectedPaymentType(null);
         setIsModalVisible(false);
-        // Yahan aap apni API call ya logic pass kar sakte hain
-        if (type === 'full') {
+    };
 
+    const onPaymentSelect = type => {
+        setSelectedPaymentType(type);
+    };
+
+    const confirmPaymentSelection = () => {
+        if (selectedPaymentType === 'full') {
+            setIsModalVisible(false);
             markPaymentVerified();
-        } else if (type == 'partial') {
-            PartialPayment()
+        } else if (selectedPaymentType === 'partial') {
+            setIsModalVisible(false);
+            PartialPayment();
         }
     };
 
     //-------------------full payment------------------------
+    
     const markPaymentVerified = async () => {
         setLoading(true)
         try {
@@ -223,7 +234,7 @@ export const PaymentDetails = ({ route }) => {
                         visible={isModalVisible}
                         transparent={true}
                         animationType="fade"
-                        onRequestClose={() => setIsModalVisible(false)}
+                        onRequestClose={handleModalClose}
                     >
                         <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
@@ -232,25 +243,60 @@ export const PaymentDetails = ({ route }) => {
 
                                 <View style={styles.modalBtnContainer}>
                                     <TouchableOpacity
-                                        style={[styles.paymentBtn, { backgroundColor: AppColors.primary }]}
+                                        style={[
+                                            styles.paymentBtn,
+                                            selectedPaymentType === 'full'
+                                                ? styles.paymentBtnSelected
+                                                : styles.paymentBtnUnselected,
+                                        ]}
                                         onPress={() => onPaymentSelect('full')}
                                     >
-                                        <Text style={styles.paymentBtnText}>Full Payment</Text>
+                                        <Text
+                                            style={[
+                                                styles.paymentBtnText,
+                                                selectedPaymentType !== 'full' && styles.paymentBtnTextUnselected,
+                                            ]}
+                                        >
+                                            Full Payment
+                                        </Text>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
-                                        style={[styles.paymentBtn, styles.partialBtn]}
+                                        style={[
+                                            styles.paymentBtn,
+                                            selectedPaymentType === 'partial'
+                                                ? styles.paymentBtnSelected
+                                                : styles.paymentBtnUnselected,
+                                        ]}
                                         onPress={() => onPaymentSelect('partial')}
                                     >
-                                        <Text style={[styles.paymentBtnText, { color: AppColors.primary }]}>Partial Payment</Text>
+                                        <Text
+                                            style={[
+                                                styles.paymentBtnText,
+                                                selectedPaymentType !== 'partial' && styles.paymentBtnTextUnselected,
+                                            ]}
+                                        >
+                                            Partial Payment
+                                        </Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity
-                                        style={styles.cancelBtn}
-                                        onPress={() => setIsModalVisible(false)}
-                                    >
-                                        <Text style={styles.cancelText}>Cancel</Text>
-                                    </TouchableOpacity>
+                                    <View style={styles.actionBtnRow}>
+                                        <TouchableOpacity
+                                            style={styles.cancelBtn}
+                                            onPress={handleModalClose}
+                                        >
+                                            <Text style={styles.cancelText}>Cancel</Text>
+                                        </TouchableOpacity>
+
+                                        {selectedPaymentType && (
+                                            <TouchableOpacity
+                                                style={styles.okBtn}
+                                                onPress={confirmPaymentSelection}
+                                            >
+                                                <Text style={styles.okText}>OK</Text>
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
                                 </View>
                             </View>
                         </View>
@@ -473,7 +519,10 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         marginBottom: '10@ms',
     },
-    partialBtn: {
+    paymentBtnSelected: {
+        backgroundColor: AppColors.primary,
+    },
+    paymentBtnUnselected: {
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: AppColors.primary,
@@ -483,12 +532,38 @@ const styles = ScaledSheet.create({
         fontSize: '15@ms',
         fontWeight: '600',
     },
+    paymentBtnTextUnselected: {
+        color: AppColors.primary,
+    },
+    actionBtnRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '10@ms',
+    },
     cancelBtn: {
         marginTop: '5@ms',
         padding: '10@ms',
+        flex: 1,
+        alignItems: 'center',
+        backgroundColor: '#fff0f0',
+        borderRadius: '10@ms',
     },
     cancelText: {
         color: 'red',
         fontSize: '14@ms',
+    },
+    okBtn: {
+        marginTop: '5@ms',
+        padding: '10@ms',
+        flex: 1,
+        alignItems: 'center',
+        backgroundColor: AppColors.primary,
+        borderRadius: '10@ms',
+    },
+    okText: {
+        color: AppColors.title,
+        fontSize: '14@ms',
+        fontWeight: '600',
     },
 });

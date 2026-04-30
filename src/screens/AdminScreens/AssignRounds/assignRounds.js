@@ -107,6 +107,8 @@ export const AssignRounds = ({ route }) => {
                     },
                 });
                 viewCommitteeRound();
+                setRoundValue(null)
+                setMemberValue(null)
             } else {
                 Toast.show({
                     type: 'customToast',

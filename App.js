@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import {
     // StatusBar,
+    StyleSheet,
     Text,
     View,
     // PermissionsAndroid,
@@ -11,6 +12,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from './src/navigations/navigationService';
 import Toast from 'react-native-toast-message';
 import { AppColors } from './src/constant/appColors';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 // import messaging from '@react-native-firebase/messaging';
 
 
@@ -80,38 +82,51 @@ const App = () => {
     //-------------------------------------------------
     const toastConfig = {
         customToast: ({ text1, text2, props }) => {
-            const { bgColor, borderColor } = props;
+            const backgroundColor = props?.bgColor || '#fff7f2';
+            const accentColor = props?.borderColor || AppColors.primary;
+            const isSuccess = accentColor === 'green';
+            const isWarning = accentColor === 'orange';
+            const iconName = isSuccess
+                ? 'check-circle'
+                : isWarning
+                    ? 'warning-amber'
+                    : 'error-outline';
+            const iconBackground = isSuccess
+                ? 'rgba(46, 125, 50, 0.12)'
+                : isWarning
+                    ? 'rgba(237, 108, 2, 0.12)'
+                    : 'rgba(211, 47, 47, 0.12)';
 
             return (
-                <View
-                    style={{
-                        height: 60,
-                        width: '90%',
-                        backgroundColor: bgColor,
-                        borderRadius: 10,
-                        padding: 15,
-                        borderLeftWidth: 6,
-                        borderLeftColor: borderColor,
-                    }}
-                >
-                    <Text
-                        style={{
-                            color: AppColors.bodyText,
-                            fontWeight: 'bold',
-                            fontSize: 16,
-                        }}
+                <View style={[styles.toastCard, { backgroundColor }]}>
+                    <View
+                        style={[
+                            styles.toastAccent,
+                            { backgroundColor: accentColor },
+                        ]}
+                    />
+                    <View
+                        style={[
+                            styles.toastIconWrap,
+                            { backgroundColor: iconBackground },
+                        ]}
                     >
-                        {text1}
-                    </Text>
-
-                    <Text
-                        style={{
-                            color: AppColors.bodyText,
-                            fontSize: 14,
-                        }}
-                    >
-                        {text2}
-                    </Text>
+                        <MaterialIcons
+                            name={iconName}
+                            size={22}
+                            color={accentColor}
+                        />
+                    </View>
+                    <View style={styles.toastContent}>
+                        <Text numberOfLines={1} style={styles.toastTitle}>
+                            {text1}
+                        </Text>
+                        {!!text2 && (
+                            <Text numberOfLines={2} style={styles.toastMessage}>
+                                {text2}
+                            </Text>
+                        )}
+                    </View>
                 </View>
             );
         },
@@ -122,8 +137,56 @@ const App = () => {
             <NavigationContainer ref={navigationRef}>
                 <AppNavigator />
             </NavigationContainer>
-            <Toast config={toastConfig} />
+            <Toast config={toastConfig} topOffset={18} visibilityTime={2600} />
         </>
     );
 };
+
+const styles = StyleSheet.create({
+    toastCard: {
+        width: '92%',
+        minHeight: 74,
+        alignSelf: 'center',
+        borderRadius: 20,
+        paddingVertical: 14,
+        paddingLeft: 18,
+        paddingRight: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        shadowColor: '#22140E',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.16,
+        shadowRadius: 16,
+        elevation: 8,
+    },
+    toastAccent: {
+        width: 5,
+        borderRadius: 999,
+        alignSelf: 'stretch',
+        marginRight: 14,
+    },
+    toastIconWrap: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    toastContent: {
+        flex: 1,
+    },
+    toastTitle: {
+        color: AppColors.focusText,
+        fontWeight: '700',
+        fontSize: 15,
+        marginBottom: 2,
+    },
+    toastMessage: {
+        color: AppColors.bodyText,
+        fontSize: 13,
+        lineHeight: 18,
+    },
+});
+
 export default App;

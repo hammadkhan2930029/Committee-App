@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../constant/appColors';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const CustomInput = ({
   label,
@@ -13,6 +14,8 @@ export const CustomInput = ({
   style,
   ...rest
 }) => {
+  const isPasswordField = type === 'password';
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
 
   const getSettingsByType = () => {
@@ -29,22 +32,49 @@ export const CustomInput = ({
   };
 
   const settings = getSettingsByType();
+  const secureTextEntry =
+    typeof rest.secureTextEntry === 'boolean'
+      ? rest.secureTextEntry
+      : isPasswordField
+        ? !isPasswordVisible
+        : settings.secureTextEntry;
 
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
 
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        keyboardType={rest.keyboardType || settings.keyboardType}
-        secureTextEntry={rest.secureTextEntry || settings.secureTextEntry}
-        autoCapitalize={rest.autoCapitalize || settings.autoCapitalize}
-        style={[styles.input, style, error && styles.errorInput, { backgroundColor: error ? '#fde1e1' : AppColors.background }]}
-        placeholderTextColor="#999"
-        {...rest}
-      />
+      <View
+        style={[
+          styles.inputWrapper,
+          error && styles.errorInput,
+          { backgroundColor: error ? '#fde1e1' : AppColors.background },
+        ]}
+      >
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          keyboardType={rest.keyboardType || settings.keyboardType}
+          secureTextEntry={secureTextEntry}
+          autoCapitalize={rest.autoCapitalize || settings.autoCapitalize}
+          style={[styles.input, style]}
+          placeholderTextColor="#999"
+          {...rest}
+        />
+
+        {isPasswordField && (
+          <TouchableOpacity
+            onPress={() => setIsPasswordVisible(prev => !prev)}
+            style={styles.eyeButton}
+          >
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={AppColors.primary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
@@ -63,19 +93,31 @@ const styles = ScaledSheet.create({
     fontWeight:'600'
 
   },
-  input: {
-    height: '48@ms',
+  inputWrapper: {
+    minHeight: '48@ms',
     borderWidth: 0.5,
     borderColor: AppColors.primary,
     borderRadius: '10@ms',
     paddingHorizontal: '12@ms',
-    fontSize: '15@ms',
     backgroundColor: AppColors.background,
+    elevation: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    height: '48@ms',
+    fontSize: '15@ms',
     color: '#000',
-    elevation: 3
+    flex: 1,
+    backgroundColor: 'transparent',
+    paddingRight: '8@ms',
   },
   errorInput: {
     borderColor: 'red',
+  },
+  eyeButton: {
+    paddingLeft: '8@ms',
+    paddingVertical: '4@ms',
   },
   errorText: {
     marginTop: '4@ms',

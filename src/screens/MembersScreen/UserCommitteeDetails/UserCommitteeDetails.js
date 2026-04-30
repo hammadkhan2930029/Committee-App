@@ -345,8 +345,8 @@ export const UserCommitteeDetails = ({ route }) => {
                     <View>
                       <Text style={styles.status}>Your Payment Status</Text>
                     </View>
-                    <View style={styles.statustype}>
-                      <Text style={styles.statustypeText}>{data.status}</Text>
+                    <View style={data.status === "Paid" ? styles.statustypePaid : styles.statustype}>
+                      <Text style={[styles.statustypeText ,{ color: data.status === "Paid" ? "#fff" : AppColors.link }]}>{data.status}</Text>
                     </View>
                   </View>
                   <View style={styles.paymentCardRow}>
@@ -579,6 +579,16 @@ const styles = ScaledSheet.create({
     width: 80,
     padding: 3,
     borderRadius: 15,
+    elevation:5
+  },
+  statustypePaid: {
+    backgroundColor: 'green',
+    width: 80,
+    padding: 3,
+    borderRadius: 15,
+    elevation:5
+
+
   },
 
   statustypeText: {
@@ -608,7 +618,7 @@ const styles = ScaledSheet.create({
   },
   //---------------------------------
   cardContainer: {
-    marginTop: -30,
+    marginTop: -80,
     backgroundColor: '#fff',
     borderRadius: '15@ms',
     padding: '16@ms',

@@ -6,7 +6,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   FlatList,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
@@ -24,6 +23,7 @@ import {
 import Toast from 'react-native-toast-message';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import { CustomButton } from '../../../components/customButton';
+import { ProfileAvatar } from '../../../components/ProfileAvatar';
 
 export const Notifications = () => {
   const navigation = useNavigation();
@@ -53,13 +53,16 @@ export const Notifications = () => {
       const response = await api.get(
         `/user/view-notifications/${userdata.user_id}`,
       );
-      const result = response.data.msg;
+      const result = Array.isArray(response?.data?.msg) ? response.data.msg : [];
       // console.log(response);
       if (response.data.code === '200') {
         setNotifyList(result);
+      } else {
+        setNotifyList([]);
       }
     } catch (error) {
       console.log(error);
+      setNotifyList([]);
     } finally {
       setLoading(false);
     }
@@ -69,7 +72,7 @@ export const Notifications = () => {
       notificationsApi();
     }
   }, [userdata]);
-  console.log('notify list :', notifyList.length);
+  console.log('notify list :', notifyList?.length || 0);
 
   //------------------------------------------------------------
 
@@ -88,7 +91,22 @@ export const Notifications = () => {
           },
         });
         notificationsApi();
-        setNotifyList();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const markSingleNotification = async notificationId => {
+    try {
+      const response = await api.get(
+        `/user/mark-as-read/notifications/${notificationId}`,
+      );
+
+      if (response?.data?.code === '200') {
+        setNotifyList(prevList =>
+          prevList.filter(item => item.id !== notificationId),
+        );
       }
     } catch (error) {
       console.log(error);
@@ -99,7 +117,7 @@ export const Notifications = () => {
 
   const renderNotification = ({ item }) => {
     return (
-      <View>
+      <TouchableOpacity activeOpacity={0.8} onPress={() => markSingleNotification(item.id)}>
         <View
           style={[
             styles.notificationCard,
@@ -110,7 +128,7 @@ export const Notifications = () => {
           <Text style={styles.notificationMessage}>{item.notification}</Text>
           <Text style={styles.notificationDate}>{item.noti_date}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -191,11 +209,7 @@ export const Notifications = () => {
               <TouchableOpacity
                 onPress={() => navigation.navigate('AdminProfile')}
               >
-                <Image source={
-                  userdata?.image
-                    ? { uri: userdata.image }
-                    : AppImages.profileAvatar
-                } style={styles.avatar} />
+                <ProfileAvatar imageUri={userdata?.image} style={styles.avatar} />
               </TouchableOpacity>
             </View>
           </View>
@@ -225,7 +239,7 @@ export const Notifications = () => {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        {notifyList.length > 0 && (
+        {notifyList?.length > 0 && (
           <View style={styles.btnView}>
             <CustomButton
               title="Mark All as Read"

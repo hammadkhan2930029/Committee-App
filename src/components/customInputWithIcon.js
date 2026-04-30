@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../constant/appColors';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const CustomInputWithIcon = ({
   label,
@@ -25,6 +26,8 @@ export const CustomInputWithIcon = ({
 
   ...rest
 }) => {
+  const isPasswordField = type === 'password';
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const getSettingsByType = () => {
     switch (type) {
@@ -63,6 +66,12 @@ export const CustomInputWithIcon = ({
   };
 
   const settings = getSettingsByType();
+  const secureTextEntry =
+    typeof rest.secureTextEntry === 'boolean'
+      ? rest.secureTextEntry
+      : isPasswordField
+        ? !isPasswordVisible
+        : settings.secureTextEntry;
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -82,7 +91,7 @@ export const CustomInputWithIcon = ({
             placeholder={placeholder}
             editable={settings.editable}
             keyboardType={settings.keyboardType}
-            secureTextEntry={settings.secureTextEntry}
+            secureTextEntry={secureTextEntry}
             autoCapitalize={settings.autoCapitalize}
             placeholderTextColor="#999"
             style={[styles.input, inputStyle, ]}
@@ -90,14 +99,25 @@ export const CustomInputWithIcon = ({
             {...rest}
           />
 
-          {rightIcon && (
+          {isPasswordField ? (
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(prev => !prev)}
+              style={styles.iconRight}
+            >
+              <Ionicons
+                name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color={AppColors.primary}
+              />
+            </TouchableOpacity>
+          ) : rightIcon ? (
             <TouchableOpacity
               onPress={onRightIconPress}
               style={styles.iconRight}
             >
               {rightIcon}
             </TouchableOpacity>
-          )}
+          ) : null}
 
         </View>
       </TouchableOpacity>

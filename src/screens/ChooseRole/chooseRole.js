@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ImageBackground, ScrollView } from 'react-native';
-import { View, TouchableOpacity, Text, Image, StatusBar, Modal, Share } from 'react-native';
+import { View, TouchableOpacity, Text, StatusBar, Modal, Share } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../constant/appImages';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -11,12 +11,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Dimensions } from 'react-native';
 import { DisclaimerModal } from '../../components/disclaimerModal'
 import { getStoredUser } from '../../Utils/getUser';
-import { profileAvatar } from '../../assets/images/profileAvatar.png'
+import { ProfileAvatar } from '../../components/ProfileAvatar';
 
 const screenWidth = Dimensions.get('window').width;
 
 export const ChooseRole = () => {
-    const [imgError, setImgError] = useState(false);
     const navigation = useNavigation();
     const [selected, setSelected] = useState(1);
     const [userData, setUserData] = useState()
@@ -40,6 +39,7 @@ export const ChooseRole = () => {
             loadUser();
         }, []),
     );
+    console.log("check this :", userData)
     //----------------------------------------------------------
     const onShare = async () => {
         try {
@@ -90,14 +90,9 @@ export const ChooseRole = () => {
                 </ImageBackground>
                 <View style={styles.profileView}>
 
-                    <Image
-                        source={
-                            userData?.image && !imgError
-                                ? { uri: userData.image }
-                                : AppImages.profileAvatar
-                        }
+                    <ProfileAvatar
+                        imageUri={userData?.image == 'https://committee.cogentdevs.com/images/user-profile/user-default.png' ? AppImages.profileAvatar : userData?.image}
                         style={styles.profileImage}
-                        onError={() => setImgError(true)}
                     />
                 </View>
 

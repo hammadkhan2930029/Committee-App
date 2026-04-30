@@ -281,7 +281,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 <View style={styles.dropdownMain}>
                     <View>
                         <CustomInputWithIcon
-                            label="Registerd Code"
+                            label="Registered Code"
                             type="text"
                             placeholder="Enter code e.g (9DK42B)"
                             value={selectCode}

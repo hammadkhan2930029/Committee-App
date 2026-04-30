@@ -363,6 +363,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../../services/api';
 import Toast from 'react-native-toast-message';
+import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { Loader } from '../Loader/loader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -537,13 +538,14 @@ export const AdminEditProfile = ({ route }) => {
                 {/* PROFILE */}
                 <View style={styles.card}>
                     <View style={styles.imageWrapper}>
-                        <Image
-                            source={
-                                image
-                                    ? { uri: image.uri }
-                                    : currentUser?.image
-                                        ? { uri: currentUser.image }
-                                        : AppImages.profileAvatar
+                       
+                        <ProfileAvatar
+                            imageUri={
+                                image?.uri
+                                    ? image.uri
+                                    : (currentUser?.image === 'https://committee.cogentdevs.com/images/user-profile/user-default.png'
+                                        ? AppImages.profileAvatar
+                                        : currentUser?.image)
                             }
                             style={styles.image}
                         />

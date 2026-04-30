@@ -3,7 +3,6 @@ import {
     View,
     StatusBar,
     ImageBackground,
-    Image,
     Text,
     ScrollView,
     TouchableOpacity,
@@ -24,6 +23,7 @@ import {
 } from 'react-native-responsive-screen';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ProfileAvatar } from '../../../components/ProfileAvatar';
 
 export const CommitteeList = () => {
     const [loading, setLoading] = useState(true);
@@ -188,12 +188,8 @@ export const CommitteeList = () => {
                             <TouchableOpacity
                                 onPress={() => navigation.navigate('AdminProfile')}
                             >
-                                <Image
-                                    source={
-                                        userData?.image
-                                            ? { uri: userData.image }
-                                            : AppImages.profileAvatar
-                                    }
+                                <ProfileAvatar
+                                    imageUri={userData?.image}
                                     style={styles.avatar}
                                 />
                             </TouchableOpacity>

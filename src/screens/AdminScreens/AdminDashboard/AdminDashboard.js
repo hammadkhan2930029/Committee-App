@@ -16,6 +16,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { navigate } from '../../../navigations/navigationService';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
@@ -201,7 +202,7 @@ export const AdminDashboard = () => {
                                         <Icon name="group-add" size={34} color={AppColors.link} />
                                         <Text style={styles.activeBC}>Active BCs</Text>
                                     </View>
-                                  
+
                                 </View>
                                 <View style={styles.counter}>
                                     <Text style={styles.counter_text}>
@@ -210,7 +211,32 @@ export const AdminDashboard = () => {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        
+
+                        {/* -------Due Payments------- */}
+
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => navigation.navigate('Payments')}
+                        >
+                            <View style={styles.Dashboardcard}>
+                                <View>
+                                    <View style={styles.imgText}>
+                                        <Ionicons
+                                            name="calendar-clear"
+                                            size={34}
+                                            color={AppColors.link}
+                                        />
+                                        <Text style={styles.activeBC}>Due Payments</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.counter}>
+                                    <Text style={styles.counter_text}>
+                                        {counter.due_payments}
+                                    </Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+
                         {/* -------Pending Payments------- */}
                         <TouchableOpacity
                             activeOpacity={0.7}

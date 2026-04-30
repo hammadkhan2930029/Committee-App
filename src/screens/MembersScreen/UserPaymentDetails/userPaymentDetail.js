@@ -17,6 +17,7 @@ import { Modal } from 'react-native';
 import { useEffect, useState } from 'react';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { DisabledButton } from '../../../components/disabledButton';
 
 
 export const UserPaymentDetails = ({ route }) => {
@@ -95,6 +96,7 @@ export const UserPaymentDetails = ({ route }) => {
       </ScrollView>
     );
   };
+  console.log("status : ", item.status)
 
   return (
     <View style={styles.container}>
@@ -150,7 +152,7 @@ export const UserPaymentDetails = ({ route }) => {
               </View>
               <View style={styles.row}>
                 <Text style={styles.text1}>Paid Amount</Text>
-                <Text style={styles.text2}>{item.paid_amount}</Text>
+                <Text style={styles.text2}>{formatNumber(item.paid_amount)}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.text1}>Pay Date</Text>
@@ -160,7 +162,7 @@ export const UserPaymentDetails = ({ route }) => {
               <View style={styles.row}>
                 <Text style={styles.text1}>Status</Text>
 
-                <View style={styles.activeBtn}>
+                <View style={[styles.activeBtn, { backgroundColor: item.status === 'verified' ? 'green' : AppColors.primary }]}>
                   <Text style={styles.active}>{item.status}</Text>
                 </View>
               </View>
@@ -182,14 +184,20 @@ export const UserPaymentDetails = ({ route }) => {
 
             <View style={styles.buttons}>
               <View style={styles.btnView}>
-                <CustomButton
-                  title="Edit Payment "
-                  onPress={() =>
-                    navigation.navigate('EditPayments', {
-                      payment_id: item.payment_id,
-                    })
-                  }
-                />
+                {item.status === 'verified' ? (
+                  <DisabledButton
+                    title="Edit Payment "
+                  />
+                ) : (
+                  <CustomButton
+                    title="Edit Payment "
+                    onPress={() =>
+                      navigation.navigate('EditPayments', {
+                        payment_id: item.payment_id,
+                      })
+                    }
+                  />
+                )}
               </View>
             </View>
             <Modal

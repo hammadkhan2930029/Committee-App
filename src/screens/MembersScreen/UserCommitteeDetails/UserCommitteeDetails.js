@@ -127,12 +127,13 @@ export const UserCommitteeDetails = ({ route }) => {
   //--------------------------------------------------------------
 
   const filterUser = memberList?.filter(item => item.user_id == userdata.user_id)[0]
-  const filterRound = roundList?.find(item =>
+  const filterRound = roundList?.filter(item =>
     item.committee_member_id === filterUser?.committe_member_id
   );
-
+  console.log('filter round : ', filterRound?.map(item => item.round_no))
+  const roundNo = filterRound?.map(item => item.round_no)
   // Display logic with safety
-  const roundNo = filterRound?.round_no || "N/A";
+  // const roundNo = filterRound?.round_no || "N/A";
   // console.log('Round Number:', roundNo);
   // console.log('filter:', filterUser);
   // console.log('filterRound:', filterRound);
@@ -253,12 +254,19 @@ export const UserCommitteeDetails = ({ route }) => {
             <View style={styles.divider} />
 
             <View style={styles.cardBody}>
-              <View style={styles.turnCircle}>
-                <Text style={styles.turnNumber}>{roundNo || '-'}</Text>
-              </View>
               <View style={styles.textContainer}>
-                <Text style={styles.label}>Your Assigned Turn</Text>
+                <Text style={styles.label}>Your Assigned Turn(s) </Text>
               </View>
+              {filterRound.map((item) => {
+                return (
+                  <View style={styles.turnCircle}>
+                    <Text style={styles.turnNumber}>{item.round_no || ''}</Text>
+                  </View>
+
+                )
+              })}
+
+
             </View>
           </View>
 
@@ -346,7 +354,7 @@ export const UserCommitteeDetails = ({ route }) => {
                       <Text style={styles.status}>Your Payment Status</Text>
                     </View>
                     <View style={data.status === "Paid" ? styles.statustypePaid : styles.statustype}>
-                      <Text style={[styles.statustypeText ,{ color: data.status === "Paid" ? "#fff" : AppColors.link }]}>{data.status}</Text>
+                      <Text style={[styles.statustypeText, { color: data.status === "Paid" ? "#fff" : AppColors.link }]}>{data.status}</Text>
                     </View>
                   </View>
                   <View style={styles.paymentCardRow}>
@@ -579,14 +587,14 @@ const styles = ScaledSheet.create({
     width: 80,
     padding: 3,
     borderRadius: 15,
-    elevation:5
+    elevation: 5
   },
   statustypePaid: {
     backgroundColor: 'green',
     width: 80,
     padding: 3,
     borderRadius: 15,
-    elevation:5
+    elevation: 5
 
 
   },
@@ -621,7 +629,7 @@ const styles = ScaledSheet.create({
     marginTop: -80,
     backgroundColor: '#fff',
     borderRadius: '15@ms',
-    padding: '16@ms',
+    padding: '10@ms',
     marginHorizontal: '10@ms',
     marginVertical: '5@ms',
     // Shadow for iOS
@@ -654,15 +662,17 @@ const styles = ScaledSheet.create({
   cardBody: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap'
   },
   turnCircle: {
-    width: '50@ms',
-    height: '50@ms',
+    width: '40@ms',
+    height: '40@ms',
     borderRadius: '25@ms',
     backgroundColor: AppColors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,
+    margin: 2
   },
   turnNumber: {
     color: '#fff',

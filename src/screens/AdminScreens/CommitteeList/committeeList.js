@@ -7,6 +7,7 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
+    Image
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -303,7 +304,7 @@ export const CommitteeList = () => {
                                                         </Text>
                                                     </View>
                                                     <View style={styles.details}>
-                                                        <Text style={styles.one}>Due on:</Text>
+                                                        <Text style={styles.one}>Due on :</Text>
                                                         <Text style={styles.count}> {datalist.due_on}</Text>
                                                     </View>
                                                 </View>

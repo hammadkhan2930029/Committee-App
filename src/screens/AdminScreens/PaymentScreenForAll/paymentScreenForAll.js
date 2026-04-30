@@ -63,7 +63,7 @@ export const Payments = () => {
             AdminpaymentList();
         }, [userData]),
     );
-    console.log('Payment list :', paymentList)
+    // console.log('Payment list :', paymentList)
     //-----------------------------------------------------------------------------
     const formatNumber = value => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
     const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
@@ -79,12 +79,12 @@ export const Payments = () => {
     const pendingAmount = pendingList.reduce((sum, item) => sum + Number(item?.paid_amount || 0), 0);
     //-----------------------------------------------------------------------------
 
-    console.log("pending list : ", pendingList)
     const summaryData = [
         { id: 1, title: 'Pending Amount', value: pendingAmount, subtitle: 'Awaiting', type: 'pending' },
         { id: 2, title: 'Pending Count', value: pendingList.length, subtitle: 'Total Items', type: 'count' },
     ];
     //-----------------------------------------------------------------------------
+    console.log("filter data paymnet : ", filterData)
 
     const renderHeader = () => (
         <View style={{ backgroundColor: AppColors.background }}>

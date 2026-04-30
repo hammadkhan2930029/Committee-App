@@ -248,7 +248,7 @@ export const PaymentHistory = () => {
                                                         <Text style={styles.name}>
                                                             {items.committe_name}
                                                         </Text>
-                                                        <View style={styles.status_view}>
+                                                        <View style={[styles.status_view , { backgroundColor: items.status === 'verified' ? 'green' : AppColors.primary }]}>
                                                             <Text style={styles.status_text}>
                                                                 {items.status}
                                                             </Text>

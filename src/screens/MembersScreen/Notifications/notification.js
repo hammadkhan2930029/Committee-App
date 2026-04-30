@@ -370,7 +370,6 @@ const styles = ScaledSheet.create({
     borderleftColor: 'gray',
     borderLeftWidth: 5,
   },
-  list: {},
   btnView: {
     position: 'absolute',
     width: '95%',

@@ -169,7 +169,7 @@ export const OtpVerification = () => {
 
 
     //-------------------------------------------------
-    const [timer, setTimer] = useState(30);
+    const [timer, setTimer] = useState(60);
     const [isResendActive, setIsResendActive] = useState(false);
 
     //-----------------Timer--------------------------------
@@ -545,7 +545,6 @@ const styles = ScaledSheet.create({
         padding: 10,
         fontSize: moderateScale(16),
         color: AppColors.bodyText,
-        opacity: 0.6,
     },
     resendBtn: {
         backgroundColor: AppColors.primary,

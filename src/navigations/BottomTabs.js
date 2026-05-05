@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AdminDashboard } from '../screens/AdminScreens/AdminDashboard/AdminDashboard';
-import { AppImages } from '../constant/appImages';
-import { AppIcons } from '../constant/appIcons';
+
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 import { AdminProfile } from '../screens/AdminProfile/adminProfile';
@@ -11,6 +10,8 @@ import { useState } from 'react';
 import { Modal, View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import { ChooseRole } from '../screens/ChooseRole/chooseRole';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +59,7 @@ export const BottomTabNavigation = () => {
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, size, color }) => {
                         let icon;
-                        if (route.name === 'AdminDashboard') {
+                        if (route.name === 'ChooseRole') {
                             icon = focused ? 'home' : 'home-outline';
                         } else if (route.name === 'CommitteeList') {
                             icon = focused ? 'list-sharp' : 'list-outline';
@@ -91,13 +92,26 @@ export const BottomTabNavigation = () => {
                         elevation: 12,
                     },
                 })}
-                initialRouteName="AdminDashboard"
+                initialRouteName="ChooseRole"
             >
+                <Tab.Screen
+                    name="ChooseRole"
+                    component={ChooseRole}
+                    options={{ headerShown: false }}
+                />
                 <Tab.Screen
                     name="AdminDashboard"
                     component={AdminDashboard}
-                    options={{ headerShown: false }}
+                    options={{
+                        headerShown: false,
+                        tabBarButton: () => null,
+                        tabBarItemStyle: {
+                            display: 'none',
+                        },
+                    }}
                 />
+
+
                 <Tab.Screen
                     name="CommitteeList"
                     component={CommitteeList}

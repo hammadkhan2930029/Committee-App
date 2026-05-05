@@ -126,7 +126,7 @@ export const Payments = () => {
 
             <View style={styles.statuslistView}>
                 <FlatList
-                    data={['All', 'Due', 'Verified', 'Pending', 'Requested']}
+                    data={['All', 'Due', 'Verified', 'Overdue', 'Requested']}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (

@@ -250,7 +250,7 @@ export const AdminDashboard = () => {
                                             size={34}
                                             color={AppColors.link}
                                         />
-                                        <Text style={styles.activeBC}>Pending Payments</Text>
+                                        <Text style={styles.activeBC}>Overdue Payments</Text>
                                     </View>
                                 </View>
                                 <View style={styles.counter}>

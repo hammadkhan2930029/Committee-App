@@ -20,11 +20,22 @@ export const ChooseRole = () => {
     const [selected, setSelected] = useState(1);
     const [userData, setUserData] = useState()
 
+    // const handleContinue = () => {
+    //     if (selected === 1) {
+    //         navigation.navigate('BottomTabNavigation');
+    //     } else if (selected === 2) {
+    //         navigation.navigate('BottomTabNavigationUser');
+    //     }
+    // };
     const handleContinue = () => {
         if (selected === 1) {
-            navigation.navigate('BottomTabNavigation');
+            navigation.navigate('AdminTabs', {
+                screen: 'AdminDashboard',
+            });
         } else if (selected === 2) {
-            navigation.navigate('BottomTabNavigationUser');
+            navigation.navigate('UserTabs', {
+                screen: 'MembersDashboard',
+            });
         }
     };
     //----------------------------------------------
@@ -226,7 +237,7 @@ const styles = ScaledSheet.create({
     profileView: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -100,
+        marginTop: -120,
     },
     profileImage: {
         backgroundColor: AppColors.background,
@@ -321,7 +332,7 @@ const styles = ScaledSheet.create({
     btnView: {
         width: '80%',
         alignSelf: 'center',
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 50
     },
     //----------------------------------------------

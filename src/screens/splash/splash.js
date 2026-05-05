@@ -45,7 +45,10 @@ export const Splash = () => {
 
         setTimeout(() => {
           if (user && user.user_id) {
-            navigation.replace('ChooseRole');
+            // navigation.replace('ChooseRole');
+            navigation.replace('AdminTabs');
+
+
           } else {
             navigation.replace('Login');
           }

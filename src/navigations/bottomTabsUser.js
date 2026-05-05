@@ -2,7 +2,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
 import { ActiveBCs } from '../screens/MembersScreen/ActiveBC/ActiveBc';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AppColors } from '../constant/appColors';
 import { AdminProfile } from '../screens/AdminProfile/adminProfile';
 import { PaymentHistory } from '../screens/MembersScreen/PaymentHistory/paymentHistory';
@@ -11,6 +10,8 @@ import { Modal, View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { ChooseRole } from '../screens/ChooseRole/chooseRole';
+
 
 const UserTab = createBottomTabNavigator();
 
@@ -55,7 +56,7 @@ export const BottomTabNavigationUser = () => {
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, size, color }) => {
                         let icon;
-                        if (route.name === 'MembersDashboard') {
+                        if (route.name === 'ChooseRole') {
                             icon = focused ? 'home' : 'home-outline';
                         } else if (route.name === 'ActiveBCs') {
                             icon = focused ? 'list-sharp' : 'list-outline';
@@ -92,13 +93,26 @@ export const BottomTabNavigationUser = () => {
                         elevation: 12,
                     },
                 })}
-                initialRouteName="MembersDashboard"
+                initialRouteName="ChooseRole"
             >
+                <UserTab.Screen
+                    name="ChooseRole"
+                    component={ChooseRole}
+                    options={{ headerShown: false }}
+                />
                 <UserTab.Screen
                     name="MembersDashboard"
                     component={MembersDashboard}
-                    options={{ headerShown: false }}
+                    options={{
+                        headerShown: false,
+                        tabBarButton: () => null,
+                        tabBarItemStyle: {
+                            display: 'none',
+                        },
+                    }}
                 />
+               
+
                 <UserTab.Screen
                     name="ActiveBCs"
                     component={ActiveBCs}

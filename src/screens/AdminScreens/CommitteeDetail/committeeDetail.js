@@ -419,17 +419,21 @@ export const CommitteeDetails = ({ route }) => {
         {/* Info Cards */}
         <View style={styles.gridView}>
           <View style={styles.grid2}>
-            <Card style={styles.smallCard}>
-              <Icon name="group" size={28} color={AppColors.primary} />
-              <Text>Total Members</Text>
-              <Text style={styles.bold}>{details.total_member}</Text>
-            </Card>
+            <TouchableOpacity onPress={() => navigation.navigate('CommitteeRoundList', { details })}>
+              <Card style={styles.smallCard} >
+                <Icon name="group" size={28} color={AppColors.primary} />
+                <Text>Total Members</Text>
+                <Text style={styles.bold}>{details.total_member}</Text>
+              </Card>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('CommitteeRoundList', { details })}>
+              <Card style={styles.smallCard}>
+                <Icon name="calendar-today" size={28} color={AppColors.primary} />
+                <Text>Rounds / Month</Text>
+                <Text style={styles.bold}>{details.total_rounds}</Text>
+              </Card>
+            </TouchableOpacity>
 
-            <Card style={styles.smallCard}>
-              <Icon name="calendar-today" size={28} color={AppColors.primary} />
-              <Text>Rounds / Month</Text>
-              <Text style={styles.bold}>{details.total_rounds}</Text>
-            </Card>
           </View>
           <View style={styles.grid2}>
             <Card style={styles.smallCard}>
@@ -586,7 +590,7 @@ export const CommitteeDetails = ({ route }) => {
 
 
       </View>
-    </ScrollView>
+    </ScrollView >
   );
 };
 

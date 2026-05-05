@@ -39,6 +39,8 @@ export const UserPaymentDetails = ({ route }) => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
   //------------------------------------------------------
+  const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+  //----------------------------------------------------
 
   useEffect(() => {
     setTimeout(() => {
@@ -163,7 +165,7 @@ export const UserPaymentDetails = ({ route }) => {
                 <Text style={styles.text1}>Status</Text>
 
                 <View style={[styles.activeBtn, { backgroundColor: item.status === 'verified' ? 'green' : AppColors.primary }]}>
-                  <Text style={styles.active}>{item.status}</Text>
+                  <Text style={styles.active}>{capitalize(item.status)}</Text>
                 </View>
               </View>
             </View>

@@ -200,6 +200,7 @@ export const UserCommitteeDetails = ({ route }) => {
   }, [details])
 
 
+  //--------------------------------------------------------------------------
 
   const paidAmount = currentMonthData.round_payment_paid
 
@@ -208,7 +209,38 @@ export const UserCommitteeDetails = ({ route }) => {
   const percentage = (paidAmount / total) * 100;
 
   const pendingAmount = paidAmount - total
+  //--------------------------------------------------------------------------
+  const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 
+  //--------------------------------------------------------------------------
+  // Is function ko component ke andar add karein
+  const isPastOrCurrentMonth = (roundMonth) => {
+    if (!roundMonth) return false;
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonthIndex = now.getMonth(); // 0-11 (Jan=0, May=4)
+
+    // API date (e.g., "May 2026") ko split karein
+    const [monthName, yearStr] = roundMonth.split(' ');
+    const roundYear = parseInt(yearStr);
+
+    // Mahine ka naam index mein convert karein
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const roundMonthIndex = monthNames.indexOf(monthName);
+
+    // Comparison Logic:
+    // 1. Agar saal pichla hai to true.
+    // 2. Agar saal current hai aur mahina pichla ya current hai to true.
+    if (roundYear < currentYear) {
+      return true;
+    } else if (roundYear === currentYear) {
+      return roundMonthIndex <= currentMonthIndex;
+    }
+
+    return false;
+  };
+  //-------------------------------------------------------------------------
 
 
   return (
@@ -354,28 +386,56 @@ export const UserCommitteeDetails = ({ route }) => {
                       <Text style={styles.status}>Your Payment Status</Text>
                     </View>
                     <View style={data.status === "Paid" ? styles.statustypePaid : styles.statustype}>
-                      <Text style={[styles.statustypeText, { color: data.status === "Paid" ? "#fff" : AppColors.link }]}>{data.status}</Text>
+                      <Text style={[styles.statustypeText, { color: data.status === "Paid" ? "#fff" : AppColors.link }]}>{capitalize(data.status)}</Text>
                     </View>
                   </View>
                   <View style={styles.paymentCardRow}>
                     <Text style={styles.label}>Round No.</Text>
                     <Text style={styles.value}>{data.round_no}</Text>
                   </View>
-                  <View style={styles.paymentCardRow}>
+                  {/* <View style={styles.paymentCardRow}>
                     <Text style={styles.label}>Name</Text>
                     <Text style={styles.value}>
                       {data?.committee_member_name
                         ? data?.committee_member_name
                         : 'User Not Assigned'}
                     </Text>
-                  </View>
+                  </View> */}
                   <View style={styles.paymentCardRow}>
                     <Text style={styles.label}>Month</Text>
                     <Text style={styles.value}>{data.round_month}</Text>
                   </View>
-
                   <View style={styles.paymentBTN}>
-                    {month === data.round_month &&
+                    {(() => {
+                      const isClickable = isPastOrCurrentMonth(data.round_month);
+                      const isPaid = data.status.toLowerCase() === 'paid';
+
+                      if (isClickable && !isPaid) {
+                        return (
+                          <CustomButton
+                            title="Payment Now"
+                            onPress={() =>
+                              navigation.navigate('UploadSlip', {
+                                singleRoundAmount: details?.amount_per_member,
+                                amount: details?.amount_per_member * (memberCountMap[data.committee_member_id] || 1),
+                                memberCount: memberCountMap[data.committee_member_id] || 1,
+                                data: data,
+                              })
+                            }
+                          />
+                        );
+                      } else {
+                        return (
+                          <DisabledButton
+                            title={isPaid ? "Paid" : "Payment Now"}
+                          />
+                        );
+                      }
+                    })()}
+                  </View>
+
+                  {/* <View style={styles.paymentBTN}>
+                    {isPastOrCurrentMonth(data.round_month) &&
                       data.status.toLowerCase() !== 'paid' ? (
                       <CustomButton
                         title="Payment Now"
@@ -394,9 +454,9 @@ export const UserCommitteeDetails = ({ route }) => {
                         }
                       />
                     ) : (
-                      <DisabledButton title="Pay Now" />
+                      <DisabledButton title="Payment Now" />
                     )}
-                  </View>
+                  </View> */}
                 </View>
               </View>
             );
@@ -608,8 +668,9 @@ const styles = ScaledSheet.create({
   paymentCardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 5,
-    marginTop: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginTop: 10 ,
   },
 
   label: {

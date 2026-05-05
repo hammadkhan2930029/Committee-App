@@ -44,7 +44,10 @@ export const PaymentHistory = () => {
         }, []),
     );
     const userID = userData?.user_id;
-    console.log(userID);
+    // console.log(userID);
+    //------------------------------------------------------
+    const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+
     //------------------------------------------------------
     const formatNumber = value => {
         if (value === null || value === undefined) return '';
@@ -58,7 +61,7 @@ export const PaymentHistory = () => {
                 `/user/view-committee-payments/list/${userID}`,
             );
             const result = response?.data?.msg;
-            console.log('payment history :', result);
+            
             if (result) {
                 setHistory(result);
                 setLoding(false);
@@ -74,6 +77,8 @@ export const PaymentHistory = () => {
             UserPaymentHistory();
         }
     }, [userID]);
+    console.log('payment history :', history);
+
     //----------------------Skeleton-----------------------------
     const MySkeleton = () => {
         return (
@@ -248,9 +253,9 @@ export const PaymentHistory = () => {
                                                         <Text style={styles.name}>
                                                             {items.committe_name}
                                                         </Text>
-                                                        <View style={[styles.status_view , { backgroundColor: items.status === 'verified' ? 'green' : AppColors.primary }]}>
+                                                        <View style={[styles.status_view, { backgroundColor: items.status === 'verified' ? 'green' : AppColors.primary }]}>
                                                             <Text style={styles.status_text}>
-                                                                {items.status}
+                                                                {capitalize(items.status)}
                                                             </Text>
                                                         </View>
                                                     </View>

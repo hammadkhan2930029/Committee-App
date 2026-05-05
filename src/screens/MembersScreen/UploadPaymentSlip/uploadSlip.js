@@ -60,7 +60,6 @@ export const UploadSlip = ({ route }) => {
         }, []),
     );
     const userID = userData?.user_id;
-    // console.log('userID', userID);
     //-------------------------------------------------
     const options = {
         mediaType: 'photo',
@@ -145,23 +144,16 @@ export const UploadSlip = ({ route }) => {
                 return;
             }
 
-            
 
-            setImageUri(asset); 
+
+            setImageUri(asset);
         });
     };
-    //------------------------------------------------
 
     //-------------------------------------------------
     const uploadPaymentSlip = async () => {
 
-        console.log('user_id', userID);
-        console.log('committee_round_id', data.committee_round_id);
-        console.log('amount', userAmount);
 
-        console.log('committee_id', data.committee_id);
-        console.log('committee_member_id', data.committee_member_id);
-        console.log('URI :', imageUri);
 
         setLoading(true);
 
@@ -173,9 +165,7 @@ export const UploadSlip = ({ route }) => {
 
             formData.append('committee_id', data.committee_id);
             formData.append('committee_member_id', data.committee_member_id);
-            // if (imageUri) {
-            //     formData.append('pay_slip', imageUri);
-            // }
+
             if (imageUri) {
                 formData.append('pay_slip', {
                     uri: imageUri.uri,
@@ -194,7 +184,7 @@ export const UploadSlip = ({ route }) => {
             Toast.show({
                 type: 'customToast',
                 text1: 'Success',
-                text2: response?.data?.msg?.[0]?.response ,
+                text2: response?.data?.msg?.[0]?.response,
                 props: {
                     bgColor: AppColors.background,
                     borderColor: 'green',
@@ -239,8 +229,28 @@ export const UploadSlip = ({ route }) => {
         setAmountError('');
         setUserAmount(numericValue);
     };
+    //--------------------------------------------------------------------
+    const [checkStatus, setCheckStatus] = useState()
+    const checkStatusApi = async () => {
+        try {
+            const response = await api.get(`/user/payment-check/${userID}/${data.committee_id}/${data.committee_member_id}/${data.committee_round_id}`)
+            const result = response?.data?.msg[0]?.payment_status
+            if (response?.data?.code == '200') {
+                setCheckStatus(result)
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useFocusEffect(
+        useCallback(() => {
+            checkStatusApi()
+        }, [userID, data.committee_id, data.committee_member_id])
+    )
 
 
+  
     return (
         <View style={styles.conatiner}>
             <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -342,7 +352,7 @@ export const UploadSlip = ({ route }) => {
                             )}
                         </View>
                         <View style={styles.customBTN}>
-                            {userAmount > 0 && userAmount <= amount && imageUri ? (
+                            {imageUri && (userAmount > 0) && (userAmount <= amount) && (checkStatus !== 'verified') ? (
                                 <CustomButton
                                     title="Submit"
                                     onPress={() => uploadPaymentSlip()}

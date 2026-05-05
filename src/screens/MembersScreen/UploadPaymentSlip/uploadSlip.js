@@ -34,14 +34,16 @@ export const UploadSlip = ({ route }) => {
     const { amount, data, memberCount, singleRoundAmount } = route.params;
     const [amountError, setAmountError] = useState('');
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const navigation = useNavigation();
     //-------------------------------------------------
     const [imageUri, setImageUri] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [userAmount, setUserAmount] = useState();
+    const [history, setHistory] = useState([]);
+
 
     //-------------------------------------------------
     const [userData, setUserData] = useState();
@@ -144,8 +146,6 @@ export const UploadSlip = ({ route }) => {
                 return;
             }
 
-
-
             setImageUri(asset);
         });
     };
@@ -153,8 +153,16 @@ export const UploadSlip = ({ route }) => {
     //-------------------------------------------------
     const uploadPaymentSlip = async () => {
 
-
-
+        // console.log('user_id', userID);
+        // console.log('committee_round_id', data.committee_round_id);
+        // console.log('amount', userAmount);
+        // console.log('committee_id', data.committee_id);
+        // console.log('committee_member_id', data.committee_member_id);
+        // console.log('pay_slip', {
+        //     uri: imageUri.uri,
+        //     name: imageUri.fileName || 'payment.jpg',
+        //     type: imageUri.type || 'image/jpeg',
+        // });
         setLoading(true);
 
         try {
@@ -162,7 +170,6 @@ export const UploadSlip = ({ route }) => {
             formData.append('user_id', userID);
             formData.append('committee_round_id', data.committee_round_id);
             formData.append('amount', userAmount);
-
             formData.append('committee_id', data.committee_id);
             formData.append('committee_member_id', data.committee_member_id);
 
@@ -173,7 +180,7 @@ export const UploadSlip = ({ route }) => {
                     type: imageUri.type || 'image/jpeg',
                 });
             }
-            console.log('formData :', formData);
+            // console.log('formData :', formData);
 
             const response = await api.post(
                 '/user/send/committee-payment', formData,
@@ -209,26 +216,7 @@ export const UploadSlip = ({ route }) => {
         }
     };
 
-    const str = String(amount);
-    //------------------------------------------------
-    const handleChangemount = value => {
-        if (value === '') {
-            setUserAmount('');
-            setAmountError('');
-        }
 
-        const numericValue = Number(value);
-        if (isNaN(numericValue)) return;
-
-        if (numericValue > amount) {
-            setAmountError(
-                `Amount cannot be greater than PKR ${formatNumber(amount)}`,
-            );
-            return;
-        }
-        setAmountError('');
-        setUserAmount(numericValue);
-    };
     //--------------------------------------------------------------------
     const [checkStatus, setCheckStatus] = useState()
     const checkStatusApi = async () => {
@@ -248,9 +236,92 @@ export const UploadSlip = ({ route }) => {
             checkStatusApi()
         }, [userID, data.committee_id, data.committee_member_id])
     )
+    // console.log('check status :', checkStatus)
+    //--------------------------------------------------------------------
+    const UserPaymentHistory = async () => {
+        try {
+            const response = await api.get(
+                `/user/view-committee-payments/list/${userID}`,
+            );
+            const result = response?.data?.msg;
+
+            if (result) {
+                setHistory(result);
+                setLoading(false)
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false)
+        }
+    };
+    useEffect(() => {
+        if (userID) {
+            UserPaymentHistory();
+        }
+    }, [userID]);
+    // console.log('payment history :', history);
+
+    //-----------------------------------------------------
 
 
-  
+    const [matchedPayment, setMatchedPayment] = useState(null);
+
+    useEffect(() => {
+        if (!history?.length || !data) return;
+
+        const normalize = val => String(val ?? '').trim();
+
+        const matched = history.filter(item =>
+            item.committe_id &&
+            normalize(item.user_id) === normalize(userID) &&
+            normalize(item.committe_id) === normalize(data.committee_id) &&
+            normalize(item.committe_round_id) === normalize(data.committee_round_id) &&
+            normalize(item.committe_member_id) === normalize(data.committee_member_id)
+        );
+        setMatchedPayment(matched || null);
+        console.log('matched :', matched)
+    }, [history]);
+    //-----------------------------------------------------
+    // console.log('FINAL MATCHED:', matchedPayment?.paid_amount);
+
+
+    const totalPaidAmount = matchedPayment?.reduce(
+        (sum, item) => sum + Number(item.paid_amount || 0),
+        0
+    );
+    const totalAmount = Number(amount || 0);
+
+    const remainingAmount = Math.max(totalAmount - totalPaidAmount, 0);
+
+    //-----------------------------------------------------
+    const handleChangemount = value => {
+        if (value === '') {
+            setUserAmount('');
+            setAmountError('');
+            return;
+        }
+
+        const numericValue = Number(value);
+        if (isNaN(numericValue)) return;
+
+
+        if (remainingAmount <= 0) {
+            setAmountError('Full payment already completed');
+            return;
+        }
+
+        if (numericValue > remainingAmount) {
+            setAmountError(
+                `Amount cannot be greater than PKR ${formatNumber(remainingAmount)}`,
+            );
+            return;
+        }
+        setAmountError('');
+        setUserAmount(numericValue);
+    };
+
+
     return (
         <View style={styles.conatiner}>
             <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -305,6 +376,10 @@ export const UploadSlip = ({ route }) => {
                             <Text style={styles.label}>Due Date</Text>
                             <Text style={styles.value}>{data.due_date}</Text>
                         </View>
+                        {matchedPayment && (<View style={styles.row}>
+                            <Text style={styles.value}>Paid : {formatNumber(totalPaidAmount)}</Text>
+                            <Text style={styles.value}>Remaining: {formatNumber(remainingAmount)}</Text>
+                        </View>)}
 
                         <View style={styles.uploadSlip}>
                             <View
@@ -313,12 +388,12 @@ export const UploadSlip = ({ route }) => {
                                     { display: userAmount > 0 ? 'flex' : 'none' },
                                 ]}
                             >
-                                <Text style={styles.decValue}>{userAmount - amount}</Text>
+                                <Text style={styles.decValue}>{userAmount - remainingAmount}</Text>
                             </View>
                             <CustomInput
                                 label="Amount"
                                 type="numeric"
-                                placeholder={formatNumber(str)}
+                                placeholder={formatNumber(remainingAmount || amount)}
                                 value={userAmount?.toString()}
                                 onChangeText={handleChangemount}
                             />
@@ -352,7 +427,11 @@ export const UploadSlip = ({ route }) => {
                             )}
                         </View>
                         <View style={styles.customBTN}>
-                            {imageUri && (userAmount > 0) && (userAmount <= amount) && (checkStatus !== 'verified') ? (
+                            {imageUri &&
+                                userAmount > 0 &&
+                                userAmount <= remainingAmount &&
+                                remainingAmount > 0 &&
+                                checkStatus !== 'verified' ? (
                                 <CustomButton
                                     title="Submit"
                                     onPress={() => uploadPaymentSlip()}

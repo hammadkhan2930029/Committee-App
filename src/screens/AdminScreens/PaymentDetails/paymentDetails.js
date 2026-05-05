@@ -226,7 +226,7 @@ export const PaymentDetails = ({ route }) => {
                             title="Verify Payment"
                             // onPress={() => markPaymentVerified()}
                             onPress={handleVerifyPress}
-                            disabled={item.status === 'verified'}
+                            // disabled={item.status === 'verified'}
                         />
                     </View>
                     {/* ------------------------------------------------------------------------ */}

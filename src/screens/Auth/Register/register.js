@@ -29,6 +29,7 @@ import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
 import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
 import auth from '@react-native-firebase/auth';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 
 const registerSchema = Yup.object().shape({
@@ -66,64 +67,7 @@ export const Register = () => {
     ///-------------------------------------------
     const [selectedCallingCode, setSelectedCallingCode] = useState('92');
     //--------------------------------------------
-    // const register = async value => {
-    //   setLoading(true);
-    //   const fullNumber = `+${selectedCallingCode}${value.phone}`;
 
-    //   console.log('Full Number :', fullNumber)
-    //   try {
-    //     var formData = new FormData();
-    //     formData.append('full_name', value.name);
-    //     formData.append('phone', fullNumber);
-    //     formData.append('email', value.email);
-
-    //     formData.append('password', value.password);
-    //     formData.append('confirm_password', value.confirmPassword);
-
-    //     const res = await api.post('/user/register', formData, {
-    //       headers: { 'Content-Type': 'multipart/form-data' },
-    //     });
-    //     console.log('response :', res?.data?.msg[0]?.response);
-    //     if (res?.status === 200 && res?.data?.msg[0]?.response === 'register') {
-    //       Toast.show({
-    //         type: 'customToast',
-    //         text1: 'Success',
-    //         text2: res?.data?.msg[0]?.response || 'Successfully Registered',
-    //         props: {
-    //           bgColor: AppColors.background,
-    //           borderColor: 'green',
-    //         },
-    //       });
-    //       navigation.goBack();
-    //     } else {
-    //       Toast.show({
-    //         type: 'customToast',
-    //         text1: 'Warning',
-    //         text2: res?.data?.msg[0]?.response || 'User already exist',
-    //         props: {
-    //           bgColor: AppColors.background,
-    //           borderColor: 'orange',
-    //         },
-    //       });
-    //     }
-
-    //     console.log('response :', res);
-    //   } catch (error) {
-    //     console.log('Try Catch Error :', error);
-    //     Toast.show({
-    //       type: 'customToast',
-    //       text1: 'Error',
-    //       text2:
-    //         error?.response?.data?.message || 'Server error, please try again',
-    //       props: {
-    //         bgColor: AppColors.background,
-    //         borderColor: '#ff5252',
-    //       },
-    //     });
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
     /// ---------------------Send OTP--------------------------
     const sendOTP = async (value) => {
         setLoading(true)
@@ -147,11 +91,11 @@ export const Register = () => {
             const result = res?.data?.msg[0]?.response
             console.log('response :', result);
 
-            if (res?.data.code === '200' && result) {
+            if (res?.data.code == '200' && result) {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg[0]?.response,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -160,13 +104,13 @@ export const Register = () => {
                 navigation.navigate('Otp', {
                     phone: fullNumber,
                     userData: value,
-                    type:'register'
+                    type: 'register'
                 });
             } else {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg[0]?.response || 'User already exist',
+                    text2: CapitalizeWords(result) || CapitalizeWords('User already exist'),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -285,7 +229,7 @@ export const Register = () => {
                                             <CustomInput
                                                 label="Password"
                                                 type="password"
-                                                placeholder="Enter password"
+                                                placeholder="Enter Password"
                                                 value={values.password}
                                                 onChangeText={handleChange('password')}
                                                 onBlur={handleBlur('password')}
@@ -294,7 +238,7 @@ export const Register = () => {
                                             <CustomInput
                                                 label="Confirm Password"
                                                 type="password"
-                                                placeholder="Re-enter password"
+                                                placeholder="Re-enter Password"
                                                 value={values.confirmPassword}
                                                 onChangeText={handleChange('confirmPassword')}
                                                 onBlur={handleBlur('confirmPassword')}

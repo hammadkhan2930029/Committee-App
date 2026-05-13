@@ -23,32 +23,21 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AppImages } from '../../../constant/appImages';
 import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
 import auth from '@react-native-firebase/auth';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 //-----------------------------------------------------
 
 const resetPasswordSchema = Yup.object().shape({
     email: Yup.string()
         .email('Invalid email format')
         .required('Email is required'),
-    // phone: Yup.string()
-    //     .matches(/^[1-9][0-9]*$/, 'Phone number cannot start with zero')
-    //     .required('Phone number is required'),
-
-    // newPassword: Yup.string()
-    //     .min(6, 'Password must be at least 6 characters long')
-    //     .required('Password is required'),
-
-    // confirmPassword: Yup.string()
-    //     .oneOf([Yup.ref('newPassword')], 'Passwords do not match')
-    //     .required('Confirm password is required'),
+  
 });
 
 //----------------------------------------------------
 export const ForgetPassword = () => {
     const [Loading, setLoading] = useState(false);
-    // const [loader, setLoader] = useState(false);
 
     const navigation = useNavigation();
-    // const [selectedCallingCode, setSelectedCallingCode] = useState('92');
 
     //----------------------------------------------------
     const resetPassword = async value => {
@@ -65,12 +54,13 @@ export const ForgetPassword = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('res :', res)
+            const result = res?.data?.msg[0].response
 
             if (res?.data?.msg[0].response === 'request send') {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg[0].response,
+                    text2: 'Request Sent',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -81,7 +71,7 @@ export const ForgetPassword = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg[0].response,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -106,26 +96,7 @@ export const ForgetPassword = () => {
             setLoading(false);
         }
     };
-    /// ---------------------Send OTP--------------------------
-    // const sendOTP = async (values) => {
-    //   setLoading(true)
-    //   try {
-    //     const fullNumber = `+${selectedCallingCode}${values.phone}`;
-
-    //     const confirmation = await auth().signInWithPhoneNumber(fullNumber);
-
-    //     navigation.navigate('Otp', {
-    //       confirmation: confirmation,
-    //       phone: fullNumber,
-    //       forgetPassData: values,
-    //     });
-
-    //   } catch (error) {
-    //     console.log("OTP ERROR:", error.message);
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // };
+  
     //----------------------------------------------------------
 
     return (
@@ -170,15 +141,12 @@ export const ForgetPassword = () => {
                     <View style={styles.formView}>
                         <Formik
                             initialValues={{
-                                // phone: '',
-                                // newPassword: '',
-                                // confirmPassword: '',
+                              
                                 email: '',
 
                             }}
                             onSubmit={(values, { resetForm }) => {
                                 resetPassword(values);
-                                // sendOTP(values)
                                 resetForm(values);
                             }}
                             validationSchema={resetPasswordSchema}
@@ -195,13 +163,7 @@ export const ForgetPassword = () => {
                                 <View>
                                     <View>
 
-                                        {/* <CustomPhoneInput
-                                            label="Phone Number"
-                                            value={values.phone}
-                                            onChangeText={handleChange('phone')}
-                                            error={touched.phone && errors.phone}
-                                            onCodeChange={(code) => setSelectedCallingCode(code)}
-                                        /> */}
+                                     
                                         <CustomInput
                                             label="Email"
                                             type="email"
@@ -212,24 +174,7 @@ export const ForgetPassword = () => {
                                             error={touched.email && errors.email}
                                         />
 
-                                        {/* <CustomInput
-                                            label="New Password"
-                                            type="password"
-                                            placeholder="Enter new password"
-                                            value={values.newPassword}
-                                            onChangeText={handleChange('newPassword')}
-                                            onBlur={handleBlur('newPassword')}
-                                            error={touched.newPassword && errors.newPassword}
-                                        />
-                                        <CustomInput
-                                            label="Confirm Password"
-                                            type="password"
-                                            placeholder="Re-enter password"
-                                            value={values.confirmPassword}
-                                            onChangeText={handleChange('confirmPassword')}
-                                            onBlur={handleBlur('confirmPassword')}
-                                            error={touched.confirmPassword && errors.confirmPassword}
-                                        /> */}
+                                        
                                     </View>
 
                                     <View style={styles.btn}>

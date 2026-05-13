@@ -20,7 +20,7 @@ import { getStoredUser } from '../../../Utils/getUser';
 import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { CustomInputWithIcon } from '../../../components/customInputWithIcon';
-
+import { CapitalizeWords } from '../../../components/capitalizeWords'
 
 
 export const AddCommitteeMembers = ({ route }) => {
@@ -115,7 +115,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -126,7 +126,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -154,7 +154,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -165,7 +165,7 @@ export const AddCommitteeMembers = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',

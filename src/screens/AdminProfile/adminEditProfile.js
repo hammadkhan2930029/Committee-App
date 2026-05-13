@@ -369,6 +369,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { getStoredUser } from '../../Utils/getUser';
 import axios from 'axios';
+import { CapitalizeWords } from '../../components/capitalizeWords';
 const { width } = Dimensions.get('window');
 
 // ✅ Validation Schema
@@ -481,7 +482,7 @@ export const AdminEditProfile = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg?.[0]?.response || 'Profile updated',
+                    text2: CapitalizeWords(res?.data?.msg?.[0]?.response) || 'Profile updated',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -493,7 +494,7 @@ export const AdminEditProfile = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg?.[0]?.response || 'Something went wrong',
+                    text2: CapitalizeWords(res?.data?.msg?.[0]?.response) || 'Something went wrong',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',

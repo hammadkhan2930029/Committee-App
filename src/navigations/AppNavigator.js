@@ -14,7 +14,7 @@ import { AssignRounds } from '../screens/AdminScreens/AssignRounds/assignRounds'
 import { MembersDetails } from '../screens/AdminScreens/MembersDetils/membersDetails';
 import { EditMember } from '../screens/AdminScreens/EditMember/editMember';
 import { PaymentDetails } from '../screens/AdminScreens/PaymentDetails/paymentDetails';
-
+import { AdminDashboard } from '../screens/AdminScreens/AdminDashboard/AdminDashboard';
 //---------members--------------------------------------
 import { BottomTabNavigationUser } from '../navigations/bottomTabsUser';
 import { MembersDashboard } from '../screens/MembersScreen/MemberDashBoard/memberDashboard';
@@ -66,6 +66,7 @@ export const AppNavigator = () => {
 
       {/* -----------------members----------------------- */}
 
+      <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
 
       <Stack.Screen name="UploadSlip" component={UploadSlip} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistory} />

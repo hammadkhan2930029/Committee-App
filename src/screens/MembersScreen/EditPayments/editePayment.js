@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import { getStoredUser } from '../../../Utils/getUser';
 import { api } from '../../../services/api';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 export const EditPayments = ({ route }) => {
   const navigation = useNavigation();
@@ -122,13 +123,13 @@ export const EditPayments = ({ route }) => {
           headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
-      const result = await response.data;
+      const result =  response.data;
       console.log('result : ', result);
       if (result.code === '200')
         Toast.show({
           type: 'customToast',
           text1: 'Success',
-          text2: result?.msg?.[0]?.response || '"committee payment updated"',
+          text2: CapitalizeWords(result?.msg?.[0]?.response) || CapitalizeWords("committee payment updated"),
           props: {
             bgColor: AppColors.background,
             borderColor: 'green',
@@ -182,14 +183,7 @@ export const EditPayments = ({ route }) => {
           </ImageBackground>
         </View>
         <View style={styles.uploadSlip}>
-          {/* <View
-            style={[
-              styles.decView,
-              { display: userAmount > 0 ? 'flex' : 'none' },
-            ]}
-          >
-            <Text style={styles.decValue}>{userAmount - amount}</Text>
-          </View> */}
+        
           <CustomInput
             label="Amount"
             type="numeric"

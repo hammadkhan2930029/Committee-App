@@ -11,6 +11,7 @@ import {
     StyleSheet,
     ScrollView,
     FlatList,
+    BackHandler,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -44,8 +45,23 @@ export const PaymentHistory = () => {
         }, []),
     );
     const userID = userData?.user_id;
-    // console.log(userID);
-    //------------------------------------------------------
+    //-----------------------------------------------------------------------------
+
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                navigation.navigate('MembersDashboard')
+                return true;
+            }
+            const backHandler = BackHandler.addEventListener('MembersDashboard', backAction)
+
+            return () => backHandler.remove()
+
+        }, [navigation])
+    )
+
+    //-----------------------------------------------------------------------------
+    
     const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 
     //------------------------------------------------------
@@ -61,7 +77,7 @@ export const PaymentHistory = () => {
                 `/user/view-committee-payments/list/${userID}`,
             );
             const result = response?.data?.msg;
-            
+
             if (result) {
                 setHistory(result);
                 setLoding(false);
@@ -205,7 +221,7 @@ export const PaymentHistory = () => {
                         <View style={styles.main}>
                             <View style={styles.TopView}>
                                 <View style={styles.backAndText}>
-                                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                                    <TouchableOpacity onPress={() => navigation.navigate('MembersDashboard')}>
                                         <Icon
                                             name="arrow-back"
                                             size={28}

@@ -12,7 +12,7 @@ import { Dimensions } from 'react-native';
 import { DisclaimerModal } from '../../components/disclaimerModal'
 import { getStoredUser } from '../../Utils/getUser';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
-
+import {saveCurrentRole} from '../../Utils/RoleStorage';
 const screenWidth = Dimensions.get('window').width;
 
 export const ChooseRole = () => {
@@ -20,19 +20,15 @@ export const ChooseRole = () => {
     const [selected, setSelected] = useState(1);
     const [userData, setUserData] = useState()
 
-    // const handleContinue = () => {
-    //     if (selected === 1) {
-    //         navigation.navigate('BottomTabNavigation');
-    //     } else if (selected === 2) {
-    //         navigation.navigate('BottomTabNavigationUser');
-    //     }
-    // };
-    const handleContinue = () => {
+  
+    const handleContinue = async () => {
         if (selected === 1) {
+            await saveCurrentRole('admin')
             navigation.navigate('AdminTabs', {
                 screen: 'AdminDashboard',
             });
         } else if (selected === 2) {
+             await saveCurrentRole('member');
             navigation.navigate('UserTabs', {
                 screen: 'MembersDashboard',
             });
@@ -50,7 +46,7 @@ export const ChooseRole = () => {
             loadUser();
         }, []),
     );
-    console.log("check this :", userData)
+    // console.log("check this :", userData)
     //----------------------------------------------------------
     const onShare = async () => {
         try {
@@ -69,6 +65,7 @@ export const ChooseRole = () => {
         }
     };
     //-------------------------------------------------------------------
+    
 
 
     return (

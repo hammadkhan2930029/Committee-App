@@ -29,6 +29,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 //----------------------------------------------
 const phoneRegExp = /^\+\d{1,4}[1-9]\d{8,14}$/;
@@ -52,7 +53,6 @@ export const Login = () => {
 
     //-----------------------------------
     const loginUser = async value => {
-        // console.log(value);
         setLoading(true);
         try {
             var formData = new FormData();
@@ -62,7 +62,8 @@ export const Login = () => {
             const res = await api.post('/user/login', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            if (res?.status === 200 && res?.data?.code === '200') {
+            const result = res?.data?.message
+            if (res?.data?.code == '200') {
                 const userData = res.data.msg[0];
                 const token = res.data.token;
 
@@ -72,19 +73,19 @@ export const Login = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res.data.message || 'Login successful',
+                    text2: CapitalizeWords(result) || 'Login Successful',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
                     },
                 });
-                navigation.replace('ChooseRole');
+                navigation.replace('AdminTabs');
                 // console.log('login userData :', userData);
             } else {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res.data.message || 'Invalid credentials',
+                    text2: CapitalizeWords(result) || 'Invalid Credentials',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',

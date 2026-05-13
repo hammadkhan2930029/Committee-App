@@ -21,6 +21,7 @@ import { api } from '../../../services/api';
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 
 
@@ -70,7 +71,7 @@ export const PaymentDetails = ({ route }) => {
     };
 
     //-------------------full payment------------------------
-    
+
     const markPaymentVerified = async () => {
         setLoading(true)
         try {
@@ -83,7 +84,7 @@ export const PaymentDetails = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -95,7 +96,7 @@ export const PaymentDetails = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -119,7 +120,7 @@ export const PaymentDetails = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -131,7 +132,7 @@ export const PaymentDetails = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -149,6 +150,8 @@ export const PaymentDetails = ({ route }) => {
     }
 
     //-----------------------------------------------------
+    const formatNumber = value => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
+
 
     return (
         <View style={styles.container}>
@@ -200,7 +203,7 @@ export const PaymentDetails = ({ route }) => {
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.text1}>Paid Amount</Text>
-                        <Text style={styles.text2}>{item.paid_amount}</Text>
+                        <Text style={styles.text2}>{formatNumber(item.paid_amount)}</Text>
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.text1}>Status</Text>
@@ -226,7 +229,7 @@ export const PaymentDetails = ({ route }) => {
                             title="Verify Payment"
                             // onPress={() => markPaymentVerified()}
                             onPress={handleVerifyPress}
-                            // disabled={item.status === 'verified'}
+                        // disabled={item.status === 'verified'}
                         />
                     </View>
                     {/* ------------------------------------------------------------------------ */}

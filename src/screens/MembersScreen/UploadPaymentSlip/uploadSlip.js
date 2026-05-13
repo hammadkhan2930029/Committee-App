@@ -31,7 +31,7 @@ import { DisabledButton } from '../../../components/disabledButton';
 
 export const UploadSlip = ({ route }) => {
     //-------------------------------------------------
-    const { amount, data, memberCount, singleRoundAmount } = route.params;
+    const { amount, data, totalRounds, singleRoundAmount } = route.params;
     const [amountError, setAmountError] = useState('');
 
     // console.log('data', data);
@@ -153,16 +153,7 @@ export const UploadSlip = ({ route }) => {
     //-------------------------------------------------
     const uploadPaymentSlip = async () => {
 
-        // console.log('user_id', userID);
-        // console.log('committee_round_id', data.committee_round_id);
-        // console.log('amount', userAmount);
-        // console.log('committee_id', data.committee_id);
-        // console.log('committee_member_id', data.committee_member_id);
-        // console.log('pay_slip', {
-        //     uri: imageUri.uri,
-        //     name: imageUri.fileName || 'payment.jpg',
-        //     type: imageUri.type || 'image/jpeg',
-        // });
+
         setLoading(true);
 
         try {
@@ -187,7 +178,7 @@ export const UploadSlip = ({ route }) => {
                 { headers: { 'Content-Type': 'multipart/form-data' } },
 
             );
-            console.log('response :', response);
+            // console.log('response :', response);
             Toast.show({
                 type: 'customToast',
                 text1: 'Success',
@@ -280,19 +271,9 @@ export const UploadSlip = ({ route }) => {
             normalize(item.committe_member_id) === normalize(data.committee_member_id)
         );
         setMatchedPayment(matched || null);
-        console.log('matched :', matched)
+        // console.log('matched :', matched)
     }, [history]);
-    //-----------------------------------------------------
-    // console.log('FINAL MATCHED:', matchedPayment?.paid_amount);
 
-
-    const totalPaidAmount = matchedPayment?.reduce(
-        (sum, item) => sum + Number(item.paid_amount || 0),
-        0
-    );
-    const totalAmount = Number(amount || 0);
-
-    const remainingAmount = Math.max(totalAmount - totalPaidAmount, 0);
 
     //-----------------------------------------------------
     const handleChangemount = value => {
@@ -320,6 +301,74 @@ export const UploadSlip = ({ route }) => {
         setAmountError('');
         setUserAmount(numericValue);
     };
+    //----------------------------------------------------------------------------
+    //-------------------------committee details----------------------------------
+    //----------------------------------------------------------------------------
+
+    const [details, setDetails] = useState([]);
+    const [roundList, setRoundList] = useState([]);
+    const [memberList, setMemberList] = useState([]);
+    const committeeDetails = async () => {
+        try {
+            const response = await api.get(
+                `/user/view-committee-detail/${data?.committee_id}`,
+            );
+
+            const result = response?.data?.msg[0];
+            const rounds = response?.data?.rounds;
+            const members = response?.data?.members;
+
+            // console.log('response :', members)
+            if (result) {
+                setMemberList(members)
+                setDetails(result);
+                setRoundList(rounds);
+                setTimeout(() => {
+                    setLoading(false);
+                }, 1000);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(() => {
+        if (data.committee_id) {
+            committeeDetails();
+        }
+    }, [data]);
+    const paidRounds = roundList?.filter(item => item.status === 'Paid').length
+    const pendingsRounds = roundList?.filter(item => item.status === 'Pending').length
+
+    //--------------------------------------------------------------
+
+    const filterUser = memberList?.filter(item => item.user_id == userData.user_id)[0]
+    const filterRound = roundList?.filter(item =>
+        item.committee_member_id === filterUser?.committe_member_id
+    );
+    // console.log('filter round : ', filterRound?.map(item => item.round_no))
+
+    // console.log("User Total Rounds :", filterRound.length)
+    const userTotalRounds = filterRound.length
+    const userPerRoundAmount = Number(details?.amount_per_member || 0);
+    const userTotalAmount = userTotalRounds * userPerRoundAmount
+ 
+
+
+
+    //---------------------------------------------------------
+
+
+    const totalPaidAmount = matchedPayment?.reduce(
+        (sum, item) => sum + Number(item.paid_amount || 0),
+        0
+    );
+    const totalAmount = Number(userTotalRounds ? userTotalAmount : amount);
+
+    const remainingAmount = Math.max(totalAmount - totalPaidAmount, 0);
+   
+
+    //---------------------------------------------------------
+
 
 
     return (
@@ -366,11 +415,11 @@ export const UploadSlip = ({ route }) => {
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Total Rounds</Text>
-                            <Text style={styles.value}>{memberCount}</Text>
+                            <Text style={styles.value}>{totalRounds || userTotalRounds}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Total Amount</Text>
-                            <Text style={styles.value}>PKR {formatNumber(amount)}</Text>
+                            <Text style={styles.value}>PKR {formatNumber(userTotalRounds ? userTotalAmount : amount)}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Due Date</Text>
@@ -393,7 +442,7 @@ export const UploadSlip = ({ route }) => {
                             <CustomInput
                                 label="Amount"
                                 type="numeric"
-                                placeholder={formatNumber(remainingAmount || amount)}
+                                placeholder={formatNumber(remainingAmount)}
                                 value={userAmount?.toString()}
                                 onChangeText={handleChangemount}
                             />

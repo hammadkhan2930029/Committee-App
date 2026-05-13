@@ -7,6 +7,7 @@ import {
   Text,
   StatusBar,
   FlatList,
+  BackHandler,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppImages } from '../../../constant/appImages';
@@ -74,39 +75,22 @@ export const ActiveBCs = () => {
       myCommitteeList();
     }
   }, [userID]);
-  //--------------------------------------------------
-  // const data = committeeList.map(item =>  item.committee_id)
-  // console.log('my committee list :', data[0]);
+  //-----------------------------------------------------------------------------
 
-  //------------------committeeDetails-----------------
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        navigation.navigate('MembersDashboard')
+        return true;
+      }
+      const backHandler = BackHandler.addEventListener('MembersDashboard', backAction)
 
-  // const committeeDetails = async () => {
-  //   try {
-  //     const response = await api.get(
-  //       `/user/view-committee-detail/${data[0]}`,
-  //     );
+      return () => backHandler.remove()
 
-  //     const result = response?.data?.msg[0];
-  //     const rounds = response?.data?.rounds;
-  //     console.log('members :', result)
-  //     console.log('rounds :', rounds)
+    }, [navigation])
+  )
 
-  //     if (result) {
-  //       setMembers(result);
-  //       setRounds(rounds);
-  //       setTimeout(() => {
-  //         setLoading(false);
-  //       }, 1000);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (data) {
-  //     committeeDetails();
-  //   }
-  // }, [data]);
+  //-----------------------------------------------------------------------------
   //----------------------Skeleton-----------------------------
   const MySkeleton = () => {
     return (
@@ -197,7 +181,7 @@ export const ActiveBCs = () => {
             <View style={styles.main}>
               <View style={styles.TopView}>
                 <View style={styles.backAndText}>
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <TouchableOpacity onPress={() => navigation.navigate('MembersDashboard')}>
                     <Icon name="arrow-back" size={24} color="#fff" />
                   </TouchableOpacity>
                   <Text style={styles.h1}>My Active BCs </Text>

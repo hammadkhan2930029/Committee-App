@@ -22,6 +22,7 @@ import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
 import React, { useState, useEffect } from 'react';
 import { Loader } from '../../Loader/loader';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 export const OtpVerification = () => {
 
@@ -69,7 +70,7 @@ export const OtpVerification = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result || 'OTP Verified ✅',
+                    text2: 'OTP Verified ✅',
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -87,7 +88,7 @@ export const OtpVerification = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -126,12 +127,12 @@ export const OtpVerification = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('res :', res)
-
+            const result = res?.data?.msg[0].response
             if (res?.data?.msg[0].response === 'request send') {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg[0].response,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -141,7 +142,7 @@ export const OtpVerification = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg[0].response,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -225,19 +226,25 @@ export const OtpVerification = () => {
             formData.append('full_name', value.name);
             formData.append('phone', phone);
             formData.append('email', value.email);
-
             formData.append('password', value.password);
             formData.append('confirm_password', value.confirmPassword);
 
             const res = await api.post('/user/register', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log('response :', res);
-            if (res?.data?.code === '200' && res?.data?.msg[0]?.response === 'Registered successfully') {
+            const code = Number(res?.data?.code);
+            const message =
+                res?.data?.msg?.[0]?.response ||
+                res?.data?.message ||
+                res?.data?.msg ||
+                'Successfully Registered';
+
+            console.log('register response:', res?.data);
+            if (code === 200) {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: res?.data?.msg[0]?.response || 'Successfully Registered',
+                    text2: CapitalizeWords(message),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -257,7 +264,7 @@ export const OtpVerification = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: res?.data?.msg[0]?.response || 'User already exist',
+                    text2: CapitalizeWords(message || 'User already exist'),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',
@@ -274,7 +281,9 @@ export const OtpVerification = () => {
                 type: 'customToast',
                 text1: 'Error',
                 text2:
-                    error?.response?.data?.message || 'Server error, please try again',
+                    error?.response?.data?.message ||
+                    error?.response?.data?.msg?.[0]?.response ||
+                    'Server error, please try again',
                 props: {
                     bgColor: AppColors.background,
                     borderColor: '#ff5252',

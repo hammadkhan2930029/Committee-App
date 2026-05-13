@@ -11,6 +11,7 @@ import {
     StyleSheet,
     ScrollView,
     FlatList,
+    BackHandler,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -59,7 +60,7 @@ export const UpComingPayments = () => {
                 `/user/upcoming-committee-payments/${userID}`,
             );
             const result = response?.data?.msg;
-            console.log('upcoming  :', result);
+            // console.log('upcoming  :', result);
             if (result) {
                 setHistory(result);
                 setLoding(false);
@@ -75,6 +76,7 @@ export const UpComingPayments = () => {
             upComingPaymentsFun();
         }
     }, [userID]);
+
 
     //----------------------Skeleton-----------------------------
     const MySkeleton = () => {
@@ -189,6 +191,23 @@ export const UpComingPayments = () => {
             </View>
         );
     };
+    //-----------------------------------------------------------------------------
+    
+    //   useFocusEffect(
+    //     useCallback(() => {
+    //       const backAction = () => {
+    //         navigation.navigate('MembersDashboard')
+    //         return true;
+    //       }
+    //       const backHandler = BackHandler.addEventListener('MembersDashboard', backAction)
+    
+    //       return () => backHandler.remove()
+    
+    //     }, [navigation])
+    //   )
+    
+      //-----------------------------------------------------------------------------
+ 
 
     return (
         <View style={styles.conatiner}>

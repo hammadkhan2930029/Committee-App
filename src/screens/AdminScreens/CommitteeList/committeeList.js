@@ -7,7 +7,8 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
-    Image
+    Image,
+    BackHandler
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../../constant/appColors';
@@ -31,6 +32,19 @@ export const CommitteeList = () => {
     const [listView, setListView] = useState([]);
     const navigation = useNavigation();
     const [hasFetched, setHasFetched] = useState(false);
+    //-------------------------------------------------
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                navigation.navigate('AdminDashboard')
+                return true;
+            }
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction)
+
+            return () => backHandler.remove()
+
+        }, [navigation])
+    )
     //----------------------------------------------
     const [userData, setUserData] = useState(null);
 
@@ -181,7 +195,7 @@ export const CommitteeList = () => {
                     <View style={styles.main}>
                         <View style={styles.TopView}>
                             <View style={styles.backAndText}>
-                                <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                                     <Icon name="arrow-back" size={24} color="#fff" />
                                 </TouchableOpacity>
                                 <Text style={styles.h1}>Committees</Text>

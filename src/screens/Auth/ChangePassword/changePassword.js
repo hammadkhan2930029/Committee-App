@@ -25,6 +25,7 @@ import { AppImages } from '../../../constant/appImages';
 import { getStoredUser } from '../../../Utils/getUser'
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 export const ChangePassword = () => {
     const navigation = useNavigation();
@@ -39,13 +40,11 @@ export const ChangePassword = () => {
                 const user = await getStoredUser();
                 if (user) {
                     setUserData(user);
-                    // console.log(user.full_name, user.user_id);
                 }
             };
             loadUser();
         }, []),
     );
-    // console.log('userData', userData);
     //--------------------------change password----------------------------------
     const changePassword = async (value) => {
         setLoading(true)
@@ -67,7 +66,7 @@ export const ChangePassword = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -78,7 +77,7 @@ export const ChangePassword = () => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: result,
+                    text2: CapitalizeWords(result),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',

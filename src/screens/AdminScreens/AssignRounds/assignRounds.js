@@ -21,6 +21,7 @@ import Toast from 'react-native-toast-message';
 import { Dropdown } from 'react-native-element-dropdown';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Loader } from '../../Loader/loader';
+import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 export const AssignRounds = ({ route }) => {
     const [roundList, setRoundList] = useState([]);
@@ -100,7 +101,7 @@ export const AssignRounds = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Success',
-                    text2: data,
+                    text2: CapitalizeWords(data),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'green',
@@ -113,7 +114,7 @@ export const AssignRounds = ({ route }) => {
                 Toast.show({
                     type: 'customToast',
                     text1: 'Warning',
-                    text2: 'something error',
+                    text2: CapitalizeWords(data),
                     props: {
                         bgColor: AppColors.background,
                         borderColor: 'orange',

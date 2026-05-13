@@ -6,6 +6,7 @@ import {
     Text,
     TouchableOpacity,
     FlatList,
+    BackHandler,
 } from 'react-native';
 // ScaledSheet aur scales ka sahi istemal
 import { moderateScale, ScaledSheet, s, vs } from 'react-native-size-matters';
@@ -43,6 +44,19 @@ export const Payments = () => {
             loadUser();
         }, []),
     );
+    //-----------------------------------------------------------------------------
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                navigation.navigate('AdminDashboard')
+                return true;
+            }
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction)
+
+            return () => backHandler.remove()
+
+        }, [navigation])
+    )
     //-----------------------------------------------------------------------------
 
     const AdminpaymentList = async () => {
@@ -92,7 +106,7 @@ export const Payments = () => {
                 <View style={styles.headerContent}>
                     <View style={styles.TopView}>
                         <View style={styles.backAndText}>
-                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                                 <Icon name="arrow-back" size={28} color={AppColors.title} />
                             </TouchableOpacity>
                             <Text style={styles.h1}>Payments</Text>
@@ -126,7 +140,7 @@ export const Payments = () => {
 
             <View style={styles.statuslistView}>
                 <FlatList
-                    data={['All', 'Due', 'Verified', 'Overdue', 'Requested']}
+                    data={['All', 'Requested', 'Due', 'Verified', 'Overdue',]}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item }) => (
@@ -153,6 +167,23 @@ export const Payments = () => {
                     keyExtractor={item => item?.payment_id?.toString()}
                     ListHeaderComponent={renderHeader}
                     contentContainerStyle={{ paddingBottom: vs(20) }}
+                    ListEmptyComponent={
+                        <View style={styles.emptyCard}>
+                            <Icon
+                                name="info-outline"
+                                size={50}
+                                color={AppColors.primary}
+                            />
+
+                            <Text style={styles.emptyTitle}>
+                                No Data Found
+                            </Text>
+
+                            <Text style={styles.emptyText}>
+                                No payments available in {selectedStatus}.
+                            </Text>
+                        </View>
+                    }
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             style={styles.paymentCard}
@@ -312,4 +343,26 @@ const styles = ScaledSheet.create({
     badgeText: { color: '#fff', fontSize: '14@ms0.7', fontWeight: 'bold' },
 
     dateValue: { fontSize: '14@ms0.7', color: AppColors.link, fontWeight: '600' },
+    //---------------------------------------
+    emptyCard: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '80@vs',
+        padding: '20@ms',
+    },
+
+    emptyTitle: {
+        fontSize: '18@ms',
+        fontWeight: 'bold',
+        color: '#222',
+        marginTop: '10@vs',
+    },
+
+    emptyText: {
+        fontSize: '14@ms',
+        color: '#777',
+        marginTop: '5@vs',
+        textAlign: 'center',
+    },
 });

@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View,
     Dimensions,
+    BackHandler,
 } from 'react-native';
 import { moderateScale, ScaledSheet } from 'react-native-size-matters';
 import { AppColors } from '../../constant/appColors';
@@ -24,7 +25,7 @@ import Toast from 'react-native-toast-message';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ProfileAvatar } from '../../components/ProfileAvatar';
 import { AppImages } from '../../constant/appImages';
-
+import { getCurrentRole } from '../../Utils/RoleStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -33,7 +34,56 @@ export const AdminProfile = () => {
     const [isLodaing, setIsLoading] = useState(false);
     const navigation = useNavigation();
     const [visible, setVisible] = useState(false)
-    //--------------------------------------------
+    const [role, setRole] = useState(null);
+    //-----------------------------------------------------------------------------
+
+    useFocusEffect(
+        useCallback(() => {
+            const loadRole = async () => {
+                const currentRole = await getCurrentRole();
+                setRole(currentRole);
+            };
+
+            loadRole();
+        }, []),
+    );
+
+    console.log('Roles :', role)
+
+    //-----------------------------------------------------------------------------
+
+
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                if (role === 'admin') {
+                    navigation.navigate('AdminTabs', {
+                        screen: 'AdminDashboard',
+                    });
+                    return true;
+                }
+
+                if (role === 'member') {
+                    navigation.navigate('UserTabs', {
+                        screen: 'MembersDashboard',
+                    });
+                    return true;
+                }
+
+                return false;
+            };
+
+            const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction,
+            );
+
+            return () => backHandler.remove();
+        }, [navigation, role]),
+    );
+
+    //-----------------------------------------------------------------------------
+
     const toggleMenu = () => {
         setVisible(!visible);
     };
@@ -131,7 +181,9 @@ export const AdminProfile = () => {
 
                 {/* HEADER */}
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => navigation.navigate('AdminTabs', {
+                        screen: 'AdminDashboard',
+                    })}>
                         <Icon name="arrow-back" size={26} color="#fff" />
                     </TouchableOpacity>
 
@@ -164,7 +216,7 @@ export const AdminProfile = () => {
                     />
 
                     <Text style={styles.name}>{userdata?.full_name}</Text>
-                    <Text style={styles.role}>Administrator</Text>
+                    <Text style={styles.role}>User</Text>
                 </View>
 
                 {/* INFO CARD */}

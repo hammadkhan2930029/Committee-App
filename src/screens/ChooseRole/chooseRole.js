@@ -46,7 +46,6 @@ export const ChooseRole = () => {
             loadUser();
         }, []),
     );
-    // console.log("check this :", userData)
     //----------------------------------------------------------
     const onShare = async () => {
         try {

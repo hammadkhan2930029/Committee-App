@@ -39,54 +39,46 @@ import { CommitteeRoundDetails } from '../screens/AdminScreens/CommitteeRoundDet
 const Stack = createNativeStackNavigator();
 
 export const AppNavigator = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="AuthStack" component={AuthNavigator} />
-      <Stack.Screen name="AdminProfile" component={AdminProfile} />
-      <Stack.Screen name="AdminEditProfile" component={AdminEditProfile} />
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="AuthStack" component={AuthNavigator} />
+            <Stack.Screen name="AdminProfile" component={AdminProfile} />
+            <Stack.Screen name="AdminEditProfile" component={AdminEditProfile} />
+            <Stack.Screen name="CreateCommittee" component={CreateCommittee} />
+            <Stack.Screen name="EditCommittee" component={EditCommittee} />
+            <Stack.Screen name="CreateMembers" component={CreateMembers} />
+            <Stack.Screen name="CommitteeDetails" component={CommitteeDetails} />
+            <Stack.Screen name="AddCommitteeMembers" component={AddCommitteeMembers} />
+            <Stack.Screen name="AssignRounds" component={AssignRounds} />
+            <Stack.Screen name="MembersDetails" component={MembersDetails} />
+            <Stack.Screen name="EditMember" component={EditMember} />
+            <Stack.Screen name="PaymentDetails" component={PaymentDetails} />
+            {/* ----------------------------------------------------- */}
+            <Stack.Screen name="ChooseRole" component={ChooseRole} />
+            <Stack.Screen name="AdminTabs" component={BottomTabNavigation} />
+            <Stack.Screen name="UserTabs" component={BottomTabNavigationUser} />
+            {/* ----------------------------------------------------- */}
 
+            {/* -----------------members----------------------- */}
 
-      <Stack.Screen name="CreateCommittee" component={CreateCommittee} />
-      <Stack.Screen name="EditCommittee" component={EditCommittee} />
-      <Stack.Screen name="CreateMembers" component={CreateMembers} />
-      <Stack.Screen name="CommitteeDetails" component={CommitteeDetails} />
-      <Stack.Screen
-        name="AddCommitteeMembers"
-        component={AddCommitteeMembers}
-      />
-      <Stack.Screen name="AssignRounds" component={AssignRounds} />
-      <Stack.Screen name="MembersDetails" component={MembersDetails} />
-      <Stack.Screen name="EditMember" component={EditMember} />
-      <Stack.Screen name="PaymentDetails" component={PaymentDetails} />
-      {/* ----------------------------------------------------- */}
-      <Stack.Screen name="ChooseRole" component={ChooseRole} />
-      <Stack.Screen name="AdminTabs" component={BottomTabNavigation} />
-      <Stack.Screen name="UserTabs" component={BottomTabNavigationUser} />
-      {/* ----------------------------------------------------- */}
+            <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
 
-      {/* -----------------members----------------------- */}
+            <Stack.Screen name="UploadSlip" component={UploadSlip} />
+            <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
+            <Stack.Screen name="UserCommitteeDetails" component={UserCommitteeDetails} />
+            <Stack.Screen name="UserPaymentDetails" component={UserPaymentDetails} />
+            <Stack.Screen name="EditPayments" component={EditPayments} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Payments" component={Payments} />
+            <Stack.Screen name="Notifications" component={Notifications} />
+            <Stack.Screen name="CommitteeList" component={CommitteeList} />
+            <Stack.Screen name="UpComingPayments" component={UpComingPayments} />
+            <Stack.Screen name="SuggestionScreen" component={SuggestionScreen} />
+            <Stack.Screen name="SupportTeam" component={SupportTeam} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            <Stack.Screen name="CommitteeRoundList" component={CommitteeRoundList} />
+            <Stack.Screen name="CommitteeRoundDetails" component={CommitteeRoundDetails} />
 
-      <Stack.Screen name="MembersDashboard" component={MembersDashboard} />
-
-      <Stack.Screen name="UploadSlip" component={UploadSlip} />
-      <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
-      <Stack.Screen
-        name="UserCommitteeDetails"
-        component={UserCommitteeDetails}
-      />
-      <Stack.Screen name="UserPaymentDetails" component={UserPaymentDetails} />
-      <Stack.Screen name="EditPayments" component={EditPayments} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Payments" component={Payments} />
-      <Stack.Screen name="Notifications" component={Notifications} />
-      <Stack.Screen name="CommitteeList" component={CommitteeList} />
-      <Stack.Screen name="UpComingPayments" component={UpComingPayments} />
-      <Stack.Screen name="SuggestionScreen" component={SuggestionScreen} />
-      <Stack.Screen name="SupportTeam" component={SupportTeam} />
-      <Stack.Screen name="ChangePassword" component={ChangePassword} />
-      <Stack.Screen name="CommitteeRoundList" component={CommitteeRoundList} />
-      <Stack.Screen name="CommitteeRoundDetails" component={CommitteeRoundDetails} />
-
-    </Stack.Navigator>
-  );
+        </Stack.Navigator>
+    );
 };

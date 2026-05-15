@@ -43,6 +43,10 @@ export const MembersDashboard = () => {
     const [notifyList, setNotifyList] = useState([]);
     const [committeeList, setCommitteeList] = useState([]);
     const [upComingList, setUpcomingList] = useState([]);
+    const [duePayments, setDuePayments] = useState([]);
+    const [OverduePayments, setOverDuePayments] = useState();
+
+
     const [visible, setVisible] = useState(false);
 
     const [loading, setLoading] = useState(true);
@@ -112,6 +116,28 @@ export const MembersDashboard = () => {
                 `/user/view-committee-payments/list/${userID}`,
             );
             const result = response?.data?.msg;
+            console.log('UserPaymentHistory Response :', result)
+            if (result) {
+
+                //------------------------------OverDue amount--------------------------------
+
+                const filterOverDueData = result.filter(item => item.status === "overdue")
+                const overDueAmount = filterOverDueData.reduce((acc, curr) => {
+                    return acc + Number(curr.amount_per_member || 0)
+                }, 0)
+                setOverDuePayments(overDueAmount)
+
+                //------------------------------Due amount-----------------------------------
+
+                const filterDueData = result.filter(item => item.status === "due")
+                const dueAmount = filterDueData.reduce((acc, curr) => {
+                    return acc + Number(curr.amount_per_member || 0)
+                }, 0)
+                console.log('Due amount :', dueAmount)
+                setDuePayments(dueAmount)
+
+
+            }
         } catch (error) {
             console.log(error);
         } finally {
@@ -126,13 +152,13 @@ export const MembersDashboard = () => {
     }, [userID]);
 
     //-------------------------------------------------------
+
     const upComingPaymentsFun = async () => {
         try {
             const response = await api.get(
                 `/user/upcoming-committee-payments/${userID}`,
             );
             const result = response?.data?.msg[0];
-            // console.log('upcoming  :', result);
             if (result) {
                 setUpcomingList(result);
                 setLoading(false);
@@ -149,7 +175,6 @@ export const MembersDashboard = () => {
         }
     }, [userID]);
 
-    // console.log('upComingList :', upComingList);
     //------------------------------------------------------
     const formatNumber = value => {
         if (value === null || value === undefined) return '';
@@ -279,6 +304,7 @@ export const MembersDashboard = () => {
 
     //-----------------------------------------------------------------
 
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
@@ -382,27 +408,25 @@ export const MembersDashboard = () => {
 
                     {/* -------------------------------------------------- */}
                     <View style={styles.mainSummaryCrd}>
-                        <View style={styles.summaryCard} >
+                        <TouchableOpacity style={styles.summaryCard} onPress={() => navigation.navigate('PaymentHistory')}>
                             <View style={styles.cardHeader}>
                                 <Icon
                                     name='pending'
                                     size={moderateScale(22)} color={AppColors.link} />
-                                <Text style={styles.cardTitle}>Due</Text>
+                                <Text style={styles.cardTitle}>Due Payments</Text>
                             </View>
-                            <Text style={styles.cardValue}>50000</Text>
-                            <Text style={styles.cardSubtitle}>0000</Text>
-                        </View>
+                            <Text style={styles.cardValue}>{formatNumber(duePayments)}</Text>
+                        </TouchableOpacity>
 
-                        <View style={styles.summaryCard} >
+                        <TouchableOpacity style={styles.summaryCard} onPress={() => navigation.navigate('PaymentHistory')}>
                             <View style={styles.cardHeader}>
                                 <Icon
                                     name='pending-actions'
                                     size={moderateScale(22)} color={AppColors.link} />
-                                <Text style={styles.cardTitle}>Over Due</Text>
+                                <Text style={styles.cardTitle}>Overdue Payments</Text>
                             </View>
-                            <Text style={styles.cardValue}>50000</Text>
-                            <Text style={styles.cardSubtitle}>0000</Text>
-                        </View>
+                            <Text style={styles.cardValue}>{formatNumber(OverduePayments)}</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {/* -------------------------------------------------- */}
@@ -624,7 +648,7 @@ const styles = ScaledSheet.create({
     summaryCard: {
         width: wp(43),
         backgroundColor: AppColors.background,
-        padding: '15@ms',
+        padding: 10,
         borderRadius: '15@ms',
         elevation: 6,
         shadowColor: "#000",
@@ -638,7 +662,7 @@ const styles = ScaledSheet.create({
 
     cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: '5@vs' },
 
-    cardTitle: { fontSize: '13@ms0.7', fontWeight: '600', marginLeft: '6@s', color: '#333' },
+    cardTitle: { fontSize: '13@ms0.7', fontWeight: '600', marginLeft: '2@s', color: '#333' },
 
     cardValue: { fontSize: '18@ms0.7', color: AppColors.link, fontWeight: 'bold', marginVertical: '5@vs' },
 

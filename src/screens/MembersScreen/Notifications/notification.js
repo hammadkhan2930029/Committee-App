@@ -27,6 +27,10 @@ import { CustomButton } from '../../../components/customButton';
 import { ProfileAvatar } from '../../../components/ProfileAvatar';
 import { CapitalizeWords } from '../../../components/capitalizeWords';
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
 export const Notifications = () => {
     const navigation = useNavigation();
 
@@ -46,9 +50,9 @@ export const Notifications = () => {
             loader();
         }, []),
     );
-    
-    
-        //-----------------------------------------------------------------------------
+
+
+    //-----------------------------------------------------------------------------
 
 
     const notificationsApi = async () => {
@@ -58,7 +62,7 @@ export const Notifications = () => {
                 `/user/view-notifications/${userdata.user_id}`,
             );
             const result = Array.isArray(response?.data?.msg) ? response.data.msg : [];
-            // console.log(response);
+
             if (response.data.code === '200') {
                 setNotifyList(result);
             } else {
@@ -72,10 +76,10 @@ export const Notifications = () => {
         }
     };
     useEffect(() => {
-        if (userdata?.full_name) {
+        if (userdata?.user_id) {
             notificationsApi();
         }
-    }, [userdata]);
+    }, [userdata?.user_id]);
     console.log('notify list :', notifyList?.length || 0);
 
     //------------------------------------------------------------
@@ -100,6 +104,7 @@ export const Notifications = () => {
             console.log(error);
         }
     };
+    //------------------------------------------------------------
 
     const markSingleNotification = async notificationId => {
         try {
@@ -135,6 +140,7 @@ export const Notifications = () => {
             </TouchableOpacity>
         );
     };
+    //------------------------------------------------------------
 
     const MySkeleton = () => {
         return (
@@ -182,82 +188,78 @@ export const Notifications = () => {
             </ScrollView>
         );
     };
+    //------------------------------------------------------------
 
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor={AppColors.primary} barStyle="light-content" />
-            <ScrollView style={styles.scroll}>
-                <View>
-                    <ImageBackground
-                        source={AppImages.Rectangle}
-                        style={styles.RectangleImg}
-                        resizeMode="cover"
-                    >
-                        <View style={styles.main}>
-                            <View style={styles.TopView}>
-                                <View
-                                    style={{
-                                        justifyContent: 'start',
-                                        alignItems: 'center',
-                                        flexDirection: 'row',
-                                    }}
-                                >
-                                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                                        <Icon
-                                            name="arrow-back"
-                                            size={28}
-                                            color={AppColors.title}
-                                        />
-                                    </TouchableOpacity>
-                                    <Text style={styles.h1}>Notifications</Text>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate('AdminProfile')}
-                                >
-                                    <ProfileAvatar imageUri={userdata?.image} style={styles.avatar} />
-                                </TouchableOpacity>
-                            </View>
+
+            {/* Header Section */}
+            <View style={{ height: moderateScale(200) }}>
+                <ImageBackground
+                    source={AppImages.Rectangle}
+                    style={styles.RectangleImg}
+                    resizeMode="cover"
+                >
+                    <View style={styles.TopView}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Icon name="arrow-back" size={28} color={AppColors.title} />
+                            </TouchableOpacity>
+                            <Text style={styles.h1}>Notifications</Text>
                         </View>
-                    </ImageBackground>
-                </View>
-                <View style={styles.list}>
-                    <View style={styles.container2}>
-                        <FlatList
-                            data={loading ? [] : notifyList}
-                            ListEmptyComponent={
-                                loading ? (
-                                    <MySkeleton />
-                                ) : (
-                                    <Text
-                                        style={{
-                                            textAlign: 'center',
-                                            fontSize: moderateScale(16),
-                                            marginTop: 50,
-                                        }}
-                                    >
-                                        No Notifications
-                                    </Text>
-                                )
-                            }
-                            renderItem={renderNotification}
-                            keyExtractor={item => item.id.toString()}
-                            showsVerticalScrollIndicator={false}
-                        />
+                        <TouchableOpacity onPress={() => navigation.navigate('AdminProfile')}>
+                            <ProfileAvatar imageUri={userdata?.image} style={styles.avatar} />
+                        </TouchableOpacity>
                     </View>
-                    {notifyList?.length > 0 && (
-                        <View style={styles.btnView}>
-                            <CustomButton
-                                title="Mark All as Read"
-                                onPress={() => markNotification(userdata.user_id)}
-                            />
-                        </View>
-                    )}
-                </View>
-            </ScrollView>
+                </ImageBackground>
+            </View>
+
+            {/* List Section */}
+            <View style={styles.list}>
+                <FlatList
+                    data={loading ? [] : notifyList}
+                    keyExtractor={item => item.id.toString()}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                    ListEmptyComponent={
+                        loading ? <MySkeleton /> :
+                            <View style={styles.emptyCard}>
+                                <Icon
+                                    name="info-outline"
+                                    size={50}
+                                    color={AppColors.primary}
+                                />
+
+                                <Text style={styles.emptyTitle}>
+                                    No Notifications Found
+                                </Text>
+
+                                <Text style={styles.emptyText}>
+                                    No Notifications available .
+                                </Text>
+                            </View>
+
+                    }
+                    renderItem={renderNotification}
+                    ListFooterComponent={
+                        notifyList.length > 0 ? (
+                            <View style={styles.btnView}>
+                                <CustomButton
+                                    title="Mark All as Read"
+                                    onPress={() => markNotification(userdata.user_id)}
+                                />
+                            </View>
+                        ) : null
+                    }
+                />
+            </View>
         </View>
     );
+
+
 };
 const styles = ScaledSheet.create({
+
     container: {
         flex: 1,
         backgroundColor: AppColors.background,
@@ -330,9 +332,13 @@ const styles = ScaledSheet.create({
         fontSize: moderateScale(18),
     },
     //-------------------------------
+    list: {
+        flex: 1,
+        marginTop: -moderateScale(50),
+    },
     container2: {
-        marginTop: hp('-10%'),
-        // backgroundColor: 'green',
+        flex: 1
+
     },
     notificationCard: {
         backgroundColor: AppColors.background,
@@ -380,9 +386,31 @@ const styles = ScaledSheet.create({
         borderLeftWidth: 5,
     },
     btnView: {
-        position: 'absolute',
-        width: '95%',
+        width: '90%',
         alignSelf: 'center',
-        bottom: -100,
+        marginVertical: 20, // Absolute khatam kar ke margin dein
+        paddingBottom: 20,
+    },
+    //---------------------------------------
+    emptyCard: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '100@vs',
+        padding: '30@ms',
+    },
+
+    emptyTitle: {
+        fontSize: '18@ms',
+        fontWeight: 'bold',
+        color: '#222',
+        marginTop: '10@vs',
+    },
+
+    emptyText: {
+        fontSize: '14@ms',
+        color: '#777',
+        marginTop: '5@vs',
+        textAlign: 'center',
     },
 });

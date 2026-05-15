@@ -160,7 +160,6 @@ export const ResetPassword = ({ route }) => {
                             }}
                             onSubmit={(values, { resetForm }) => {
                                 changePassword(values)
-                                // resetForm()
 
                             }}
                         >

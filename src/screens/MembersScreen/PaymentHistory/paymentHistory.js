@@ -31,6 +31,8 @@ export const PaymentHistory = () => {
     const [userData, setUserData] = useState();
     const [history, setHistory] = useState([]);
     const [loading, setLoding] = useState(true);
+    const [selectedStatus, setSelectedStatus] = useState('All');
+
     //-----------------get user data --------------------
 
     useFocusEffect(
@@ -61,16 +63,18 @@ export const PaymentHistory = () => {
     )
 
     //-----------------------------------------------------------------------------
-    
+
     const capitalize = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 
-    //------------------------------------------------------
+    //-----------------------------------------------------------------------------
+
     const formatNumber = value => {
         if (value === null || value === undefined) return '';
 
         return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
-    //------------------------------------------------------
+    //-----------------------------------------------------------------------------
+
     const UserPaymentHistory = async () => {
         try {
             const response = await api.get(
@@ -93,9 +97,11 @@ export const PaymentHistory = () => {
             UserPaymentHistory();
         }
     }, [userID]);
+
     console.log('payment history :', history);
 
-    //----------------------Skeleton-----------------------------
+    //----------------------Skeleton----------------------------------------------------
+
     const MySkeleton = () => {
         return (
             <View>
@@ -208,6 +214,33 @@ export const PaymentHistory = () => {
             </View>
         );
     };
+    //------------------------------------------------------------------------------
+    const validPayments = history.filter(item => Number(item?.paid_amount) >= 0);
+    const filterData = selectedStatus === 'All'
+        ? validPayments
+        : validPayments.filter(item => item?.status?.toLowerCase() === selectedStatus.toLowerCase());
+    //-----------------------------------------------------------------------------
+    const renderHeader = () => (
+        <View style={styles.statusBG}>
+
+            <View style={styles.statuslistView}>
+                <FlatList
+                    data={['All', 'Requested', 'Due', 'Verified', 'Overdue',]}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={[styles.statusTab, selectedStatus === item && styles.activeStatusTab]}
+                            onPress={() => setSelectedStatus(item)}
+                        >
+                            <Text style={[styles.statusTabText, selectedStatus === item && styles.activeStatusTabText]}>{item}</Text>
+                        </TouchableOpacity>
+                    )}
+                    keyExtractor={i => i}
+                />
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.conatiner}>
@@ -241,9 +274,28 @@ export const PaymentHistory = () => {
                     <MySkeleton />
                 ) : (
                     <View style={styles.pymentsCardView}>
+
                         <FlatList
-                            data={history}
+                            data={filterData}
                             keyExtractor={(item, index) => index.toString()}
+                            ListHeaderComponent={renderHeader}
+                               ListEmptyComponent={
+                                                    <View style={styles.emptyCard}>
+                                                        <Icon
+                                                            name="info-outline"
+                                                            size={50}
+                                                            color={AppColors.primary}
+                                                        />
+                            
+                                                        <Text style={styles.emptyTitle}>
+                                                            No Data Found
+                                                        </Text>
+                            
+                                                        <Text style={styles.emptyText}>
+                                                            No payments available in {selectedStatus}.
+                                                        </Text>
+                                                    </View>
+                                                }
                             renderItem={item => {
                                 const items = item?.item;
                                 return (
@@ -297,11 +349,7 @@ export const PaymentHistory = () => {
                                                     <CustomButton
                                                         title="Payment Details"
                                                         disabled={item.status == 'verified'}
-                                                        onPress={() =>
-                                                            navigation.navigate('UserPaymentDetails', {
-                                                                item: items,
-                                                            })
-                                                        }
+                                                        onPress={() => navigation.navigate('UserPaymentDetails', { item: items })}
                                                     />
                                                 </View>
                                             </View>
@@ -378,7 +426,6 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        // backgroundColor:'yellow',
         marginBottom: 10,
     },
     card: {
@@ -395,6 +442,7 @@ const styles = ScaledSheet.create({
     },
 
     //---------------------------------
+
     header: {
         borderBottomColor: AppColors.primary,
         borderBottomWidth: 1,
@@ -460,5 +508,60 @@ const styles = ScaledSheet.create({
     },
     scroll: {
         marginBottom: 65,
+    },
+    //------------------------------------------------------
+    statusBG: {
+        backgroundColor: AppColors.background,
+         paddingVertical: '15@vs',
+         marginTop:50
+
+    },
+    statuslistView: {
+        //  paddingVertical: '15@vs',
+        //   paddingHorizontal: '10@s' 
+    },
+
+    activeStatusTab: {
+        backgroundColor: AppColors.primary,
+    },
+
+    activeStatusTabText: {
+        color: '#fff',
+    },
+
+    statusTab: {
+        paddingHorizontal: '18@s',
+        height: '42@vs',
+        justifyContent: 'center',
+        borderRadius: '21@s',
+        backgroundColor: AppColors.background,
+        marginHorizontal: '6@s',
+        borderWidth: 1,
+        borderColor: AppColors.primary,
+        elevation: 3,
+    },
+
+    statusTabText: { fontSize: '15@ms0.7', fontWeight: '600', color: '#000000' },
+     //---------------------------------------
+    emptyCard: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '80@vs',
+        padding: '20@ms',
+    },
+
+    emptyTitle: {
+        fontSize: '18@ms',
+        fontWeight: 'bold',
+        color: '#222',
+        marginTop: '10@vs',
+    },
+
+    emptyText: {
+        fontSize: '14@ms',
+        color: '#777',
+        marginTop: '5@vs',
+        textAlign: 'center',
     },
 });

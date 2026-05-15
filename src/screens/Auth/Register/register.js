@@ -23,7 +23,8 @@ import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../../../services/api';
 import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 //-----------------------------------------
 import * as Yup from 'yup';
 import { Loader } from '../../Loader/loader';
@@ -153,7 +154,7 @@ export const Register = () => {
                                         onPress={() => navigation.goBack()}
                                         style={styles.backbtn}
                                     >
-                                        <Icon
+                                        <MaterialIcons
                                             name="arrow-back"
                                             size={28}
                                             color={AppColors.title}
@@ -178,7 +179,6 @@ export const Register = () => {
                             }}
                             validationSchema={registerSchema}
                             onSubmit={(values, { resetForm }) => {
-                                // register(values)
                                 sendOTP(values)
                                 resetForm();
                             }}
@@ -257,16 +257,34 @@ export const Register = () => {
                                 </View>
                             )}
                         </Formik>
-                        <View style={styles.continueLine}>
+                        {/* <View style={styles.continueLine}>
                             <Image source={AppImages.VectorLine} />
                             <Text style={styles.continueLine_text}>Or Continue With</Text>
                             <Image source={AppImages.VectorLine} />
-                        </View>
-                        <View style={styles.socialIocns_View}>
-                            <Image source={AppIcons.apple} style={styles.socialIocns} />
-                            <Image source={AppIcons.facebook} style={styles.socialIocns} />
-                            <Image source={AppIcons.google} style={styles.socialIocns} />
-                        </View>
+                        </View> */}
+                        {/* <View style={styles.socialIocns_View}>
+                            <View>
+                                <MaterialIcons
+                                    name="facebook"
+                                    size={34}
+                                    color={AppColors.primary}
+                                />
+                            </View>
+                            <View>
+                                <Ionicons
+                                    name="logo-whatsapp"
+                                    size={34}
+                                    color={AppColors.primary}
+                                />
+                            </View>
+                            <View>
+                                <Ionicons
+                                    name="logo-google"
+                                    size={34}
+                                    color={AppColors.primary}
+                                />
+                            </View>
+                        </View> */}
                         <View style={styles.registerView}>
                             <Text style={styles.registerText}>
                                 Already Have An Account ?{' '}

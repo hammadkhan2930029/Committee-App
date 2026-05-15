@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AdminDashboard } from '../screens/AdminScreens/AdminDashboard/AdminDashboard';
-
 import { CommitteeList } from '../screens/AdminScreens/CommitteeList/committeeList';
 import { Payments } from '../screens/AdminScreens/PaymentScreenForAll/paymentScreenForAll';
 import { AdminProfile } from '../screens/AdminProfile/adminProfile';
@@ -12,17 +11,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useNavigation } from '@react-navigation/native';
 import { ChooseRole } from '../screens/ChooseRole/chooseRole';
 
-
 const Tab = createBottomTabNavigator();
-
-
-
 
 export const BottomTabNavigation = () => {
 
     const navigation = useNavigation()
     const [menuVisible, setMenuVisible] = useState(false);
-
 
     //---------------------------CustomMenuButton----------------------------------
 
@@ -118,7 +112,7 @@ export const BottomTabNavigation = () => {
                     options={{ headerShown: false }}
                 />
 
-                {/* CENTER BUTTON */}
+                {/* ----------------CENTER BUTTON------------------------------ */}
                 <Tab.Screen
                     name="Menu"
                     component={View}
@@ -128,7 +122,7 @@ export const BottomTabNavigation = () => {
                         ),
                     }}
                 />
-                {/* ------------- */}
+                {/* ------------------------------------------------------------ */}
 
                 <Tab.Screen
                     name="Payments"
@@ -142,39 +136,33 @@ export const BottomTabNavigation = () => {
                 />
 
             </Tab.Navigator>
-            {/* BOTTOM MODAL */}
+            {/* --------------------BOTTOM MODAL---------------------- */}
 
             <Modal visible={menuVisible} transparent animationType="slide">
                 <TouchableOpacity
                     style={{ flex: 1, backgroundColor: 'rgba(101, 101, 101, 0.4)' }}
                     activeOpacity={1}
-                    onPress={() => setMenuVisible(false)}
-                >
-                    <View
-                        style={styles.modal}
-                    >
+                    onPress={() => setMenuVisible(false)}>
 
+                    <View style={styles.modal}>
 
                         <TouchableOpacity
                             onPress={() => {
                                 navigation.navigate('SuggestionScreen')
-                                setMenuVisible(false)
-                            }}
+                                setMenuVisible(false)}}
                             style={styles.item}>
                             <MaterialCommunityIcons name="lightbulb-outline" size={24} color={AppColors.link} />
-
                             <Text style={styles.text}>Suggestion</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => {
                             navigation.navigate('SupportTeam')
-                            setMenuVisible(false)
-                        }}
+                            setMenuVisible(false) }}
                             style={styles.item}>
                             <MaterialCommunityIcons name="comment-text-outline" size={24} color={AppColors.link} />
-
                             <Text style={styles.text}>Support</Text>
                         </TouchableOpacity>
+
                     </View>
                 </TouchableOpacity>
             </Modal>

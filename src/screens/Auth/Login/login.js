@@ -198,12 +198,12 @@ export const Login = () => {
                                 </View>
                             )}
                         </Formik>
-                        <View style={styles.continueLine}>
+                        {/* <View style={styles.continueLine}>
                             <Image source={AppImages.VectorLine} />
                             <Text style={styles.continueLine_text}>Or Continue With</Text>
                             <Image source={AppImages.VectorLine} />
-                        </View>
-                        <View style={styles.socialIocns_View}>
+                        </View> */}
+                        {/* <View style={styles.socialIocns_View}>
                             <View>
                                 <MaterialIcons
                                     name="facebook"
@@ -225,7 +225,7 @@ export const Login = () => {
                                     color={AppColors.primary}
                                 />
                             </View>
-                        </View>
+                        </View> */}
                         <View style={styles.registerView}>
                             <Text style={styles.registerText}>
                                 Don’t Have An Account?{' '}

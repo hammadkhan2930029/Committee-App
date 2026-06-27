@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import CountryPicker from 'react-native-country-picker-modal';
 import { ScaledSheet, moderateScale } from 'react-native-size-matters';
 import { AppColors } from '../constant/appColors';
 
-export const CustomPhoneInput = ({ label, value, onChangeText, error, onCodeChange }) => {
+export const CustomPhoneInput = forwardRef(({ label, value, onChangeText, error, onCodeChange }) => {
   const [countryCode, setCountryCode] = useState('PK');
   const [callingCode, setCallingCode] = useState('92');
   const [visible, setVisible] = useState(false);
@@ -61,7 +61,7 @@ export const CustomPhoneInput = ({ label, value, onChangeText, error, onCodeChan
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
-};
+});
 
 const styles = ScaledSheet.create({
   container: { marginBottom: '2@ms' },

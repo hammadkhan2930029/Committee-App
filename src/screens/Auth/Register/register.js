@@ -32,27 +32,62 @@ import { CustomPhoneInput } from '../../../components/CustomePhoneInput';
 import auth from '@react-native-firebase/auth';
 import { CapitalizeWords } from '../../../components/capitalizeWords';
 
+const phoneLengthByCode = {
+    '92': 10,
+    '91': 10,
+    '971': 9,
+    '966': 9,
+    '1': 10,
+    '44': 10,
+};
 
-const registerSchema = Yup.object().shape({
-    name: Yup.string()
-        .min(3, 'Name must be at least 3 characters long')
-        .required('Name is required'),
+const getRegisterSchema = (selectedCallingCode) =>
+    Yup.object().shape({
+        name: Yup.string()
+            .min(3, 'Name must be at least 3 characters long')
+            .required('Name is required'),
 
-    phone: Yup.string()
-        .matches(/^[1-9][0-9]*$/, 'Phone number cannot start with zero')
-        .required('Phone number is required'),
-    email: Yup.string()
-        .email('Invalid email format')
-        .required('Email is required'),
+        phone: Yup.string()
+            .matches(/^[1-9][0-9]*$/, 'Phone number cannot start with zero')
+            .length(
+                phoneLengthByCode[selectedCallingCode] || 15,
+                `Phone number must be ${phoneLengthByCode[selectedCallingCode] || 15} digits`
+            )
+            .required('Phone number is required'),
 
-    password: Yup.string()
-        .min(6, 'Password must be at least 6 characters long')
-        .required('Password is required'),
+        email: Yup.string()
+            .email('Invalid email format')
+            .required('Email is required'),
 
-    confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password')], 'Passwords do not match')
-        .required('Confirm password is required'),
-});
+        password: Yup.string()
+            .min(6, 'Password must be at least 6 characters long')
+            .required('Password is required'),
+
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref('password')], 'Passwords do not match')
+            .required('Confirm password is required'),
+    });
+
+// const registerSchema = Yup.object().shape({
+//     name: Yup.string()
+//         .min(3, 'Name must be at least 3 characters long')
+//         .required('Name is required'),
+
+//     phone: Yup.string()
+//         .matches(/^[1-9][0-9]*$/, 'Phone number cannot start with zero')
+//         .required('Phone number is required'),
+//     email: Yup.string()
+//         .email('Invalid email format')
+//         .required('Email is required'),
+
+//     password: Yup.string()
+//         .min(6, 'Password must be at least 6 characters long')
+//         .required('Password is required'),
+
+//     confirmPassword: Yup.string()
+//         .oneOf([Yup.ref('password')], 'Passwords do not match')
+//         .required('Confirm password is required'),
+// });
 
 //-----------------------------------------
 
@@ -68,6 +103,10 @@ export const Register = () => {
     ///-------------------------------------------
     const [selectedCallingCode, setSelectedCallingCode] = useState('92');
     //--------------------------------------------
+
+    const getPhoneMaxLength = () => {
+        return phoneLengthByCode[selectedCallingCode] || 15;
+    };
 
     /// ---------------------Send OTP--------------------------
     const sendOTP = async (value) => {
@@ -177,9 +216,24 @@ export const Register = () => {
                                 password: '',
                                 confirmPassword: '',
                             }}
-                            validationSchema={registerSchema}
+                            validationSchema={getRegisterSchema(selectedCallingCode)}
                             onSubmit={(values, { resetForm }) => {
-                                sendOTP(values)
+                                const isValid = phoneInput.current?.isValidNumber(values.phone);
+
+                                if (!isValid) {
+                                    Toast.show({
+                                        type: 'customToast',
+                                        text1: 'Warning',
+                                        text2: 'Invalid phone number for selected country',
+                                        props: {
+                                            bgColor: AppColors.background,
+                                            borderColor: 'orange',
+                                        },
+                                    });
+                                    return;
+                                }
+
+                                sendOTP(values);
                                 resetForm();
                             }}
                         >
@@ -206,10 +260,19 @@ export const Register = () => {
                                             />
 
 
-                                            <CustomPhoneInput
+                                            {/* <CustomPhoneInput
                                                 label="Phone Number"
                                                 keyboardType="phone-pad"
-
+                                                ref={phoneInput}
+                                                value={values.phone}
+                                                onChangeText={handleChange('phone')}
+                                                error={touched.phone && errors.phone}
+                                                onCodeChange={(code) => setSelectedCallingCode(code)}
+                                            /> */}
+                                            <CustomPhoneInput
+                                                ref={phoneInput}
+                                                label="Phone Number"
+                                                keyboardType="phone-pad"
                                                 value={values.phone}
                                                 onChangeText={handleChange('phone')}
                                                 error={touched.phone && errors.phone}
@@ -257,34 +320,7 @@ export const Register = () => {
                                 </View>
                             )}
                         </Formik>
-                        {/* <View style={styles.continueLine}>
-                            <Image source={AppImages.VectorLine} />
-                            <Text style={styles.continueLine_text}>Or Continue With</Text>
-                            <Image source={AppImages.VectorLine} />
-                        </View> */}
-                        {/* <View style={styles.socialIocns_View}>
-                            <View>
-                                <MaterialIcons
-                                    name="facebook"
-                                    size={34}
-                                    color={AppColors.primary}
-                                />
-                            </View>
-                            <View>
-                                <Ionicons
-                                    name="logo-whatsapp"
-                                    size={34}
-                                    color={AppColors.primary}
-                                />
-                            </View>
-                            <View>
-                                <Ionicons
-                                    name="logo-google"
-                                    size={34}
-                                    color={AppColors.primary}
-                                />
-                            </View>
-                        </View> */}
+
                         <View style={styles.registerView}>
                             <Text style={styles.registerText}>
                                 Already Have An Account ?{' '}

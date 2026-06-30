@@ -33,12 +33,36 @@ import auth from '@react-native-firebase/auth';
 import { CapitalizeWords } from '../../../components/capitalizeWords';
 
 const phoneLengthByCode = {
-    '92': 10,
-    '91': 10,
-    '971': 9,
-    '966': 9,
-    '1': 10,
-    '44': 10,
+    // South Asia
+    '92': 10,   // Pakistan
+    '91': 10,   // India
+    '880': 10,  // Bangladesh
+    '94': 9,    // Sri Lanka
+    '977': 10,  // Nepal
+    '960': 7,   // Maldives
+    '975': 8,   // Bhutan
+    '93': 9,    // Afghanistan
+
+    // Gulf (GCC)
+    '971': 9,   // UAE
+    '966': 9,   // Saudi Arabia
+    '974': 8,   // Qatar
+    '965': 8,   // Kuwait
+    '973': 8,   // Bahrain
+    '968': 8,   // Oman
+
+    // Middle East
+    '98': 10,   // Iran
+    '964': 10,  // Iraq
+    '962': 9,   // Jordan
+    '961': 8,   // Lebanon
+    '967': 9,   // Yemen
+    '963': 9,   // Syria
+
+    // Western
+    '1': 10,    // US & Canada
+    '44': 10,   // United Kingdom
+    '61': 9,    // Australia
 };
 
 const getRegisterSchema = (selectedCallingCode) =>

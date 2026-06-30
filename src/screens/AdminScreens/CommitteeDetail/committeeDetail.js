@@ -18,6 +18,8 @@ import { AppImages } from '../../../constant/appImages';
 import { navigate } from '../../../navigations/navigationService';
 import { api } from '../../../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import { Loader } from '../../Loader/loader';
 import Toast from 'react-native-toast-message';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -396,6 +398,116 @@ export const CommitteeDetails = ({ route }) => {
           </View>
         </View>
       </ImageBackground>
+      {/* -------------------------------------------------------- */}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          // marginTop: 15,
+          padding: 10
+        }}
+      >
+        {/* Edit */}
+        <TouchableOpacity
+          disabled={hasAnyPaid || isverified}
+          style={{
+            flex: 1,
+            height: 55,
+            marginHorizontal: 3,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor:
+              hasAnyPaid || isverified
+                ? AppColors.placeholder
+                : AppColors.primary,
+          }}
+          onPress={() =>
+            navigate('EditCommittee', {
+              details,
+              start: startDate,
+              due: dueOn,
+            })
+          }
+        >
+          <Ionicons name="create-outline" size={20} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700', marginTop: 3 }}>
+            Edit
+          </Text>
+        </TouchableOpacity>
+
+        {/* Delete */}
+        <TouchableOpacity
+          disabled={hasAnyPaid || isverified}
+          style={{
+            flex: 1,
+            height: 55,
+            marginHorizontal: 3,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor:
+              hasAnyPaid || isverified
+                ? AppColors.placeholder
+                : AppColors.primary,
+          }}
+          onPress={deleteCommittee}
+        >
+          <Ionicons name="trash-outline" size={20} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700', marginTop: 3 }}>
+            Delete
+          </Text>
+        </TouchableOpacity>
+
+        {/* Members */}
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            height: 55,
+            marginHorizontal: 3,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: AppColors.primary,
+          }}
+          onPress={() =>
+            navigate('AddCommitteeMembers', {
+              multipleData,
+            })
+          }
+        >
+          <Ionicons name="people-outline" size={20} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700', marginTop: 3 }}>
+            Members
+          </Text>
+        </TouchableOpacity>
+
+        {/* Rounds */}
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            height: 55,
+            marginHorizontal: 3,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: AppColors.primary,
+          }}
+          onPress={() =>
+            navigate('AssignRounds', {
+              multipleData,
+            })
+          }
+        >
+          <Ionicons name="repeat-outline" size={20} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700', marginTop: 3 }}>
+            Rounds
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {/* -------------------------------------------------------------- */}
       <View style={styles.sub_container}>
 
         {/* Top Progress Section */}
@@ -526,69 +638,7 @@ export const CommitteeDetails = ({ route }) => {
 
         </Card>
         {/* ------------------------------------------ */}
-        <View style={styles.buttonRow}>
-
-          <TouchableOpacity
-            disabled={hasAnyPaid || isverified}
-            style={[
-              styles.btn, styles.editBtn,
-              {
-                backgroundColor:
-                  hasAnyPaid || isverified
-                    ? AppColors.placeholder
-                    : AppColors.primary,
-              },
-            ]}
-            onPress={() =>
-              navigate('EditCommittee', {
-                details: details,
-                start: startDate,
-                due: dueOn,
-              })
-            }
-          >
-            <Text style={styles.btnText}>Edit</Text>
-          </TouchableOpacity>
-          {/* ---------------------------------------------- */}
-
-          <TouchableOpacity
-            disabled={hasAnyPaid || isverified}
-            style={[
-              styles.btn, styles.deleteBtn,
-              {
-                backgroundColor:
-                  hasAnyPaid || isverified
-                    ? AppColors.placeholder
-                    : AppColors.primary,
-              },
-            ]}
-            onPress={() => deleteCommittee()}
-          >
-            <Text style={styles.btnText}>Delete</Text>
-          </TouchableOpacity>
-          {/* ---------------------------------------------- */}
-
-          <TouchableOpacity style={[styles.btn, styles.lightBtn]}
-            onPress={() =>
-              navigate('AddCommitteeMembers', {
-                multipleData: multipleData,
-              })
-            }
-          >
-            <Text style={styles.lightText}>Add Members</Text>
-          </TouchableOpacity>
-          {/* ---------------------------------------------- */}
-
-          <TouchableOpacity style={[styles.btn, styles.lightBtn]}
-            onPress={() =>
-              navigate('AssignRounds', { multipleData: multipleData })
-            }>
-            <Text style={styles.lightText}>Assign Rounds</Text>
-          </TouchableOpacity>
-
-        </View>
-
-
+        
       </View>
     </ScrollView >
   );
